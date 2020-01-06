@@ -1,0 +1,3 @@
+-- xin standard library
+
+(: (println s) (out (+ s '\n')))
