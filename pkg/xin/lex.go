@@ -36,6 +36,8 @@ const (
 	Call
 	// Call native function, e.g. 'out'
 	CallNative
+	// Return function call
+	Ret
 )
 
 type Position struct {
