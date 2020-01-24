@@ -11,13 +11,11 @@
 ;     (a parenthesized expression) that simplifies, or a value. Evaluating an expression
 ;     is recursively simplifying forms by how they were defined.
 ;
-; : (bind operator) - bind a name in the current scope to a value.
-;   if of form (: (a ...) thing), define a function that is invoked via (a ...)
-;   if of form (: a thing), define a value that is referenced via a
-; do - concurrent evaluation of multiple expressions
-;    begin - macro used to do sequential eval
-;    do-where and begin-where, used to do eval with bound local variables.
-; match - match-case
+; standard library things?
+; begin - macro used to do sequential eval
+; do-where and begin-where, used to do eval with bound local variables.
+; car / cdr - to manipulate and create list structures.
+;   higher level list constructors like (list ...elements) are derived from car/cdr
 ; package - defines current package (namespace)
 ;   (package main), (package os::net)
 ;   imports are done via the bind form
@@ -25,8 +23,7 @@
 ;
 ; builtin functions
 ; (size x) - returns integer size.
-; (type x) - returns the constructor of the type, like string, number, form, list, stream
-;   we don't have nulls -- just result structs and types. NO bools, just 0 and 1 aliased.
+; (type x) - we don't have nulls -- just result structs and types. No bools, just 0 and 1 aliased.
 ;   list, form, and stream can be parameterized on other basic types if we decide to build
 ;   a more advanced inferencing type system.
 
@@ -78,3 +75,10 @@
 (: (respond socket req)
    (<- socket 'hello world'))
 (each-of-stream tcp-socket respond)
+
+; variadic functions
+; variadic functions end their form definition with a ...identifier
+; which is a list that absorbs all following arguments.
+(: (sum ...numbers)
+   ; do something with list numbers.
+   (...))
