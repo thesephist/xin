@@ -1,0 +1,80 @@
+; xin brainstorming
+;
+; key ideas:
+; - synchronous io monads and concurrency via blocking streams and do-groups
+;   all IO is done via streams, including reading and writing to and from files / network sockets,
+;   signal handling, etc.
+; - lazy expression simplification as a conceptual model for describing functions
+;   and processes. (a b (c d)) evaluates the defined form (a . .), which then forces
+;   evaluation of the value b and the form (c .), which forces eval of d.
+;   - functions are called "forms", and every name in Xin is bound to either a "form"
+;     (a parenthesized expression) that simplifies, or a value. Evaluating an expression
+;     is recursively simplifying forms by how they were defined.
+;
+; : (bind operator) - bind a name in the current scope to a value.
+;   if of form (: (a ...) thing), define a function that is invoked via (a ...)
+;   if of form (: a thing), define a value that is referenced via a
+; do - concurrent evaluation of multiple expressions
+;    begin - macro used to do sequential eval
+;    do-where and begin-where, used to do eval with bound local variables.
+; match - match-case
+; package - defines current package (namespace)
+;   (package main), (package os::net)
+;   imports are done via the bind form
+;   e.g. (: net os::net), (: openFile os::fs::open) (the latter opens a file as a source-stream)
+;
+; builtin functions
+; (size x) - returns integer size.
+; (type x) - returns the constructor of the type, like string, number, form, list, stream
+;   we don't have nulls -- just result structs and types. NO bools, just 0 and 1 aliased.
+;   list, form, and stream can be parameterized on other basic types if we decide to build
+;   a more advanced inferencing type system.
+
+(package main)
+
+; booleans
+(: true 1)
+(: false 0)
+
+; io stream
+; streams are synchronous, blocking sinks and sources of values
+(: (log s)
+   ; sink stream
+   (<- os::stdout (+ s '\n')))
+(: (scan s)
+   ; source stream
+   (-> os::stdin))
+(: starting-point 10)
+
+; I don't have to do anything about builtin (like "if")
+; special forms if i evaluate outside in instead of
+; inside out like Ink, lazy eval.
+(: (factorial n)
+   (if (= n 0)
+     1
+     (* n (factorial (- n 1)))))
+(: (fibonacci n)
+   (match n
+          (0 1)
+          (1 1)
+          (? (+ (fibonacci (- n 1))
+                (fibonacci (- n 2))))))
+
+(log (factorial starting-point))
+(log (fibonacci starting-point))
+
+; tcp web server, streams
+(: (each-of-stream source-stream callback)
+   (begin (: (sub)
+             ; !? asks "is the stream closed?"
+             (if (!? source-stream)
+               ()
+               (begin (callback (<- source-stream))
+                      (sub))))
+          (sub)))
+; question: can we define inline / anonyumous functions? how?
+(: tcp-socket
+   (os::net::bind-tcp 8080))
+(: (respond socket req)
+   (<- socket 'hello world'))
+(each-of-stream tcp-socket respond)

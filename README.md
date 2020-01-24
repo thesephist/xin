@@ -29,6 +29,7 @@ Non-goals
 - Xin should have a native TCP/ UDP `net` interface, rather than a native HTTP adapter like Ink neglecting raw network syscalls.
 
 - The way we achieve this is by taking a prefix syntax and translating it into 100% postfix syntax before compiling it into machine-portable bytecode, which runs in a stack machine that can execute postfix functions quickly.
+- To make Xin lisp-style powerful, we need some way to define macros or give quoted expressions to functions that are not evaluated immediately.
 - Ink is about language expressiveness and maximum flexibility that reflected real-world programs. Xin is about a virtual machine and data structures forming a data pipeline.
 - Xin will be written in Go, but maybe C and Rust later?
 - For performance's sake Xin tries to minimize Gc in the interpreter and language to zero. This means Xin is not memory managed, though we provide APIs to allocate and get a reference to a `Arc` of a memory. Not a pointer, but a fixed-size reference. And we can then also practice writing a memory allocator maybe.
