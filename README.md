@@ -6,8 +6,6 @@ Xin is a purely functional programming language inspired by lisp syntax and CSP 
 
 - Expressive, extensible syntax that's natural to read and suitable for defining DSLs
 - Performance: [Ink](https://github.com/thesephist/ink) is about 3-4x slower than Python. Xin programs should run at least 10x faster than Python, and the language design should lend itself to efficient compiler optimizations.
-- Ability to define special forms on the fly through lazy evaluation of forms, but not macros.
-    - i.e. `(if cond ifTrue if False)` is not a builtin, and should be defined by the standard library based on `(match v ...)`.
 - Programs that lend themselves to sophisticated data structures and dumb algorithms, rather than vice versa
 - Ease of learning, within the constraints of the syntax
 - Great REPL

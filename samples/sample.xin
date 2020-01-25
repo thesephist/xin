@@ -1,7 +1,7 @@
-; xin brainstorming
+; Xin brainstorming
 ;
 ; key ideas:
-; - synchronous io monads and concurrency via blocking streams and do-groups
+; - synchronous io monads and concurrency via blocking streams and go-forms
 ;   all IO is done via streams, including reading and writing to and from files / network sockets,
 ;   signal handling, etc.
 ; - lazy expression simplification as a conceptual model for describing functions
@@ -10,24 +10,6 @@
 ;   - functions are called "forms", and every name in Xin is bound to either a "form"
 ;     (a parenthesized expression) that simplifies, or a value. Evaluating an expression
 ;     is recursively simplifying forms by how they were defined.
-;
-; standard library things?
-; begin - macro used to do sequential eval
-; do-where and begin-where, used to do eval with bound local variables.
-; car / cdr - to manipulate and create list structures.
-;   higher level list constructors like (list ...elements) are derived from car/cdr
-; package - defines current package (namespace)
-;   (package main), (package os::net)
-;   imports are done via the bind form
-;   e.g. (: net os::net), (: openFile os::fs::open) (the latter opens a file as a source-stream)
-;
-; builtin functions
-; (size x) - returns integer size.
-; (type x) - we don't have nulls -- just result structs and types. No bools, just 0 and 1 aliased.
-;   list, form, and stream can be parameterized on other basic types if we decide to build
-;   a more advanced inferencing type system.
-
-(package main)
 
 ; booleans
 (: true 1)
@@ -35,43 +17,79 @@
 
 ; io stream
 ; streams are synchronous, blocking sinks and sources of values
+(: (scan)
+   ; source stream
+   (-> os::stdin))
 (: (log s)
    ; sink stream
    (<- os::stdout (+ s '\n')))
-(: (scan s)
-   ; source stream
-   (-> os::stdin))
-(: starting-point 10)
+(: (err e)
+   (<- os::stderr (+ s '\n')))
 
-; I don't have to do anything about builtin (like "if")
-; special forms if i evaluate outside in instead of
-; inside out like Ink, lazy eval.
+; "if" and lazy evaluation allows us to define "unless"
+; in userspace
+(: (unless c A B)
+   (if c B A))
+
+; basic number algorithms
 (: (factorial n)
    (if (= n 0)
      1
      (* n (factorial (- n 1)))))
 (: (fibonacci n)
-   (match n
-          (0 1)
-          (1 1)
-          (? (+ (fibonacci (- n 1))
-                (fibonacci (- n 2))))))
+   (switch n
+           (0 1)
+           (1 1)
+           (? (+ (fibonacci (- n 1))
+                 (fibonacci (- n 2))))))
 
+(: starting-point 10)
 (log (factorial starting-point))
 (log (fibonacci starting-point))
 
+; rat is a rational number data abstraction
+(: (rat n d)
+   (rat-canonicalize (vec 1 n d)))
+(: (sign r)
+   (vec-get vec 0))
+(: (numerator r)
+   (vec-get vec 1))
+(: (denominator r)
+   (vec-get vec 2))
+(: (rat-canonicalize r)
+   (do (: canon-sign (if (> (* (numerator r) (denominator r)) 0)
+                       1
+                       -1))
+     (: canon-numerator (/ (numerator r) (gcd (numerator r) (denominator r))))
+     (: canon-denominator (/ (denominator r) (gcd (numerator r) (denominator r))))
+     (vec sign numerator denominator)))
+
+; set abstraction from a map
+(: (set)
+   (map))
+(: (set-add! v)
+   (map-set! v 0))
+(: (set-del! v)
+   (map-del! v))
+(: (set-has v)
+   (if (= (map-get v) 0)
+     true
+     false))
+
+; lambda is defined in the userspace
+(: (lambda args body)
+   (do (: (f ...args)
+          body)
+     f))
+
 ; tcp web server, streams
 (: (each-of-stream source-stream callback)
-   (begin (: (sub)
-             ; !? asks "is the stream closed?"
-             (if (!? source-stream)
-               ()
-               (begin (callback (<- source-stream))
-                      (sub))))
-          (sub)))
-; question: can we define inline / anonyumous functions? how?
+   ((lambda () (if (stream::closed? source-stream)
+                 0
+                 (do (callback (<- source-stream))
+                   (sub))))))
 (: tcp-socket
-   (os::net::bind-tcp 8080))
+   (os::net::tcp::bind 8080))
 (: (respond socket req)
    (<- socket 'hello world'))
 (each-of-stream tcp-socket respond)
@@ -80,5 +98,6 @@
 ; variadic functions end their form definition with a ...identifier
 ; which is a list that absorbs all following arguments.
 (: (sum ...numbers)
-   ; do something with list numbers.
-   (...))
+   (reduce numbers 0 +))
+(: (prod ...numbers)
+   (reduce numbers 1 *))

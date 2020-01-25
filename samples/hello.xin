@@ -1,7 +1,7 @@
 ; basic hello world
-(<- stdout 'hello world')
+(<- os::stdout 'hello world')
 
 ; hello world as a function
 (: (say-hello)
-   (<- stdout 'hello world'))
+   (<- os::stdout 'hello world'))
 (say-hello)
