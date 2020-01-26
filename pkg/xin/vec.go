@@ -3,7 +3,7 @@ package xin
 func vecForm(fr *Frame, args []Value) (Value, error) {
 	vecValues := make([]Value, len(args))
 	for i, a := range args {
-		val, err := unlazy(fr, a)
+		val, err := unlazy(a)
 		if err != nil {
 			return nil, err
 		}

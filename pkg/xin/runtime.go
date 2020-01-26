@@ -2,6 +2,7 @@ package xin
 
 import (
 	"fmt"
+	"strings"
 )
 
 type formEvaler func(*Frame, []Value) (Value, error)
@@ -15,12 +16,24 @@ func (v DefaultFormValue) String() string {
 	return fmt.Sprintf("Default form %s", v.name)
 }
 
+func (v DefaultFormValue) Equal(o Value) bool {
+	if ov, ok := o.(DefaultFormValue); ok {
+		return v.name == ov.name
+	}
+
+	return false
+}
+
 func loadAllDefaultForms(fr *Frame) {
 	builtins := map[string]formEvaler{
 		"+": addForm,
 		"-": subtractForm,
 		"*": multiplyForm,
 		"/": divideForm,
+
+		">": greaterForm,
+		"<": lessForm,
+		"=": equalForm,
 
 		"&": andForm,
 		"|": orForm,
@@ -63,7 +76,11 @@ type MismatchedArgumentsError struct {
 }
 
 func (e MismatchedArgumentsError) Error() string {
-	return fmt.Sprintf("Mismatched arguments")
+	ss := make([]string, len(e.args))
+	for i, n := range e.args {
+		ss[i] = n.String()
+	}
+	return fmt.Sprintf("Mismatched arguments: %s", strings.Join(ss, " "))
 }
 
 func addForm(fr *Frame, args []Value) (Value, error) {
@@ -74,13 +91,23 @@ func addForm(fr *Frame, args []Value) (Value, error) {
 		}
 	}
 
-	first, err := unlazy(fr, args[0])
+	first, err := unlazy(args[0])
 	if err != nil {
 		return nil, err
 	}
-	second, err := unlazy(fr, args[1])
+	second, err := unlazy(args[1])
 	if err != nil {
 		return nil, err
+	}
+
+	if firstInt, fok := first.(IntValue); fok {
+		if _, sok := second.(FracValue); sok {
+			first = FracValue(float64(firstInt))
+		}
+	} else if _, fok := first.(FracValue); fok {
+		if secondInt, sok := second.(IntValue); sok {
+			second = FracValue(float64(secondInt))
+		}
 	}
 
 	switch cleanFirst := first.(type) {
@@ -102,7 +129,9 @@ func addForm(fr *Frame, args []Value) (Value, error) {
 		}
 	}
 
-	return nil, MismatchedArgumentsError{}
+	return nil, MismatchedArgumentsError{
+		args: args,
+	}
 }
 
 func subtractForm(fr *Frame, args []Value) (Value, error) {
@@ -113,13 +142,23 @@ func subtractForm(fr *Frame, args []Value) (Value, error) {
 		}
 	}
 
-	first, err := unlazy(fr, args[0])
+	first, err := unlazy(args[0])
 	if err != nil {
 		return nil, err
 	}
-	second, err := unlazy(fr, args[1])
+	second, err := unlazy(args[1])
 	if err != nil {
 		return nil, err
+	}
+
+	if firstInt, fok := first.(IntValue); fok {
+		if _, sok := second.(FracValue); sok {
+			first = FracValue(float64(firstInt))
+		}
+	} else if _, fok := first.(FracValue); fok {
+		if secondInt, sok := second.(IntValue); sok {
+			second = FracValue(float64(secondInt))
+		}
 	}
 
 	switch cleanFirst := first.(type) {
@@ -133,7 +172,9 @@ func subtractForm(fr *Frame, args []Value) (Value, error) {
 		}
 	}
 
-	return nil, MismatchedArgumentsError{}
+	return nil, MismatchedArgumentsError{
+		args: args,
+	}
 }
 
 func multiplyForm(fr *Frame, args []Value) (Value, error) {
@@ -144,13 +185,23 @@ func multiplyForm(fr *Frame, args []Value) (Value, error) {
 		}
 	}
 
-	first, err := unlazy(fr, args[0])
+	first, err := unlazy(args[0])
 	if err != nil {
 		return nil, err
 	}
-	second, err := unlazy(fr, args[1])
+	second, err := unlazy(args[1])
 	if err != nil {
 		return nil, err
+	}
+
+	if firstInt, fok := first.(IntValue); fok {
+		if _, sok := second.(FracValue); sok {
+			first = FracValue(float64(firstInt))
+		}
+	} else if _, fok := first.(FracValue); fok {
+		if secondInt, sok := second.(IntValue); sok {
+			second = FracValue(float64(secondInt))
+		}
 	}
 
 	switch cleanFirst := first.(type) {
@@ -174,7 +225,9 @@ func multiplyForm(fr *Frame, args []Value) (Value, error) {
 		}
 	}
 
-	return nil, MismatchedArgumentsError{}
+	return nil, MismatchedArgumentsError{
+		args: args,
+	}
 }
 
 func divideForm(fr *Frame, args []Value) (Value, error) {
@@ -185,13 +238,23 @@ func divideForm(fr *Frame, args []Value) (Value, error) {
 		}
 	}
 
-	first, err := unlazy(fr, args[0])
+	first, err := unlazy(args[0])
 	if err != nil {
 		return nil, err
 	}
-	second, err := unlazy(fr, args[1])
+	second, err := unlazy(args[1])
 	if err != nil {
 		return nil, err
+	}
+
+	if firstInt, fok := first.(IntValue); fok {
+		if _, sok := second.(FracValue); sok {
+			first = FracValue(float64(firstInt))
+		}
+	} else if _, fok := first.(FracValue); fok {
+		if secondInt, sok := second.(IntValue); sok {
+			second = FracValue(float64(secondInt))
+		}
 	}
 
 	switch cleanFirst := first.(type) {
@@ -205,7 +268,9 @@ func divideForm(fr *Frame, args []Value) (Value, error) {
 		}
 	}
 
-	return nil, MismatchedArgumentsError{}
+	return nil, MismatchedArgumentsError{
+		args: args,
+	}
 }
 
 func andForm(fr *Frame, args []Value) (Value, error) {
@@ -216,11 +281,11 @@ func andForm(fr *Frame, args []Value) (Value, error) {
 		}
 	}
 
-	first, err := unlazy(fr, args[0])
+	first, err := unlazy(args[0])
 	if err != nil {
 		return nil, err
 	}
-	second, err := unlazy(fr, args[1])
+	second, err := unlazy(args[1])
 	if err != nil {
 		return nil, err
 	}
@@ -232,7 +297,9 @@ func andForm(fr *Frame, args []Value) (Value, error) {
 		}
 	}
 
-	return nil, MismatchedArgumentsError{}
+	return nil, MismatchedArgumentsError{
+		args: args,
+	}
 }
 
 func orForm(fr *Frame, args []Value) (Value, error) {
@@ -243,11 +310,11 @@ func orForm(fr *Frame, args []Value) (Value, error) {
 		}
 	}
 
-	first, err := unlazy(fr, args[0])
+	first, err := unlazy(args[0])
 	if err != nil {
 		return nil, err
 	}
-	second, err := unlazy(fr, args[1])
+	second, err := unlazy(args[1])
 	if err != nil {
 		return nil, err
 	}
@@ -259,7 +326,9 @@ func orForm(fr *Frame, args []Value) (Value, error) {
 		}
 	}
 
-	return nil, MismatchedArgumentsError{}
+	return nil, MismatchedArgumentsError{
+		args: args,
+	}
 }
 
 func xorForm(fr *Frame, args []Value) (Value, error) {
@@ -270,11 +339,11 @@ func xorForm(fr *Frame, args []Value) (Value, error) {
 		}
 	}
 
-	first, err := unlazy(fr, args[0])
+	first, err := unlazy(args[0])
 	if err != nil {
 		return nil, err
 	}
-	second, err := unlazy(fr, args[1])
+	second, err := unlazy(args[1])
 	if err != nil {
 		return nil, err
 	}
@@ -286,5 +355,124 @@ func xorForm(fr *Frame, args []Value) (Value, error) {
 		}
 	}
 
-	return nil, MismatchedArgumentsError{}
+	return nil, MismatchedArgumentsError{
+		args: args,
+	}
+}
+
+func greaterForm(fr *Frame, args []Value) (Value, error) {
+	if len(args) != 2 {
+		return nil, IncorrectNumberOfArgsError{
+			required: 2,
+			given:    len(args),
+		}
+	}
+
+	first, err := unlazy(args[0])
+	if err != nil {
+		return nil, err
+	}
+	second, err := unlazy(args[1])
+	if err != nil {
+		return nil, err
+	}
+
+	switch cleanFirst := first.(type) {
+	case IntValue:
+		if cleanSecond, ok := second.(IntValue); ok {
+			if cleanFirst > cleanSecond {
+				return IntValue(1), nil
+			} else {
+				return IntValue(0), nil
+			}
+		}
+	case StringValue:
+		if cleanSecond, ok := second.(StringValue); ok {
+			cmp := strings.Compare(string(cleanFirst), string(cleanSecond))
+			if cmp == 1 {
+				return IntValue(1), nil
+			} else {
+				return IntValue(0), nil
+			}
+		}
+	}
+
+	return nil, MismatchedArgumentsError{
+		args: args,
+	}
+}
+func lessForm(fr *Frame, args []Value) (Value, error) {
+	if len(args) != 2 {
+		return nil, IncorrectNumberOfArgsError{
+			required: 2,
+			given:    len(args),
+		}
+	}
+
+	first, err := unlazy(args[0])
+	if err != nil {
+		return nil, err
+	}
+	second, err := unlazy(args[1])
+	if err != nil {
+		return nil, err
+	}
+
+	switch cleanFirst := first.(type) {
+	case IntValue:
+		if cleanSecond, ok := second.(IntValue); ok {
+			if cleanFirst < cleanSecond {
+				return IntValue(1), nil
+			} else {
+				return IntValue(0), nil
+			}
+		}
+	case StringValue:
+		if cleanSecond, ok := second.(StringValue); ok {
+			cmp := strings.Compare(string(cleanFirst), string(cleanSecond))
+			if cmp == -1 {
+				return IntValue(1), nil
+			} else {
+				return IntValue(0), nil
+			}
+		}
+	}
+
+	return nil, MismatchedArgumentsError{
+		args: args,
+	}
+}
+
+func equalForm(fr *Frame, args []Value) (Value, error) {
+	if len(args) != 2 {
+		return nil, IncorrectNumberOfArgsError{
+			required: 2,
+			given:    len(args),
+		}
+	}
+
+	first, err := unlazy(args[0])
+	if err != nil {
+		return nil, err
+	}
+	second, err := unlazy(args[1])
+	if err != nil {
+		return nil, err
+	}
+
+	if firstInt, fok := first.(IntValue); fok {
+		if _, sok := second.(FracValue); sok {
+			first = FracValue(float64(firstInt))
+		}
+	} else if _, fok := first.(FracValue); fok {
+		if secondInt, sok := second.(IntValue); sok {
+			second = FracValue(float64(secondInt))
+		}
+	}
+
+	if first.Equal(second) {
+		return IntValue(1), nil
+	} else {
+		return IntValue(0), nil
+	}
 }

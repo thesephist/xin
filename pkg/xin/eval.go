@@ -35,9 +35,14 @@ func (e InvalidFormError) Error() string {
 
 func (fr *Frame) Get(name string) (Value, error) {
 	if val, prs := fr.Scope[name]; prs {
-		return val, nil
-	}
-	if fr.Parent != nil {
+		tmp, err := unlazy(val)
+		if err != nil {
+			return nil, err
+		}
+
+		fr.Scope[name] = tmp
+		return tmp, nil
+	} else if fr.Parent != nil {
 		return fr.Parent.Get(name)
 	}
 	return nil, UndefinedNameError{name: name}
@@ -84,7 +89,10 @@ func evalForm(fr *Frame, node *astNode) (Value, error) {
 		localFrame := newFrame()
 		localFrame.Parent = fr
 		for i, n := range node.leaves[1:] {
-			localFrame.Scope[form.arguments[i]] = LazyValue{node: n}
+			localFrame.Scope[form.arguments[i]] = LazyValue{
+				frame: fr,
+				node:  n,
+			}
 		}
 
 		return eval(localFrame, form.definition)
@@ -94,7 +102,10 @@ func evalForm(fr *Frame, node *astNode) (Value, error) {
 	if ok {
 		args := make([]Value, len(node.leaves)-1)
 		for i, n := range node.leaves[1:] {
-			args[i] = LazyValue{node: n}
+			args[i] = LazyValue{
+				frame: fr,
+				node:  n,
+			}
 		}
 
 		return dForm.eval(fr, args)
