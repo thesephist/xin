@@ -2,9 +2,9 @@ package xin
 
 var streamId int64 = 0
 
-type sinkCallback func(Value) error
+type sinkCallback func(Value) InterpreterError
 
-type sourceCallback func() (Value, error)
+type sourceCallback func() (Value, InterpreterError)
 
 type StreamValue struct {
 	// id is used to compare and de-duplicate stream values in memory
@@ -40,7 +40,7 @@ func (v StreamValue) Equal(o Value) bool {
 	return false
 }
 
-func streamForm(vm *Vm, fr *Frame, args []Value) (Value, error) {
+func streamForm(vm *Vm, fr *Frame, args []Value) (Value, InterpreterError) {
 	if len(args) != 0 {
 		return nil, IncorrectNumberOfArgsError{
 			required: 0,
@@ -51,15 +51,7 @@ func streamForm(vm *Vm, fr *Frame, args []Value) (Value, error) {
 	return StreamValue{}, nil
 }
 
-type InvalidStreamCallbackError struct {
-	reason string
-}
-
-func (e InvalidStreamCallbackError) Error() string {
-	return "Invalid stream callback:" + e.reason
-}
-
-func streamSetSink(vm *Vm, fr *Frame, args []Value) (Value, error) {
+func streamSetSink(vm *Vm, fr *Frame, args []Value) (Value, InterpreterError) {
 	if len(args) != 2 {
 		return nil, IncorrectNumberOfArgsError{
 			required: 2,
@@ -84,12 +76,9 @@ func streamSetSink(vm *Vm, fr *Frame, args []Value) (Value, error) {
 				}
 			}
 
-			firstStream.sink = func(v Value) error {
+			firstStream.sink = func(v Value) InterpreterError {
 				localFrame := newFrame(fr)
 				localFrame.Put(secondForm.arguments[0], v)
-
-				vm.Unlock()
-				defer vm.Lock()
 
 				_, err := eval(localFrame, secondForm.definition)
 				return err
@@ -104,7 +93,7 @@ func streamSetSink(vm *Vm, fr *Frame, args []Value) (Value, error) {
 	}
 }
 
-func streamSetSource(vm *Vm, fr *Frame, args []Value) (Value, error) {
+func streamSetSource(vm *Vm, fr *Frame, args []Value) (Value, InterpreterError) {
 	if len(args) != 2 {
 		return nil, IncorrectNumberOfArgsError{
 			required: 2,
@@ -129,11 +118,8 @@ func streamSetSource(vm *Vm, fr *Frame, args []Value) (Value, error) {
 				}
 			}
 
-			firstStream.source = func() (Value, error) {
+			firstStream.source = func() (Value, InterpreterError) {
 				localFrame := newFrame(fr)
-
-				vm.Unlock()
-				defer vm.Lock()
 
 				return eval(localFrame, secondForm.definition)
 			}
@@ -147,7 +133,7 @@ func streamSetSource(vm *Vm, fr *Frame, args []Value) (Value, error) {
 	}
 }
 
-func sourceForm(vm *Vm, fr *Frame, args []Value) (Value, error) {
+func sourceForm(vm *Vm, fr *Frame, args []Value) (Value, InterpreterError) {
 	if len(args) != 1 {
 		return nil, IncorrectNumberOfArgsError{
 			required: 1,
@@ -175,7 +161,7 @@ func sourceForm(vm *Vm, fr *Frame, args []Value) (Value, error) {
 	}
 }
 
-func sinkForm(vm *Vm, fr *Frame, args []Value) (Value, error) {
+func sinkForm(vm *Vm, fr *Frame, args []Value) (Value, InterpreterError) {
 	if len(args) != 2 {
 		return nil, IncorrectNumberOfArgsError{
 			required: 2,

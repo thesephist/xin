@@ -1,7 +1,6 @@
 package xin
 
 import (
-	"fmt"
 	"strings"
 )
 
@@ -9,6 +8,7 @@ type astNode struct {
 	isForm bool
 	token  token
 	leaves []*astNode
+	position
 }
 
 func (n astNode) String() string {
@@ -23,21 +23,7 @@ func (n astNode) String() string {
 	}
 }
 
-type UnexpectedTokenError struct {
-	token token
-}
-
-func (e UnexpectedTokenError) Error() string {
-	return fmt.Sprintf("Unexpected token %s", e.token)
-}
-
-type UnexpectedEndingError struct{}
-
-func (e UnexpectedEndingError) Error() string {
-	return "Unexpected ending"
-}
-
-func parse(toks tokenStream) (astNode, error) {
+func parse(toks tokenStream) (astNode, InterpreterError) {
 	root := astNode{
 		isForm: true,
 		leaves: []*astNode{},
@@ -65,27 +51,33 @@ func parse(toks tokenStream) (astNode, error) {
 	return root, nil
 }
 
-func parseGeneric(toks tokenStream) (astNode, int, error) {
+func parseGeneric(toks tokenStream) (astNode, int, InterpreterError) {
 	if toks[0].kind == tkOpenParen {
 		return parseForm(toks)
 	} else if toks[0].kind == tkCloseParen {
-		return astNode{}, 0, UnexpectedTokenError{token: toks[0]}
+		return astNode{}, 0, UnexpectedTokenError{
+			token:    toks[0],
+			position: toks[0].position,
+		}
 	} else {
 		return parseAtom(toks)
 	}
 }
 
-func parseForm(toks tokenStream) (astNode, int, error) {
+func parseForm(toks tokenStream) (astNode, int, InterpreterError) {
 	root := astNode{
-		isForm: true,
-		leaves: []*astNode{},
+		isForm:   true,
+		leaves:   []*astNode{},
+		position: toks[0].position,
 	}
 
 	index := 1 // Skip open paren
 	max := len(toks)
 
 	if max == 1 {
-		return astNode{}, 0, UnexpectedEndingError{}
+		return astNode{}, 0, UnexpectedEndingError{
+			position: toks[0].position,
+		}
 	}
 
 	for toks[index].kind != tkCloseParen {
@@ -97,18 +89,21 @@ func parseForm(toks tokenStream) (astNode, int, error) {
 		index += delta
 
 		if index >= max {
-			return astNode{}, 0, UnexpectedEndingError{}
+			return astNode{}, 0, UnexpectedEndingError{
+				position: toks[index-1].position,
+			}
 		}
 	}
 
 	return root, index + 1, nil
 }
 
-func parseAtom(toks tokenStream) (astNode, int, error) {
+func parseAtom(toks tokenStream) (astNode, int, InterpreterError) {
 	if len(toks) > 0 {
 		return astNode{
-			isForm: false,
-			token:  toks[0],
+			isForm:   false,
+			token:    toks[0],
+			position: toks[0].position,
 		}, 1, nil
 	} else {
 		return astNode{}, 0, UnexpectedEndingError{}

@@ -82,7 +82,6 @@ Xin has 3 special forms.
 - `:`: define a new name in the current lexical scope and set it to reference a given value
 - `if`: an if-else
 - `do`: sequentially evaluate multiple following expressions
-- `co`: concurrently evaluate multiple following expressions
 
 ### Concurrency and streams
 

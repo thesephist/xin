@@ -30,6 +30,7 @@ func repl() {
 	reader := bufio.NewReader(os.Stdin)
 	for {
 		fmt.Printf("> ")
+
 		text, err := reader.ReadString('\n')
 		if err == io.EOF {
 			break
@@ -37,9 +38,9 @@ func repl() {
 			fmt.Println("Repl error:", err.Error())
 		}
 
-		result, err := vm.Eval(strings.NewReader(text))
-		if err != nil {
-			fmt.Println("Eval error:", err.Error())
+		result, ierr := vm.Eval(strings.NewReader(text))
+		if ierr != nil {
+			fmt.Println("Eval error:", xin.FormatError(ierr))
 		} else {
 			fmt.Println(result)
 		}

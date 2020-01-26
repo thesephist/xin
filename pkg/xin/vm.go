@@ -22,21 +22,23 @@ func NewVm() *Vm {
 	loadAllDefaultValues(vm)
 	loadAllDefaultForms(vm)
 
-	vm.Lock()
 	return vm
 }
 
-func (vm *Vm) Eval(r io.Reader) (Value, error) {
+func (vm *Vm) Eval(r io.Reader) (Value, InterpreterError) {
 	defer vm.waiter.Wait()
 
-	toks := lex(r)
+	toks, err := lex(r)
+	if err != nil {
+		fmt.Printf("Lex error: %s", FormatError(err))
+	}
 	rootNode, err := parse(toks)
 	if err != nil {
-		fmt.Printf("There was an error: %s", err.Error())
+		fmt.Printf("Parse error: %s", FormatError(err))
 	}
 
-	vm.Unlock()
-	defer vm.Lock()
+	vm.Lock()
+	defer vm.Unlock()
 
 	val, err := unlazyEval(vm.Frame, &rootNode)
 	if err != nil {

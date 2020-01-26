@@ -6,17 +6,16 @@ import (
 	"io"
 	"os"
 	"strings"
-	"time"
 )
 
-type formEvaler func(*Vm, *Frame, []Value) (Value, error)
+type formEvaler func(*Vm, *Frame, []Value) (Value, InterpreterError)
 
 type DefaultFormValue struct {
 	name   string
 	evaler formEvaler
 }
 
-func (v DefaultFormValue) eval(fr *Frame, args []Value) (Value, error) {
+func (v DefaultFormValue) eval(fr *Frame, args []Value) (Value, InterpreterError) {
 	return v.evaler(fr.Vm, fr, args)
 }
 
@@ -32,25 +31,17 @@ func (v DefaultFormValue) Equal(o Value) bool {
 	return false
 }
 
-type RuntimeError struct {
-	reason string
-}
-
-func (e RuntimeError) Error() string {
-	return "Runtime error:" + e.reason
-}
-
 func loadAllDefaultValues(vm *Vm) {
 	fr := vm.Frame
 
 	fr.Put("os::stdout", StreamValue{
-		sink: func(v Value) error {
+		sink: func(v Value) InterpreterError {
 			fmt.Printf(v.String())
 			return nil
 		},
 	})
 	fr.Put("os::stdin", StreamValue{
-		source: func() (Value, error) {
+		source: func() (Value, InterpreterError) {
 			reader := bufio.NewReader(os.Stdin)
 			input, err := reader.ReadString('\n')
 			if err == io.EOF {
@@ -62,25 +53,6 @@ func loadAllDefaultValues(vm *Vm) {
 			}
 
 			return StringValue(input[:len(input)-1]), nil
-		},
-	})
-	fr.Put("os::sleep", StreamValue{
-		sink: func(v Value) error {
-			if duration, ok := v.(IntValue); ok {
-				time.Sleep(time.Duration(
-					int64(float64(duration) * float64(time.Second)),
-				))
-				return nil
-			} else if duration, ok := v.(FracValue); ok {
-				time.Sleep(time.Duration(
-					int64(float64(duration) * float64(time.Second)),
-				))
-				return nil
-			}
-
-			return MismatchedArgumentsError{
-				args: []Value{v},
-			}
 		},
 	})
 }
@@ -116,6 +88,8 @@ func loadAllDefaultForms(vm *Vm) {
 		"stream-set-source!": streamSetSource,
 		"->":                 sourceForm,
 		"<-":                 sinkForm,
+
+		"os::wait": osWaitForm,
 	}
 
 	fr := vm.Frame
@@ -131,29 +105,7 @@ func loadDefaultForm(vm *Vm, fr *Frame, name string, evaler formEvaler) {
 	})
 }
 
-type IncorrectNumberOfArgsError struct {
-	required int
-	given    int
-}
-
-func (e IncorrectNumberOfArgsError) Error() string {
-	return fmt.Sprintf("Incorrect number of arguments: requires %d but got %d",
-		e.required, e.given)
-}
-
-type MismatchedArgumentsError struct {
-	args []Value
-}
-
-func (e MismatchedArgumentsError) Error() string {
-	ss := make([]string, len(e.args))
-	for i, n := range e.args {
-		ss[i] = n.String()
-	}
-	return fmt.Sprintf("Mismatched arguments: %s", strings.Join(ss, " "))
-}
-
-func addForm(vm *Vm, fr *Frame, args []Value) (Value, error) {
+func addForm(vm *Vm, fr *Frame, args []Value) (Value, InterpreterError) {
 	if len(args) != 2 {
 		return nil, IncorrectNumberOfArgsError{
 			required: 2,
@@ -204,7 +156,7 @@ func addForm(vm *Vm, fr *Frame, args []Value) (Value, error) {
 	}
 }
 
-func subtractForm(vm *Vm, fr *Frame, args []Value) (Value, error) {
+func subtractForm(vm *Vm, fr *Frame, args []Value) (Value, InterpreterError) {
 	if len(args) != 2 {
 		return nil, IncorrectNumberOfArgsError{
 			required: 2,
@@ -247,7 +199,7 @@ func subtractForm(vm *Vm, fr *Frame, args []Value) (Value, error) {
 	}
 }
 
-func multiplyForm(vm *Vm, fr *Frame, args []Value) (Value, error) {
+func multiplyForm(vm *Vm, fr *Frame, args []Value) (Value, InterpreterError) {
 	if len(args) != 2 {
 		return nil, IncorrectNumberOfArgsError{
 			required: 2,
@@ -300,7 +252,7 @@ func multiplyForm(vm *Vm, fr *Frame, args []Value) (Value, error) {
 	}
 }
 
-func divideForm(vm *Vm, fr *Frame, args []Value) (Value, error) {
+func divideForm(vm *Vm, fr *Frame, args []Value) (Value, InterpreterError) {
 	if len(args) != 2 {
 		return nil, IncorrectNumberOfArgsError{
 			required: 2,
@@ -343,7 +295,7 @@ func divideForm(vm *Vm, fr *Frame, args []Value) (Value, error) {
 	}
 }
 
-func andForm(vm *Vm, fr *Frame, args []Value) (Value, error) {
+func andForm(vm *Vm, fr *Frame, args []Value) (Value, InterpreterError) {
 	if len(args) != 2 {
 		return nil, IncorrectNumberOfArgsError{
 			required: 2,
@@ -372,7 +324,7 @@ func andForm(vm *Vm, fr *Frame, args []Value) (Value, error) {
 	}
 }
 
-func orForm(vm *Vm, fr *Frame, args []Value) (Value, error) {
+func orForm(vm *Vm, fr *Frame, args []Value) (Value, InterpreterError) {
 	if len(args) != 2 {
 		return nil, IncorrectNumberOfArgsError{
 			required: 2,
@@ -401,7 +353,7 @@ func orForm(vm *Vm, fr *Frame, args []Value) (Value, error) {
 	}
 }
 
-func xorForm(vm *Vm, fr *Frame, args []Value) (Value, error) {
+func xorForm(vm *Vm, fr *Frame, args []Value) (Value, InterpreterError) {
 	if len(args) != 2 {
 		return nil, IncorrectNumberOfArgsError{
 			required: 2,
@@ -430,7 +382,7 @@ func xorForm(vm *Vm, fr *Frame, args []Value) (Value, error) {
 	}
 }
 
-func greaterForm(vm *Vm, fr *Frame, args []Value) (Value, error) {
+func greaterForm(vm *Vm, fr *Frame, args []Value) (Value, InterpreterError) {
 	if len(args) != 2 {
 		return nil, IncorrectNumberOfArgsError{
 			required: 2,
@@ -471,7 +423,7 @@ func greaterForm(vm *Vm, fr *Frame, args []Value) (Value, error) {
 		args: args,
 	}
 }
-func lessForm(vm *Vm, fr *Frame, args []Value) (Value, error) {
+func lessForm(vm *Vm, fr *Frame, args []Value) (Value, InterpreterError) {
 	if len(args) != 2 {
 		return nil, IncorrectNumberOfArgsError{
 			required: 2,
@@ -513,7 +465,7 @@ func lessForm(vm *Vm, fr *Frame, args []Value) (Value, error) {
 	}
 }
 
-func equalForm(vm *Vm, fr *Frame, args []Value) (Value, error) {
+func equalForm(vm *Vm, fr *Frame, args []Value) (Value, InterpreterError) {
 	if len(args) != 2 {
 		return nil, IncorrectNumberOfArgsError{
 			required: 2,

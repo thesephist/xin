@@ -23,7 +23,6 @@ highlight link xinNumber Number
 " builtin functions
 syntax keyword xinKeyword if contained
 syntax keyword xinKeyword do contained
-syntax keyword xinKeyword co contained
 highlight link xinKeyword Keyword
 
 " functions

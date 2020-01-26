@@ -84,10 +84,10 @@ func (v LazyValue) Equal(o Value) bool {
 	panic("<lazy> value should never be compared!")
 }
 
-func unlazy(v Value) (Value, error) {
+func unlazy(v Value) (Value, InterpreterError) {
 	var lzv LazyValue
 	var isLazy bool
-	var err error
+	var err InterpreterError
 
 	lzv, isLazy = v.(LazyValue)
 	for isLazy {
@@ -102,7 +102,7 @@ func unlazy(v Value) (Value, error) {
 	return v, nil
 }
 
-func unlazyEval(fr *Frame, node *astNode) (Value, error) {
+func unlazyEval(fr *Frame, node *astNode) (Value, InterpreterError) {
 	asLazy, err := eval(fr, node)
 	if err != nil {
 		return nil, err

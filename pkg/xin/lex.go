@@ -1,6 +1,7 @@
 package xin
 
 import (
+	"fmt"
 	"io"
 	"strconv"
 	"strings"
@@ -57,6 +58,10 @@ type position struct {
 	col      int
 }
 
+func (p position) String() string {
+	return fmt.Sprintf("%s:%d:%d", p.filePath, p.line, p.col)
+}
+
 func bufToToken(s string, pos position) token {
 	if strings.HasPrefix(s, "0x") || strings.HasPrefix(s, "0X") {
 		hexPart := s[2:]
@@ -95,12 +100,11 @@ func bufToToken(s string, pos position) token {
 	}
 }
 
-// TODO: lexer should be able to throw parse errors
-func lex(r io.Reader) tokenStream {
+func lex(r io.Reader) (tokenStream, InterpreterError) {
 	toks := make([]token, 0)
 	rdr, err := newReader(r)
 	if err != nil {
-		return toks
+		return toks, nil
 	}
 
 	buf := ""
@@ -154,5 +158,5 @@ func lex(r io.Reader) tokenStream {
 		}
 	}
 
-	return toks
+	return toks, nil
 }

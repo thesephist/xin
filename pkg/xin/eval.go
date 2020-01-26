@@ -3,7 +3,6 @@ package xin
 import (
 	"fmt"
 	"strconv"
-	"strings"
 )
 
 type Frame struct {
@@ -26,23 +25,7 @@ func newFrame(parent *Frame) *Frame {
 	}
 }
 
-type UndefinedNameError struct {
-	name string
-}
-
-func (e UndefinedNameError) Error() string {
-	return fmt.Sprintf("Undefined name %s", e.name)
-}
-
-type InvalidFormError struct {
-	node *astNode
-}
-
-func (e InvalidFormError) Error() string {
-	return fmt.Sprintf("Invalid form: %s", e.node)
-}
-
-func (fr *Frame) Get(name string) (Value, error) {
+func (fr *Frame) Get(name string, pos position) (Value, InterpreterError) {
 	if val, prs := fr.Scope[name]; prs {
 		tmp, err := unlazy(val)
 		if err != nil {
@@ -52,16 +35,19 @@ func (fr *Frame) Get(name string) (Value, error) {
 		fr.Scope[name] = tmp
 		return tmp, nil
 	} else if fr.Parent != nil {
-		return fr.Parent.Get(name)
+		return fr.Parent.Get(name, pos)
 	}
-	return nil, UndefinedNameError{name: name}
+	return nil, UndefinedNameError{
+		name:     name,
+		position: pos,
+	}
 }
 
 func (fr *Frame) Put(name string, val Value) {
 	fr.Scope[name] = val
 }
 
-func eval(fr *Frame, node *astNode) (Value, error) {
+func eval(fr *Frame, node *astNode) (Value, InterpreterError) {
 	if node.isForm {
 		return evalForm(fr, node)
 	}
@@ -69,9 +55,12 @@ func eval(fr *Frame, node *astNode) (Value, error) {
 	return evalAtom(fr, node)
 }
 
-func evalForm(fr *Frame, node *astNode) (Value, error) {
+func evalForm(fr *Frame, node *astNode) (Value, InterpreterError) {
 	if len(node.leaves) == 0 {
-		return nil, InvalidFormError{node: node}
+		return nil, InvalidFormError{
+			node:     node,
+			position: node.position,
+		}
 	}
 
 	formNode := node.leaves[0]
@@ -85,18 +74,15 @@ func evalForm(fr *Frame, node *astNode) (Value, error) {
 			return evalIfForm(fr, node.leaves[1:])
 		case "do":
 			return evalDoForm(fr, node.leaves[1:])
-		case "co":
-			return evalCoForm(fr, node.leaves[1:])
 		}
 	}
 
-	formHead, err := eval(fr, formNode)
+	maybeForm, err := eval(fr, formNode)
 	if err != nil {
 		return nil, err
 	}
 
-	form, ok := formHead.(FormValue)
-	if ok {
+	if form, ok := maybeForm.(FormValue); ok {
 		localFrame := newFrame(fr)
 		for i, n := range node.leaves[1:] {
 			localFrame.Put(form.arguments[i], LazyValue{
@@ -106,10 +92,7 @@ func evalForm(fr *Frame, node *astNode) (Value, error) {
 		}
 
 		return eval(localFrame, form.definition)
-	}
-
-	dForm, ok := formHead.(DefaultFormValue)
-	if ok {
+	} else if form, ok := maybeForm.(DefaultFormValue); ok {
 		args := make([]Value, len(node.leaves)-1)
 		for i, n := range node.leaves[1:] {
 			args[i] = LazyValue{
@@ -118,18 +101,21 @@ func evalForm(fr *Frame, node *astNode) (Value, error) {
 			}
 		}
 
-		return dForm.eval(fr, args)
+		return form.eval(fr, args)
 	}
 
-	return nil, InvalidFormError{node: node}
+	return nil, InvalidFormError{
+		node:     node,
+		position: node.position,
+	}
 
 }
 
-func evalAtom(fr *Frame, node *astNode) (Value, error) {
+func evalAtom(fr *Frame, node *astNode) (Value, InterpreterError) {
 	tok := node.token
 	switch tok.kind {
 	case tkName:
-		return fr.Get(tok.value)
+		return fr.Get(tok.value, node.position)
 	case tkNumberLiteralInt:
 		iv, _ := strconv.ParseInt(tok.value, 10, 64)
 		return IntValue(iv), nil
@@ -146,39 +132,7 @@ func evalAtom(fr *Frame, node *astNode) (Value, error) {
 	}
 }
 
-type InvalidBindError struct {
-	nodes []*astNode
-}
-
-func (e InvalidBindError) Error() string {
-	ss := make([]string, len(e.nodes))
-	for i, n := range e.nodes {
-		ss[i] = n.String()
-	}
-	return fmt.Sprintf("Invalid bind error: %s", strings.Join(ss, " "))
-}
-
-type InvalidIfError struct {
-	nodes []*astNode
-}
-
-func (e InvalidIfError) Error() string {
-	ss := make([]string, len(e.nodes))
-	for i, n := range e.nodes {
-		ss[i] = n.String()
-	}
-	return fmt.Sprintf("Invalid if error: %s", strings.Join(ss, " "))
-}
-
-type InvalidIfConditionError struct {
-	cond Value
-}
-
-func (e InvalidIfConditionError) Error() string {
-	return fmt.Sprintf("Invalid if condition: %s", e.cond)
-}
-
-func evalBindForm(fr *Frame, args []*astNode) (Value, error) {
+func evalBindForm(fr *Frame, args []*astNode) (Value, InterpreterError) {
 	if len(args) != 2 {
 		return nil, InvalidBindError{nodes: args}
 	}
@@ -229,7 +183,7 @@ func evalBindForm(fr *Frame, args []*astNode) (Value, error) {
 	return val, nil
 }
 
-func evalIfForm(fr *Frame, args []*astNode) (Value, error) {
+func evalIfForm(fr *Frame, args []*astNode) (Value, InterpreterError) {
 	if len(args) != 3 {
 		return nil, InvalidIfError{nodes: args}
 	}
@@ -253,9 +207,9 @@ func evalIfForm(fr *Frame, args []*astNode) (Value, error) {
 	}
 }
 
-func evalDoForm(fr *Frame, args []*astNode) (Value, error) {
+func evalDoForm(fr *Frame, args []*astNode) (Value, InterpreterError) {
 	var final Value
-	var err error
+	var err InterpreterError
 
 	for _, node := range args {
 		final, err = eval(fr, node)
@@ -265,20 +219,4 @@ func evalDoForm(fr *Frame, args []*astNode) (Value, error) {
 	}
 
 	return final, nil
-}
-
-func evalCoForm(fr *Frame, args []*astNode) (Value, error) {
-	for _, node := range args {
-		fr.Vm.waiter.Add(1)
-		go func(n *astNode) {
-			defer fr.Vm.waiter.Done()
-
-			_, err := eval(fr, n)
-			if err != nil {
-				fmt.Println("Eval error:", err.Error())
-			}
-		}(node)
-	}
-
-	return IntValue(len(args)), nil
 }

@@ -34,9 +34,9 @@ func run(filePath string) {
 	}
 
 	vm := xin.NewVm()
-	_, err = vm.Eval(file)
-	if err != nil {
-		fmt.Println("Eval error:", err.Error())
+	_, ierr := vm.Eval(file)
+	if ierr != nil {
+		fmt.Println("Eval error:", xin.FormatError(ierr))
 		return
 	}
 }
