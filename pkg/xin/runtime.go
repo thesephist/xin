@@ -42,11 +42,13 @@ func loadAllDefaultForms(fr *Frame) {
 		"vec":      vecForm,
 		"vec-get":  vecGetForm,
 		"vec-set!": vecSetForm,
+		"vec-size": vecSizeForm,
 
 		"map":      mapForm,
 		"map-get":  mapGetForm,
 		"map-set!": mapSetForm,
 		"map-del!": mapDelForm,
+		"map-size": mapSizeForm,
 	}
 
 	for name, evaler := range builtins {
