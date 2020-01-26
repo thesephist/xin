@@ -13,6 +13,7 @@ func NewVm() *Vm {
 	vm := &Vm{
 		Frame: newFrame(),
 	}
+	loadAllDefaultValues(vm.Frame)
 	loadAllDefaultForms(vm.Frame)
 
 	return vm

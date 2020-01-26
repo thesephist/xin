@@ -1,5 +1,37 @@
 package xin
 
+import (
+	"strings"
+)
+
+type VecValue []Value
+
+func (v VecValue) String() string {
+	ss := make([]string, len(v))
+	for i, item := range v {
+		ss[i] = item.String()
+	}
+	return "(<vec> " + strings.Join(ss, " ") + ")"
+}
+
+func (v VecValue) Equal(o Value) bool {
+	if ov, ok := o.(VecValue); ok {
+		if len(v) != len(ov) {
+			return false
+		}
+
+		for i, x := range v {
+			if x != ov[i] {
+				return false
+			}
+		}
+
+		return true
+	}
+
+	return false
+}
+
 func vecForm(fr *Frame, args []Value) (Value, error) {
 	vecValues := make([]Value, len(args))
 	for i, a := range args {

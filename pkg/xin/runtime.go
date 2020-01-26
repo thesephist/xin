@@ -24,6 +24,31 @@ func (v DefaultFormValue) Equal(o Value) bool {
 	return false
 }
 
+func loadAllDefaultValues(fr *Frame) {
+	// stdin := make(StreamValue)
+	// go func() {
+	// 	stdinReader := bufio.NewReader(os.Stdin)
+	// 	for {
+	// 		input, err := stdinReader.ReadString('\n')
+	// 		if err == io.EOF {
+	// 			break
+	// 		}
+
+	// 		stdin <- StringValue(input)
+	// 	}
+	// }()
+	// fr.Scope["os::stdin"] = stdin
+
+	stdout := make(StreamValue)
+	go func() {
+		for {
+			out := <-stdout
+			fmt.Printf(out.String())
+		}
+	}()
+	fr.Scope["os::stdout"] = stdout
+}
+
 func loadAllDefaultForms(fr *Frame) {
 	builtins := map[string]formEvaler{
 		"+": addForm,
@@ -49,6 +74,10 @@ func loadAllDefaultForms(fr *Frame) {
 		"map-set!": mapSetForm,
 		"map-del!": mapDelForm,
 		"map-size": mapSizeForm,
+
+		"stream": streamForm,
+		"->":     sourceForm,
+		"<-":     sinkForm,
 	}
 
 	for name, evaler := range builtins {

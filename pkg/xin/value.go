@@ -14,7 +14,7 @@ type Value interface {
 type StringValue string
 
 func (v StringValue) String() string {
-	return "'" + string(v) + "'"
+	return string(v)
 }
 
 func (v StringValue) Equal(o Value) bool {
@@ -65,64 +65,6 @@ func (v FormValue) String() string {
 func (v FormValue) Equal(o Value) bool {
 	if ov, ok := o.(FormValue); ok {
 		return v.definition == ov.definition
-	}
-
-	return false
-}
-
-type VecValue []Value
-
-func (v VecValue) String() string {
-	ss := make([]string, len(v))
-	for i, item := range v {
-		ss[i] = item.String()
-	}
-	return "(<vec> " + strings.Join(ss, " ") + ")"
-}
-
-func (v VecValue) Equal(o Value) bool {
-	if ov, ok := o.(VecValue); ok {
-		if len(v) != len(ov) {
-			return false
-		}
-
-		for i, x := range v {
-			if x != ov[i] {
-				return false
-			}
-		}
-
-		return true
-	}
-
-	return false
-}
-
-type MapValue map[Value]Value
-
-func (v MapValue) String() string {
-	i := 0
-	ss := make([]string, len(v))
-	for k, val := range v {
-		ss[i] = k.String() + "->" + val.String()
-		i++
-	}
-	return "(<map> " + strings.Join(ss, " ") + ")"
-}
-
-func (v MapValue) Equal(o Value) bool {
-	if ov, ok := o.(MapValue); ok {
-		if len(v) != len(ov) {
-			return false
-		}
-
-		for i, x := range v {
-			if x != ov[i] {
-				return false
-			}
-		}
-
-		return true
 	}
 
 	return false

@@ -15,7 +15,7 @@ const cliVersion = "0.1"
 func main() {
 	// fmt.Printf("Xin v%s\n", cliVersion)
 
-	file, err := os.Open("samples/fib.xin")
+	file, err := os.Open("samples/hello.xin")
 	defer file.Close()
 
 	vm := xin.NewVm()

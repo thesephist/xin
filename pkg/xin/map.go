@@ -1,5 +1,39 @@
 package xin
 
+import (
+	"strings"
+)
+
+type MapValue map[Value]Value
+
+func (v MapValue) String() string {
+	i := 0
+	ss := make([]string, len(v))
+	for k, val := range v {
+		ss[i] = k.String() + "->" + val.String()
+		i++
+	}
+	return "(<map> " + strings.Join(ss, " ") + ")"
+}
+
+func (v MapValue) Equal(o Value) bool {
+	if ov, ok := o.(MapValue); ok {
+		if len(v) != len(ov) {
+			return false
+		}
+
+		for i, x := range v {
+			if x != ov[i] {
+				return false
+			}
+		}
+
+		return true
+	}
+
+	return false
+}
+
 func mapForm(fr *Frame, args []Value) (Value, error) {
 	if len(args) != 0 {
 		return nil, IncorrectNumberOfArgsError{
