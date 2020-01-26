@@ -5,3 +5,5 @@
 (co (say-with-pause 3 'after three -- should be last')
     (say-with-pause 2.5 'in the middle')
     (say-with-pause 2 'after two'))
+
+(say-with-pause 1 'this should be first')

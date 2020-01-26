@@ -114,15 +114,21 @@ func lex(r io.Reader) tokenStream {
 		peeked := rdr.peek()
 		switch {
 		case peeked == ";":
+			clear()
 			rdr.upto("\n")
 			rdr.skip()
 		case peeked == "'":
 			clear()
 			rdr.skip()
+
 			content := rdr.upto("'")
+			for rdr.lookback() == "\\" {
+				content += rdr.upto("'")
+			}
+
 			toks = append(toks, token{
 				kind:     tkStringLiteral,
-				value:    content,
+				value:    escapeString(content),
 				position: rdr.currPos(),
 			})
 			rdr.skip()
