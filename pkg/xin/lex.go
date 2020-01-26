@@ -1,64 +1,128 @@
 package xin
 
-// Instructions
-const (
-	Nop = iota
-
-	// Basic math
-	Add
-	Sub
-	Mul
-	Div
-	Pow
-	Sin
-	Cos
-	Log // natural
-
-	// Convert to given type
-	ConvStr
-	ConvInt
-	ConvFloat
-	ConvBool
-
-	// Concat a string
-	CatStr
-	// Concat a list
-	CatList
-	// Index into string
-	StrAt
-	// get length of str/list
-	LenStr
-	LenList
-
-	// Call Xin function
-	// TODO: not sure if necessary, since function calls
-	// are implied by syntax.
-	Call
-	// Call native function, e.g. 'out'
-	CallNative
-	// Return function call
-	Ret
+import (
+	"io"
+	"strconv"
+	"strings"
+	"unicode"
 )
 
-type Position struct {
-	FilePath string
-	Line     int
-	Col      int
+const (
+	tkOpenParen = iota
+	tkCloseParen
+
+	tkName
+	tkNumberLiteralInt
+	tkNumberLiteralDecimal
+	tkNumberLiteralHex
+	tokstringLiteral
+)
+
+type tokenKind int
+
+type token struct {
+	kind  tokenKind
+	value string
+	position
 }
 
-type Tok interface {
-	String() string
-	Position() Position
+func (tk token) String() string {
+	switch tk.kind {
+	case tkOpenParen:
+		return "("
+	case tkCloseParen:
+		return ")"
+	case tkName, tkNumberLiteralInt, tkNumberLiteralDecimal, tkNumberLiteralHex:
+		return tk.value
+	case tokstringLiteral:
+		return "'" + tk.value + "'"
+	default:
+		return "unknown token"
+	}
 }
 
-type Expr interface {
-	String() string
-	Pretty() string
-	Position() string
-	Compile() []Instruction
+type tokenStream []token
+
+func (toks tokenStream) String() string {
+	tokstrings := make([]string, len(toks))
+	for i, tk := range toks {
+		tokstrings[i] = tk.String()
+	}
+	return strings.Join(tokstrings, " ")
 }
 
-// TODO: not sure what this needs to look like
-type Instruction interface {
-	Arity()
+type position struct {
+	filePath string
+	line     int
+	col      int
+}
+
+func bufToToken(s string, pos position) token {
+	if strings.HasPrefix(s, "0x") || strings.HasPrefix(s, "0X") {
+		return token{
+			kind:     tkNumberLiteralHex,
+			value:    s[2:len(s)],
+			position: pos,
+		}
+	} else if _, err := strconv.Atoi(s); err == nil {
+		return token{
+			kind:     tkNumberLiteralInt,
+			value:    s,
+			position: pos,
+		}
+	} else if _, err := strconv.ParseFloat(s, 64); err == nil {
+		return token{
+			kind:     tkNumberLiteralDecimal,
+			value:    s,
+			position: pos,
+		}
+	} else {
+		return token{
+			kind:     tkName,
+			value:    s,
+			position: pos,
+		}
+	}
+}
+
+func Lex(r io.Reader) tokenStream {
+	toks := make([]token, 0)
+	rdr, err := newReader(r)
+	if err != nil {
+		return toks
+	}
+
+	buf := ""
+	clear := func() {
+		if buf != "" {
+			toks = append(toks, bufToToken(buf, rdr.currPos()))
+			buf = ""
+		}
+	}
+	for !rdr.done() {
+		peeked := rdr.peek()
+		switch {
+		case peeked == "(":
+			clear()
+			toks = append(toks, token{
+				kind:     tkOpenParen,
+				position: rdr.currPos(),
+			})
+			rdr.skip()
+		case peeked == ")":
+			clear()
+			toks = append(toks, token{
+				kind:     tkCloseParen,
+				position: rdr.currPos(),
+			})
+			rdr.skip()
+		case unicode.IsSpace([]rune(peeked)[0]):
+			clear()
+			rdr.skip()
+		default:
+			buf += rdr.next()
+		}
+	}
+
+	return toks
 }

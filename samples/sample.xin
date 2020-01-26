@@ -62,7 +62,7 @@
                        -1))
      (: canon-numerator (/ (numerator r) (gcd (numerator r) (denominator r))))
      (: canon-denominator (/ (denominator r) (gcd (numerator r) (denominator r))))
-     (vec sign numerator denominator)))
+     (vec canon-sign canon-numerator canon-denominator)))
 
 ; set abstraction from a map
 (: (set)
