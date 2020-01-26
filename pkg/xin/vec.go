@@ -32,7 +32,7 @@ func (v VecValue) Equal(o Value) bool {
 	return false
 }
 
-func vecForm(fr *Frame, args []Value) (Value, error) {
+func vecForm(vm *Vm, fr *Frame, args []Value) (Value, error) {
 	vecValues := make([]Value, len(args))
 	for i, a := range args {
 		val, err := unlazy(a)
@@ -44,7 +44,7 @@ func vecForm(fr *Frame, args []Value) (Value, error) {
 	return VecValue(vecValues), nil
 }
 
-func vecGetForm(fr *Frame, args []Value) (Value, error) {
+func vecGetForm(vm *Vm, fr *Frame, args []Value) (Value, error) {
 	if len(args) != 2 {
 		return nil, IncorrectNumberOfArgsError{
 			required: 2,
@@ -61,11 +61,11 @@ func vecGetForm(fr *Frame, args []Value) (Value, error) {
 		return nil, err
 	}
 
-	isFirstVec, fok := first.(VecValue)
-	isSecondInt, sok := second.(IntValue)
+	firstVec, fok := first.(VecValue)
+	secondInt, sok := second.(IntValue)
 	if fok && sok {
-		if int(isSecondInt) < len(isFirstVec) {
-			return isFirstVec[isSecondInt], nil
+		if int(secondInt) < len(firstVec) {
+			return firstVec[secondInt], nil
 		}
 
 		return VecValue{}, nil
@@ -76,7 +76,7 @@ func vecGetForm(fr *Frame, args []Value) (Value, error) {
 	}
 }
 
-func vecSetForm(fr *Frame, args []Value) (Value, error) {
+func vecSetForm(vm *Vm, fr *Frame, args []Value) (Value, error) {
 	if len(args) != 3 {
 		return nil, IncorrectNumberOfArgsError{
 			required: 3,
@@ -97,11 +97,11 @@ func vecSetForm(fr *Frame, args []Value) (Value, error) {
 		return nil, err
 	}
 
-	isFirstVec, fok := first.(VecValue)
-	isSecondInt, sok := second.(IntValue)
+	firstVec, fok := first.(VecValue)
+	secondInt, sok := second.(IntValue)
 	if fok && sok {
-		if int(isSecondInt) < len(isFirstVec) {
-			isFirstVec[isSecondInt] = third
+		if int(secondInt) < len(firstVec) {
+			firstVec[secondInt] = third
 			return third, nil
 		}
 
@@ -113,7 +113,7 @@ func vecSetForm(fr *Frame, args []Value) (Value, error) {
 	}
 }
 
-func vecSizeForm(fr *Frame, args []Value) (Value, error) {
+func vecSizeForm(vm *Vm, fr *Frame, args []Value) (Value, error) {
 	if len(args) != 1 {
 		return nil, IncorrectNumberOfArgsError{
 			required: 1,
@@ -126,8 +126,8 @@ func vecSizeForm(fr *Frame, args []Value) (Value, error) {
 		return nil, err
 	}
 
-	if isFirstVec, fok := first.(VecValue); fok {
-		return IntValue(len(isFirstVec)), nil
+	if firstVec, fok := first.(VecValue); fok {
+		return IntValue(len(firstVec)), nil
 	}
 
 	return nil, MismatchedArgumentsError{

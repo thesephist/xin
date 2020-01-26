@@ -7,11 +7,20 @@ import (
 )
 
 type Frame struct {
+	Vm     *Vm
 	Scope  map[string]Value
 	Parent *Frame
 }
 
-func newFrame() *Frame {
+func newFrame(parent *Frame) *Frame {
+	if parent != nil {
+		return &Frame{
+			Vm:     parent.Vm,
+			Scope:  make(map[string]Value),
+			Parent: parent,
+		}
+	}
+
 	return &Frame{
 		Scope: make(map[string]Value),
 	}
@@ -76,6 +85,8 @@ func evalForm(fr *Frame, node *astNode) (Value, error) {
 			return evalIfForm(fr, node.leaves[1:])
 		case "do":
 			return evalDoForm(fr, node.leaves[1:])
+		case "co":
+			return evalCoForm(fr, node.leaves[1:])
 		}
 	}
 
@@ -86,13 +97,12 @@ func evalForm(fr *Frame, node *astNode) (Value, error) {
 
 	form, ok := formHead.(FormValue)
 	if ok {
-		localFrame := newFrame()
-		localFrame.Parent = fr
+		localFrame := newFrame(fr)
 		for i, n := range node.leaves[1:] {
-			localFrame.Scope[form.arguments[i]] = LazyValue{
+			localFrame.Put(form.arguments[i], LazyValue{
 				frame: fr,
 				node:  n,
-			}
+			})
 		}
 
 		return eval(localFrame, form.definition)
@@ -255,4 +265,20 @@ func evalDoForm(fr *Frame, args []*astNode) (Value, error) {
 	}
 
 	return final, nil
+}
+
+func evalCoForm(fr *Frame, args []*astNode) (Value, error) {
+	for _, node := range args {
+		fr.Vm.waiter.Add(1)
+		go func(n *astNode) {
+			defer fr.Vm.waiter.Done()
+
+			_, err := eval(fr, n)
+			if err != nil {
+				fmt.Println("Eval error:", err.Error())
+			}
+		}(node)
+	}
+
+	return IntValue(len(args)), nil
 }

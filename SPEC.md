@@ -79,9 +79,10 @@ Xin has these types:
 
 Xin has 3 special forms.
 
-- `:`: define a new name in the current lexical scope and set it to reference a given value.
-- `if`: an if-else.
+- `:`: define a new name in the current lexical scope and set it to reference a given value
+- `if`: an if-else
 - `do`: sequentially evaluate multiple following expressions
+- `co`: concurrently evaluate multiple following expressions
 
 ### Concurrency and streams
 
@@ -101,7 +102,7 @@ will print "hello world" to standard out.
 
 Streams can be used to read and write to files, network sockets, or to arbitrary other programs and sinks/sources of values, like OS signals. When writing concurrent programs, blocking stream IO is also the primary synchronization primitive in Xin.
 
-Despite the vocabulary for concurrency in Xin, Xin is a single-threaded language with an interpreter lock, and concurrent calls are deterministically ordered onto the execution timeline.
+Despite the vocabulary for concurrency in Xin, Xin is a single-threaded language with an interpreter lock, and concurrent calls are ordered onto a single execution timeline.
 
 ## Packages and imports
 

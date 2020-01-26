@@ -1,0 +1,7 @@
+(: (say-with-pause secs saying)
+   (do (<- os::sleep secs)
+     (<- os::stdout saying)))
+
+(co (say-with-pause 3 'after three -- should be last')
+    (say-with-pause 2.5 'in the middle')
+    (say-with-pause 2 'after two'))

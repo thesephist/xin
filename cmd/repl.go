@@ -1,4 +1,4 @@
-package main
+package cmd
 
 import (
 	"bufio"
@@ -7,25 +7,25 @@ import (
 	"os"
 	"strings"
 
+	"github.com/spf13/cobra"
 	"github.com/thesephist/xin/pkg/xin"
 )
 
-const cliVersion = "0.1"
+var replCmd = &cobra.Command{
+	Use:   "repl",
+	Short: "Run a Xin repl",
+	Long:  "Start an interactive Xin language interpreter session",
+	Run: func(cmd *cobra.Command, args []string) {
+		repl()
+	},
+}
 
-func main() {
-	// fmt.Printf("Xin v%s\n", cliVersion)
+func init() {
+	rootCmd.AddCommand(replCmd)
+}
 
-	file, err := os.Open("samples/hello.xin")
-	defer file.Close()
-
+func repl() {
 	vm := xin.NewVm()
-	result, err := vm.Eval(file)
-	if err != nil {
-		fmt.Println("Eval error:", err.Error())
-		return
-	}
-
-	fmt.Println(result)
 
 	reader := bufio.NewReader(os.Stdin)
 	for {

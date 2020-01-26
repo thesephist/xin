@@ -3,4 +3,4 @@
      1
      (* n (fact (- n 1)))))
 
-(fact 10)
+(<- os::stdout (fact 10))

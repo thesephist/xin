@@ -1,0 +1,10 @@
+; print your name
+(: (puts s)
+   (<- os::stdout (+ s '\n')))
+
+(puts 'What is your name?')
+
+(: user-name
+   (-> os::stdin))
+
+(puts (+ 'Hello, ' user-name))

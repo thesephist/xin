@@ -34,7 +34,7 @@ func (v MapValue) Equal(o Value) bool {
 	return false
 }
 
-func mapForm(fr *Frame, args []Value) (Value, error) {
+func mapForm(vm *Vm, fr *Frame, args []Value) (Value, error) {
 	if len(args) != 0 {
 		return nil, IncorrectNumberOfArgsError{
 			required: 0,
@@ -45,7 +45,7 @@ func mapForm(fr *Frame, args []Value) (Value, error) {
 	return make(MapValue), nil
 }
 
-func mapGetForm(fr *Frame, args []Value) (Value, error) {
+func mapGetForm(vm *Vm, fr *Frame, args []Value) (Value, error) {
 	if len(args) != 2 {
 		return nil, IncorrectNumberOfArgsError{
 			required: 2,
@@ -62,8 +62,8 @@ func mapGetForm(fr *Frame, args []Value) (Value, error) {
 		return nil, err
 	}
 
-	if isFirstMap, ok := first.(MapValue); ok {
-		val, prs := isFirstMap[second]
+	if firstMap, ok := first.(MapValue); ok {
+		val, prs := firstMap[second]
 		if prs {
 			return val, nil
 		}
@@ -76,7 +76,7 @@ func mapGetForm(fr *Frame, args []Value) (Value, error) {
 	}
 }
 
-func mapSetForm(fr *Frame, args []Value) (Value, error) {
+func mapSetForm(vm *Vm, fr *Frame, args []Value) (Value, error) {
 	if len(args) != 3 {
 		return nil, IncorrectNumberOfArgsError{
 			required: 3,
@@ -97,8 +97,8 @@ func mapSetForm(fr *Frame, args []Value) (Value, error) {
 		return nil, err
 	}
 
-	if isFirstMap, ok := first.(MapValue); ok {
-		isFirstMap[second] = third
+	if firstMap, ok := first.(MapValue); ok {
+		firstMap[second] = third
 
 		return third, nil
 	}
@@ -108,7 +108,7 @@ func mapSetForm(fr *Frame, args []Value) (Value, error) {
 	}
 }
 
-func mapDelForm(fr *Frame, args []Value) (Value, error) {
+func mapDelForm(vm *Vm, fr *Frame, args []Value) (Value, error) {
 	if len(args) != 2 {
 		return nil, IncorrectNumberOfArgsError{
 			required: 2,
@@ -125,10 +125,10 @@ func mapDelForm(fr *Frame, args []Value) (Value, error) {
 		return nil, err
 	}
 
-	if isFirstMap, ok := first.(MapValue); ok {
-		val, prs := isFirstMap[second]
+	if firstMap, ok := first.(MapValue); ok {
+		val, prs := firstMap[second]
 		if prs {
-			delete(isFirstMap, second)
+			delete(firstMap, second)
 			return val, nil
 		}
 
@@ -140,7 +140,7 @@ func mapDelForm(fr *Frame, args []Value) (Value, error) {
 	}
 }
 
-func mapSizeForm(fr *Frame, args []Value) (Value, error) {
+func mapSizeForm(vm *Vm, fr *Frame, args []Value) (Value, error) {
 	if len(args) != 1 {
 		return nil, IncorrectNumberOfArgsError{
 			required: 1,
@@ -153,8 +153,8 @@ func mapSizeForm(fr *Frame, args []Value) (Value, error) {
 		return nil, err
 	}
 
-	if isFirstMap, fok := first.(MapValue); fok {
-		return IntValue(len(isFirstMap)), nil
+	if firstMap, fok := first.(MapValue); fok {
+		return IntValue(len(firstMap)), nil
 	}
 
 	return nil, MismatchedArgumentsError{
