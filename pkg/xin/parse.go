@@ -54,7 +54,7 @@ func parse(toks tokenStream) (astNode, error) {
 	index := 0
 	max := len(toks)
 	for index < max {
-		n, delta, err := parseGeneric(toks[index:max])
+		n, delta, err := parseGeneric(toks[index:])
 		if err != nil {
 			return astNode{}, err
 		}
@@ -89,7 +89,7 @@ func parseForm(toks tokenStream) (astNode, int, error) {
 	}
 
 	for toks[index].kind != tkCloseParen {
-		n, delta, err := parseGeneric(toks[index:max])
+		n, delta, err := parseGeneric(toks[index:])
 		if err != nil {
 			return astNode{}, 0, err
 		}

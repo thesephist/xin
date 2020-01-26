@@ -12,8 +12,11 @@ const cliVersion = "0.1"
 func main() {
 	// fmt.Printf("Xin v%s\n", cliVersion)
 
+	testProgram := "(+ 2 40)"
+	fmt.Println("Running test program ", testProgram)
+
 	vm := xin.NewVm()
-	result, err := vm.Eval(strings.NewReader("(+ 1 14)"))
+	result, err := vm.Eval(strings.NewReader(testProgram))
 	if err != nil {
 		fmt.Println("Eval error:", err.Error())
 		return

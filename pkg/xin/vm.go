@@ -10,9 +10,12 @@ type Vm struct {
 }
 
 func NewVm() *Vm {
-	return &Vm{
+	vm := &Vm{
 		Frame: newFrame(),
 	}
+	loadAllDefaultForms(vm.Frame)
+
+	return vm
 }
 
 func (vm *Vm) Eval(r io.Reader) (Value, error) {
@@ -22,5 +25,5 @@ func (vm *Vm) Eval(r io.Reader) (Value, error) {
 		fmt.Printf("There was an error: %s", err.Error())
 	}
 
-	return eval(vm.Frame, rootNode)
+	return eval(vm.Frame, &rootNode)
 }

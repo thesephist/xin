@@ -15,7 +15,7 @@ const (
 	tkNumberLiteralInt
 	tkNumberLiteralDecimal
 	tkNumberLiteralHex
-	tokstringLiteral
+	tkStringLiteral
 )
 
 type tokenKind int
@@ -34,7 +34,7 @@ func (tk token) String() string {
 		return ")"
 	case tkName, tkNumberLiteralInt, tkNumberLiteralDecimal, tkNumberLiteralHex:
 		return tk.value
-	case tokstringLiteral:
+	case tkStringLiteral:
 		return "'" + tk.value + "'"
 	default:
 		return "unknown token"
@@ -59,12 +59,22 @@ type position struct {
 
 func bufToToken(s string, pos position) token {
 	if strings.HasPrefix(s, "0x") || strings.HasPrefix(s, "0X") {
-		return token{
-			kind:     tkNumberLiteralHex,
-			value:    s[2:len(s)],
-			position: pos,
+		hexPart := s[2:]
+		if _, err := strconv.ParseInt(hexPart, 16, 64); err == nil {
+			return token{
+				kind:     tkNumberLiteralHex,
+				value:    hexPart,
+				position: pos,
+			}
+		} else {
+			return token{
+				kind: tkNumberLiteralHex,
+				// TODO: make this throw a parse err
+				value:    "0",
+				position: pos,
+			}
 		}
-	} else if _, err := strconv.Atoi(s); err == nil {
+	} else if _, err := strconv.ParseInt(s, 10, 64); err == nil {
 		return token{
 			kind:     tkNumberLiteralInt,
 			value:    s,
@@ -85,6 +95,7 @@ func bufToToken(s string, pos position) token {
 	}
 }
 
+// TODO: lexer should be able to throw parse errors
 func lex(r io.Reader) tokenStream {
 	toks := make([]token, 0)
 	rdr, err := newReader(r)
