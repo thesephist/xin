@@ -34,6 +34,14 @@ func (e IncorrectNumberOfArgsError) Error() string {
 		e.required, e.given)
 }
 
+type MismatchedArgumentsError struct {
+	args []Value
+}
+
+func (e MismatchedArgumentsError) Error() string {
+	return fmt.Sprintf("Mismatched arguments")
+}
+
 func addForm(fr *Frame, args []Value) (Value, error) {
 	if len(args) != 2 {
 		return nil, IncorrectNumberOfArgsError{
@@ -51,11 +59,12 @@ func addForm(fr *Frame, args []Value) (Value, error) {
 		return nil, err
 	}
 
+	// TODO: write implementation
 	if iFirst, iOk := first.(IntValue); iOk {
 		if iSecond, jOk := second.(IntValue); jOk {
 			return IntValue(int64(iFirst) + int64(iSecond)), nil
 		}
 	}
 
-	return IntValue(0), nil
+	return nil, MismatchedArgumentsError{}
 }

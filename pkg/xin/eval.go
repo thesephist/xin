@@ -82,6 +82,7 @@ func evalForm(fr *Frame, node *astNode) (Value, error) {
 	form, ok := formHead.(FormValue)
 	if ok {
 		localFrame := newFrame()
+		localFrame.Parent = fr
 		for i, n := range node.leaves[1:] {
 			localFrame.Scope[form.arguments[i]] = LazyValue{node: n}
 		}
@@ -169,21 +170,27 @@ func evalBindForm(fr *Frame, args []*astNode) (Value, error) {
 			return nil, InvalidBindError{nodes: args}
 		}
 
+		formNameNode := specimen.leaves[0]
+		formName := ""
+		if !formNameNode.isForm && formNameNode.token.kind == tkName {
+			formName = formNameNode.token.value
+		}
+
 		argList := specimen.leaves[1:]
 		argNames := make([]string, len(argList))
 		for i, n := range argList {
 			if !n.isForm && n.token.kind == tkName {
 				argNames[i] = n.token.value
+			} else {
+				return nil, InvalidBindError{nodes: args}
 			}
-
-			return nil, InvalidBindError{nodes: args}
 		}
 
 		form := FormValue{
 			arguments:  argNames,
 			definition: body,
 		}
-		fr.Put("fn", form)
+		fr.Put(formName, form)
 
 		return form, nil
 	}

@@ -12,7 +12,8 @@ const cliVersion = "0.1"
 func main() {
 	// fmt.Printf("Xin v%s\n", cliVersion)
 
-	testProgram := "(+ 2 40)"
+	testProgram := "(: limit 7) (: (add a b c)\n\t(+ a (+ b limit))) (add 1 limit 3)"
+
 	fmt.Println("Running test program ", testProgram)
 
 	vm := xin.NewVm()

@@ -47,7 +47,11 @@ func (v LazyValue) String() string {
 
 func unlazy(fr *Frame, v Value) (Value, error) {
 	if asLazy, isLazy := v.(LazyValue); isLazy {
-		return eval(fr, asLazy.node)
+		tmp, err := eval(fr, asLazy.node)
+		if err != nil {
+			return nil, err
+		}
+		return unlazy(fr, tmp)
 	}
 
 	return v, nil
