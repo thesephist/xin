@@ -217,7 +217,7 @@ func evalIfForm(fr *Frame, args []*astNode) (Value, error) {
 	ifTrueNode := args[1]
 	ifFalseNode := args[2]
 
-	cond, err := eval(fr, condNode)
+	cond, err := unlazyEval(fr, condNode)
 	if err != nil {
 		return nil, err
 	}

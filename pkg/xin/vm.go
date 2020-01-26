@@ -25,5 +25,5 @@ func (vm *Vm) Eval(r io.Reader) (Value, error) {
 		fmt.Printf("There was an error: %s", err.Error())
 	}
 
-	return eval(vm.Frame, &rootNode)
+	return unlazyEval(vm.Frame, &rootNode)
 }

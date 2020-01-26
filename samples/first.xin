@@ -1,0 +1,11 @@
+(: limit 12)
+
+(: (add a b c)
+   (+ a (+ b c)))
+
+(: (unless cond x y)
+   (if cond y x))
+
+(unless 1
+  (* (vec 1 2 3) 3)
+  (add 4 limit 5))

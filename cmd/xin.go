@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"strings"
+	"os"
 
 	"github.com/thesephist/xin/pkg/xin"
 )
@@ -12,12 +12,11 @@ const cliVersion = "0.1"
 func main() {
 	// fmt.Printf("Xin v%s\n", cliVersion)
 
-	testProgram := "(: limit 7) (: (add a b c)\n\t(+ a (+ b limit))) (add 1 limit 3)"
-
-	fmt.Println("Running test program ", testProgram)
+	file, err := os.Open("samples/first.xin")
+	defer file.Close()
 
 	vm := xin.NewVm()
-	result, err := vm.Eval(strings.NewReader(testProgram))
+	result, err := vm.Eval(file)
 	if err != nil {
 		fmt.Println("Eval error:", err.Error())
 		return
