@@ -12,13 +12,12 @@ const cliVersion = "0.1"
 func main() {
 	// fmt.Printf("Xin v%s\n", cliVersion)
 
-	toks, err := xin.Parse(xin.Lex(strings.NewReader("(if 1 (sum 10 2) (* 4 5))")))
+	vm := xin.NewVm()
+	result, err := vm.Eval(strings.NewReader("(+ 1 14)"))
 	if err != nil {
-		fmt.Printf("there was an error: %s", err.Error())
+		fmt.Println("Eval error:", err.Error())
+		return
 	}
-	fmt.Println(toks.String())
 
-	// vm := xin.NewVm()
-	// result := vm.Eval(strings.NewReader("(+ 1 14)"))
-	// fmt.Println(result)
+	fmt.Println(result)
 }

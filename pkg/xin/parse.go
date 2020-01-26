@@ -37,7 +37,7 @@ func (e UnexpectedEndingError) Error() string {
 	return "Unexpected ending"
 }
 
-func Parse(toks tokenStream) (astNode, error) {
+func parse(toks tokenStream) (astNode, error) {
 	root := astNode{
 		isForm: true,
 		leaves: []*astNode{},

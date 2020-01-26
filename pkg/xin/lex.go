@@ -85,7 +85,7 @@ func bufToToken(s string, pos position) token {
 	}
 }
 
-func Lex(r io.Reader) tokenStream {
+func lex(r io.Reader) tokenStream {
 	toks := make([]token, 0)
 	rdr, err := newReader(r)
 	if err != nil {

@@ -8,14 +8,14 @@ type Value interface {
 	String() string
 }
 
-type String string
+type StringValue string
 
-func (s String) String() string {
-	return string(s)
+func (v StringValue) String() string {
+	return "'" + string(v) + "'"
 }
 
-type Int int
+type IntValue int64
 
-func (i Int) String() string {
-	return strconv.Itoa(int(i))
+func (v IntValue) String() string {
+	return strconv.FormatInt(int64(v), 10)
 }
