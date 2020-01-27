@@ -3,8 +3,9 @@
 [![GoDoc](https://godoc.org/github.com/thesephist/xin?status.svg)](https://godoc.org/github.com/thesephist/xin)
 [![Build Status](https://travis-ci.com/thesephist/xin.svg?branch=master)](https://travis-ci.com/thesephist/xin)
 
+Xin is a functional programming language inspired by Lisp and CSP. Xin aspires to be an expressive, extensible language built on a small number of simple elements that work well together. You can find a deep dive into the language design [in the spec document](SPEC.md).
 
-Xin is a purely functional programming language inspired by lisp syntax and CSP ideas about concurrency and data sharing. Xin aspires to be an expressive, concise language built on a small number of simple elements that work well together.
+Xin is my second toy programming language, after [Ink](https://github.com/thesephist/ink). With Xin, I'm specifically exploring ideas around code as a data structure, lazy evaluation in an interpreter context, and streaming evented I/O.
 
 Here's the fibonacci sequence, written naively in Xin.
 
@@ -34,24 +35,10 @@ Xin supports proper tail calls, so we can write this in a faster (`O(n)`) tail-r
 ## Goals
 
 - Expressive, extensible syntax that's natural to read and suitable for defining DSLs
-- Performance: [Ink](https://github.com/thesephist/ink) is about 3-4x slower than Python. Xin programs should run at least 10x faster than Python, and the language design should lend itself to efficient compiler optimizations.
 - Programs that lend themselves to sophisticated data structures and dumb algorithms, rather than vice versa
-- Ease of learning, within the constraints of the syntax
+- Ease of learning
 - Great REPL
 
-## Syntax (WIP)
+## Key ideas in Xin
 
-- Also reference: https://schemers.org/Documents/Standards/R5RS/r5rs.pdf
-
-## Type system (WIP)
-
-Supports algebraic types and type aliases and parameterized types, with strong type inference.
-
-Maybe if we have a macro system we can use that a stand-in for generics.
-
-## Xin bytecode
-
-Xin bytecode is a stack machine that is the compilation target for the Xin language.
-
-- Look at WebAssembly bytecode spec.
-- Look at ALE (https://github.com/kode4food/ale) implementation and syntax, especially for the stack machine bytecode vm
+[section to be written]

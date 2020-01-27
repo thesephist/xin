@@ -2,9 +2,9 @@
 
 ## Introduction
 
-Xin is a purely functional programming language inspired by lisp syntax and CSP ideas about concurrency and data sharing. Xin aspires to be an expressive, concise language built on a small number of simple elements that work well together.
+Xin is a functional programming language inspired by Lisp and CSP. Xin aspires to be an expressive, extensible language built on a small number of simple elements that work well together.
 
-Xin supports proper tail calls and uses tail recursion as the only looping primitive, but provides common vocabulary like `while` and `for` / `range` as standard library forms.
+Xin supports proper tail calls and uses tail recursion as the only looping primitive, but provides common vocabulary like `while` and `for` / `range` as standard library forms. Xin uses lazy evaluation.
 
 ## Syntax
 
@@ -21,15 +21,6 @@ Xin's grammar is simple. Here is the complete BNF grammar for Xin. Notably, any 
 
 <program> ::= <form>*
 ```
-
-### Wildcard identifier (?)
-
-The special-case identifier `?` does not reference anything -- to deference `?` is a compile-time error.
-
-`?` is a wildcard identifier, and can be used in two cases.
-
-1. In a definition of a form that takes several arguments, where we want to ignore certain arguments.
-2. In an equality check or comparison, where we want to compare against a generic value or structure that will always return true.
 
 ### Scope
 
@@ -83,25 +74,32 @@ Xin has 3 special forms.
 - `if`: an if-else
 - `do`: sequentially evaluate multiple following expressions
 
-### Concurrency and streams
+### Streams
 
-Streams are the primitive for constructing concurrent programs and doing I/O in Xin. Streams are blocking, synchronous sinks and sources of values.
+Streams are the primitive for constructing concurrent programs and doing I/O in Xin. Streams are sinks and sources of values that interface with the rest of the host system, or another remote part of the Xin program.
 
-The source operator `->` pops one value out of the stream. If the stream has no value in the queue, this form blocks.
+The source operator `->` pops one value out of the stream.
 
-The sink operator `<-` pushes one value into the stream. If there are expressions blocking on the stream, it un-blocks the first-queued expression.
+The sink operator `<-` pushes one value into the stream.
 
-For example, the `os::out` stream represents the standard out file of a process. Running
+For example, the `os::stdout` stream represents the standard out file of a process. Running
 
 ```
-(<- os::stdout 'hello world')
+(<- os::stdout 'hello world\n')
 ```
 
 will print "hello world" to standard out.
 
-Streams can be used to read and write to files, network sockets, or to arbitrary other programs and sinks/sources of values, like OS signals. When writing concurrent programs, blocking stream IO is also the primary synchronization primitive in Xin.
+Streams can be used to read and write to files, network sockets, or to arbitrary other programs and sinks/sources of values, like OS signals. Despite the vocabulary for concurrency in Xin, Xin is a single-threaded language with an interpreter lock, and concurrent calls are ordered onto a single execution timeline, like JavaScript and CPython asyncio.
 
-Despite the vocabulary for concurrency in Xin, Xin is a single-threaded language with an interpreter lock, and concurrent calls are ordered onto a single execution timeline.
+### Lazy evaluation
+
+Evaluation of all expressions and forms in Xin are deferred until they are coerced to resolve to a value by a special form, or by returning a value to the Repl. Expressions are coerced to take real values in the following cases:
+
+1. Before being bound to a name via the bind (`:`) special form
+2. As a top-level expression in a `do` special form
+3. When interfacing with any runtime API that interacts with the outside world, like `os::stdout`
+4. When returned as a value to the Repl.
 
 ## Packages and imports
 
