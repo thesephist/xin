@@ -87,11 +87,11 @@
                   (+ s t))
                pad))
 
-(: (str-split-vec v delim) 0)
-
 (: (str-index? s sub) 0)
 
-(: (str-has? s sub))
+(: (str-split s delim) 0)
+
+(: (str-has? s sub) 0)
 
 (: (str-prefix? s sub) 0)
 

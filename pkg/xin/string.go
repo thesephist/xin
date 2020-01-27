@@ -161,7 +161,10 @@ func strSliceForm(fr *Frame, args []Value) (Value, InterpreterError) {
 		}
 
 		if inRange(secondInt) && inRange(thirdInt) {
-			return firstStr[secondInt:thirdInt], nil
+			byteSlice := firstStr[secondInt:thirdInt]
+			destSlice := make([]byte, len(byteSlice))
+			copy(destSlice, byteSlice)
+			return StringValue(destSlice), nil
 		}
 
 		return IntValue(0), nil

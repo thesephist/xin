@@ -190,7 +190,22 @@ func osDeleteForm(fr *Frame, args []Value) (Value, InterpreterError) {
 	}
 }
 
-func osDumpForm(fr *Frame, args []Value) (Value, InterpreterError) {
+func osArgsForm(fr *Frame, args []Value) (Value, InterpreterError) {
+	if len(args) != 0 {
+		return nil, IncorrectNumberOfArgsError{
+			required: 0,
+			given:    len(args),
+		}
+	}
+
+	argsVec := make([]Value, len(os.Args))
+	for i, a := range os.Args {
+		argsVec[i] = StringValue(a)
+	}
+	return NewVecValue(argsVec), nil
+}
+
+func debugDumpForm(fr *Frame, args []Value) (Value, InterpreterError) {
 	if len(args) != 0 {
 		return nil, IncorrectNumberOfArgsError{
 			required: 0,

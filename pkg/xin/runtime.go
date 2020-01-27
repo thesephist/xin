@@ -109,7 +109,9 @@ func loadAllDefaultForms(vm *Vm) {
 		"os::read":   osReadForm,
 		"os::write":  osWriteForm,
 		"os::delete": osDeleteForm,
-		"os::dump":   osDumpForm,
+		"os::args":   osArgsForm,
+
+		"debug::dump": debugDumpForm,
 	}
 
 	fr := vm.Frame
