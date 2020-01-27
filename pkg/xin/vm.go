@@ -21,6 +21,7 @@ func NewVm() *Vm {
 
 	loadAllDefaultValues(vm)
 	loadAllDefaultForms(vm)
+	loadStandardLibrary(vm)
 
 	return vm
 }

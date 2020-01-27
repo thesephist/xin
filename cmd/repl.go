@@ -27,9 +27,10 @@ func init() {
 func repl() {
 	vm := xin.NewVm()
 
+	replCount := 0
 	reader := bufio.NewReader(os.Stdin)
 	for {
-		fmt.Printf("> ")
+		fmt.Printf("%d ) ", replCount)
 
 		text, err := reader.ReadString('\n')
 		if err == io.EOF {
@@ -42,7 +43,13 @@ func repl() {
 		if ierr != nil {
 			fmt.Println("Eval error:", xin.FormatError(ierr))
 		} else {
-			fmt.Println(result)
+			vm.Frame.Put(
+				fmt.Sprintf("_%d", replCount),
+				result,
+			)
+			fmt.Printf("%d ) %s\n\n", replCount, result)
+
+			replCount++
 		}
 	}
 }

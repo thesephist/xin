@@ -6,6 +6,6 @@
 
 ; basic io
 (: (log s)
-   (<- os::stdout s))
+   (<- os::stdout (+ s '\n')))
 (: (scan)
    (-> os::stdin))

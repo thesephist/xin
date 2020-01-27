@@ -3,8 +3,18 @@ RUN = go run -race ${CMD}
 
 all: run
 
+
+# initialize development workspace
+init:
+	go get github.com/rakyll/statik
+
+
 run:
 	${RUN}
+
+
+gen:
+	statik -src=./lib
 
 
 # build for specific OS target

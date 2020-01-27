@@ -11,10 +11,6 @@
 ;     (a parenthesized expression) that simplifies, or a value. Evaluating an expression
 ;     is recursively simplifying forms by how they were defined.
 
-; booleans
-(: true 1)
-(: false 0)
-
 ; io stream
 ; streams are synchronous, blocking sinks and sources of values
 (: (scan)
