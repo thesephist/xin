@@ -34,7 +34,7 @@ func (v MapValue) Equal(o Value) bool {
 	return false
 }
 
-func mapForm(vm *Vm, fr *Frame, args []Value) (Value, InterpreterError) {
+func mapForm(fr *Frame, args []Value) (Value, InterpreterError) {
 	if len(args) != 0 {
 		return nil, IncorrectNumberOfArgsError{
 			required: 0,
@@ -45,7 +45,7 @@ func mapForm(vm *Vm, fr *Frame, args []Value) (Value, InterpreterError) {
 	return make(MapValue), nil
 }
 
-func mapGetForm(vm *Vm, fr *Frame, args []Value) (Value, InterpreterError) {
+func mapGetForm(fr *Frame, args []Value) (Value, InterpreterError) {
 	if len(args) != 2 {
 		return nil, IncorrectNumberOfArgsError{
 			required: 2,
@@ -76,7 +76,7 @@ func mapGetForm(vm *Vm, fr *Frame, args []Value) (Value, InterpreterError) {
 	}
 }
 
-func mapSetForm(vm *Vm, fr *Frame, args []Value) (Value, InterpreterError) {
+func mapSetForm(fr *Frame, args []Value) (Value, InterpreterError) {
 	if len(args) != 3 {
 		return nil, IncorrectNumberOfArgsError{
 			required: 3,
@@ -108,7 +108,7 @@ func mapSetForm(vm *Vm, fr *Frame, args []Value) (Value, InterpreterError) {
 	}
 }
 
-func mapDelForm(vm *Vm, fr *Frame, args []Value) (Value, InterpreterError) {
+func mapDelForm(fr *Frame, args []Value) (Value, InterpreterError) {
 	if len(args) != 2 {
 		return nil, IncorrectNumberOfArgsError{
 			required: 2,
@@ -140,7 +140,7 @@ func mapDelForm(vm *Vm, fr *Frame, args []Value) (Value, InterpreterError) {
 	}
 }
 
-func mapSizeForm(vm *Vm, fr *Frame, args []Value) (Value, InterpreterError) {
+func mapSizeForm(fr *Frame, args []Value) (Value, InterpreterError) {
 	if len(args) != 1 {
 		return nil, IncorrectNumberOfArgsError{
 			required: 1,

@@ -40,7 +40,7 @@ func (v StreamValue) Equal(o Value) bool {
 	return false
 }
 
-func streamForm(vm *Vm, fr *Frame, args []Value) (Value, InterpreterError) {
+func streamForm(fr *Frame, args []Value) (Value, InterpreterError) {
 	if len(args) != 0 {
 		return nil, IncorrectNumberOfArgsError{
 			required: 0,
@@ -51,7 +51,7 @@ func streamForm(vm *Vm, fr *Frame, args []Value) (Value, InterpreterError) {
 	return StreamValue{}, nil
 }
 
-func streamSetSink(vm *Vm, fr *Frame, args []Value) (Value, InterpreterError) {
+func streamSetSink(fr *Frame, args []Value) (Value, InterpreterError) {
 	if len(args) != 2 {
 		return nil, IncorrectNumberOfArgsError{
 			required: 2,
@@ -93,7 +93,7 @@ func streamSetSink(vm *Vm, fr *Frame, args []Value) (Value, InterpreterError) {
 	}
 }
 
-func streamSetSource(vm *Vm, fr *Frame, args []Value) (Value, InterpreterError) {
+func streamSetSource(fr *Frame, args []Value) (Value, InterpreterError) {
 	if len(args) != 2 {
 		return nil, IncorrectNumberOfArgsError{
 			required: 2,
@@ -133,7 +133,7 @@ func streamSetSource(vm *Vm, fr *Frame, args []Value) (Value, InterpreterError) 
 	}
 }
 
-func sourceForm(vm *Vm, fr *Frame, args []Value) (Value, InterpreterError) {
+func sourceForm(fr *Frame, args []Value) (Value, InterpreterError) {
 	if len(args) != 1 {
 		return nil, IncorrectNumberOfArgsError{
 			required: 1,
@@ -161,7 +161,7 @@ func sourceForm(vm *Vm, fr *Frame, args []Value) (Value, InterpreterError) {
 	}
 }
 
-func sinkForm(vm *Vm, fr *Frame, args []Value) (Value, InterpreterError) {
+func sinkForm(fr *Frame, args []Value) (Value, InterpreterError) {
 	if len(args) != 2 {
 		return nil, IncorrectNumberOfArgsError{
 			required: 2,

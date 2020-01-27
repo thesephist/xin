@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-type formEvaler func(*Vm, *Frame, []Value) (Value, InterpreterError)
+type formEvaler func(*Frame, []Value) (Value, InterpreterError)
 
 type DefaultFormValue struct {
 	name   string
@@ -16,7 +16,7 @@ type DefaultFormValue struct {
 }
 
 func (v DefaultFormValue) eval(fr *Frame, args []Value) (Value, InterpreterError) {
-	return v.evaler(fr.Vm, fr, args)
+	return v.evaler(fr, args)
 }
 
 func (v DefaultFormValue) String() string {
@@ -105,7 +105,7 @@ func loadDefaultForm(vm *Vm, fr *Frame, name string, evaler formEvaler) {
 	})
 }
 
-func addForm(vm *Vm, fr *Frame, args []Value) (Value, InterpreterError) {
+func addForm(fr *Frame, args []Value) (Value, InterpreterError) {
 	if len(args) != 2 {
 		return nil, IncorrectNumberOfArgsError{
 			required: 2,
@@ -156,7 +156,7 @@ func addForm(vm *Vm, fr *Frame, args []Value) (Value, InterpreterError) {
 	}
 }
 
-func subtractForm(vm *Vm, fr *Frame, args []Value) (Value, InterpreterError) {
+func subtractForm(fr *Frame, args []Value) (Value, InterpreterError) {
 	if len(args) != 2 {
 		return nil, IncorrectNumberOfArgsError{
 			required: 2,
@@ -199,7 +199,7 @@ func subtractForm(vm *Vm, fr *Frame, args []Value) (Value, InterpreterError) {
 	}
 }
 
-func multiplyForm(vm *Vm, fr *Frame, args []Value) (Value, InterpreterError) {
+func multiplyForm(fr *Frame, args []Value) (Value, InterpreterError) {
 	if len(args) != 2 {
 		return nil, IncorrectNumberOfArgsError{
 			required: 2,
@@ -252,7 +252,7 @@ func multiplyForm(vm *Vm, fr *Frame, args []Value) (Value, InterpreterError) {
 	}
 }
 
-func divideForm(vm *Vm, fr *Frame, args []Value) (Value, InterpreterError) {
+func divideForm(fr *Frame, args []Value) (Value, InterpreterError) {
 	if len(args) != 2 {
 		return nil, IncorrectNumberOfArgsError{
 			required: 2,
@@ -295,7 +295,7 @@ func divideForm(vm *Vm, fr *Frame, args []Value) (Value, InterpreterError) {
 	}
 }
 
-func andForm(vm *Vm, fr *Frame, args []Value) (Value, InterpreterError) {
+func andForm(fr *Frame, args []Value) (Value, InterpreterError) {
 	if len(args) != 2 {
 		return nil, IncorrectNumberOfArgsError{
 			required: 2,
@@ -324,7 +324,7 @@ func andForm(vm *Vm, fr *Frame, args []Value) (Value, InterpreterError) {
 	}
 }
 
-func orForm(vm *Vm, fr *Frame, args []Value) (Value, InterpreterError) {
+func orForm(fr *Frame, args []Value) (Value, InterpreterError) {
 	if len(args) != 2 {
 		return nil, IncorrectNumberOfArgsError{
 			required: 2,
@@ -353,7 +353,7 @@ func orForm(vm *Vm, fr *Frame, args []Value) (Value, InterpreterError) {
 	}
 }
 
-func xorForm(vm *Vm, fr *Frame, args []Value) (Value, InterpreterError) {
+func xorForm(fr *Frame, args []Value) (Value, InterpreterError) {
 	if len(args) != 2 {
 		return nil, IncorrectNumberOfArgsError{
 			required: 2,
@@ -382,7 +382,7 @@ func xorForm(vm *Vm, fr *Frame, args []Value) (Value, InterpreterError) {
 	}
 }
 
-func greaterForm(vm *Vm, fr *Frame, args []Value) (Value, InterpreterError) {
+func greaterForm(fr *Frame, args []Value) (Value, InterpreterError) {
 	if len(args) != 2 {
 		return nil, IncorrectNumberOfArgsError{
 			required: 2,
@@ -423,7 +423,7 @@ func greaterForm(vm *Vm, fr *Frame, args []Value) (Value, InterpreterError) {
 		args: args,
 	}
 }
-func lessForm(vm *Vm, fr *Frame, args []Value) (Value, InterpreterError) {
+func lessForm(fr *Frame, args []Value) (Value, InterpreterError) {
 	if len(args) != 2 {
 		return nil, IncorrectNumberOfArgsError{
 			required: 2,
@@ -465,7 +465,7 @@ func lessForm(vm *Vm, fr *Frame, args []Value) (Value, InterpreterError) {
 	}
 }
 
-func equalForm(vm *Vm, fr *Frame, args []Value) (Value, InterpreterError) {
+func equalForm(fr *Frame, args []Value) (Value, InterpreterError) {
 	if len(args) != 2 {
 		return nil, IncorrectNumberOfArgsError{
 			required: 2,

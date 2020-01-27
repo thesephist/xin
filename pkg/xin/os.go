@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-func osWaitForm(vm *Vm, fr *Frame, args []Value) (Value, InterpreterError) {
+func osWaitForm(fr *Frame, args []Value) (Value, InterpreterError) {
 	if len(args) != 2 {
 		return nil, IncorrectNumberOfArgsError{
 			required: 2,
@@ -28,6 +28,8 @@ func osWaitForm(vm *Vm, fr *Frame, args []Value) (Value, InterpreterError) {
 			args: args,
 		}
 	}
+
+	vm := fr.Vm
 
 	vm.waiter.Add(1)
 	go func() {

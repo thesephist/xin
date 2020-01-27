@@ -32,7 +32,7 @@ func (v VecValue) Equal(o Value) bool {
 	return false
 }
 
-func vecForm(vm *Vm, fr *Frame, args []Value) (Value, InterpreterError) {
+func vecForm(fr *Frame, args []Value) (Value, InterpreterError) {
 	vecValues := make([]Value, len(args))
 	for i, a := range args {
 		val, err := unlazy(a)
@@ -44,7 +44,7 @@ func vecForm(vm *Vm, fr *Frame, args []Value) (Value, InterpreterError) {
 	return VecValue(vecValues), nil
 }
 
-func vecGetForm(vm *Vm, fr *Frame, args []Value) (Value, InterpreterError) {
+func vecGetForm(fr *Frame, args []Value) (Value, InterpreterError) {
 	if len(args) != 2 {
 		return nil, IncorrectNumberOfArgsError{
 			required: 2,
@@ -76,7 +76,7 @@ func vecGetForm(vm *Vm, fr *Frame, args []Value) (Value, InterpreterError) {
 	}
 }
 
-func vecSetForm(vm *Vm, fr *Frame, args []Value) (Value, InterpreterError) {
+func vecSetForm(fr *Frame, args []Value) (Value, InterpreterError) {
 	if len(args) != 3 {
 		return nil, IncorrectNumberOfArgsError{
 			required: 3,
@@ -113,7 +113,7 @@ func vecSetForm(vm *Vm, fr *Frame, args []Value) (Value, InterpreterError) {
 	}
 }
 
-func vecSizeForm(vm *Vm, fr *Frame, args []Value) (Value, InterpreterError) {
+func vecSizeForm(fr *Frame, args []Value) (Value, InterpreterError) {
 	if len(args) != 1 {
 		return nil, IncorrectNumberOfArgsError{
 			required: 1,
