@@ -8,9 +8,12 @@ type sinkCallback func(Value) InterpreterError
 
 type sourceCallback func() (Value, InterpreterError)
 
+type closerCallback func() InterpreterError
+
 type streamCallbacks struct {
 	sink   sinkCallback
 	source sourceCallback
+	closer closerCallback
 }
 
 type StreamValue struct {
@@ -35,6 +38,10 @@ func (v StreamValue) isSource() bool {
 	return v.callbacks.source != nil
 }
 
+func (v StreamValue) isClose() bool {
+	return v.callbacks.closer != nil
+}
+
 func (v StreamValue) String() string {
 	streamType := ""
 	if v.isSink() {
@@ -42,6 +49,9 @@ func (v StreamValue) String() string {
 	}
 	if v.isSource() {
 		streamType += "source "
+	}
+	if v.isClose() {
+		streamType += "close "
 	}
 	return fmt.Sprintf("(%s<stream %d>)", streamType, v.id)
 }
@@ -146,7 +156,47 @@ func streamSetSource(fr *Frame, args []Value) (Value, InterpreterError) {
 	}
 }
 
-func sourceForm(fr *Frame, args []Value) (Value, InterpreterError) {
+func streamSetClose(fr *Frame, args []Value) (Value, InterpreterError) {
+	if len(args) != 2 {
+		return nil, IncorrectNumberOfArgsError{
+			required: 2,
+			given:    len(args),
+		}
+	}
+
+	first, err := unlazy(args[0])
+	if err != nil {
+		return nil, err
+	}
+	second, err := unlazy(args[1])
+	if err != nil {
+		return nil, err
+	}
+
+	if firstStream, ok := first.(StreamValue); ok {
+		if secondForm, ok := second.(FormValue); ok {
+			if len(secondForm.arguments) != 0 {
+				return nil, InvalidStreamCallbackError{
+					reason: "Mismatched argument count in callback",
+				}
+			}
+
+			firstStream.callbacks.closer = func() InterpreterError {
+				localFrame := newFrame(fr)
+				eval(localFrame, secondForm.definition)
+				return nil
+			}
+
+			return secondForm, nil
+		}
+	}
+
+	return nil, MismatchedArgumentsError{
+		args: args,
+	}
+}
+
+func streamSourceForm(fr *Frame, args []Value) (Value, InterpreterError) {
 	if len(args) != 1 {
 		return nil, IncorrectNumberOfArgsError{
 			required: 1,
@@ -174,7 +224,7 @@ func sourceForm(fr *Frame, args []Value) (Value, InterpreterError) {
 	}
 }
 
-func sinkForm(fr *Frame, args []Value) (Value, InterpreterError) {
+func streamSinkForm(fr *Frame, args []Value) (Value, InterpreterError) {
 	if len(args) != 2 {
 		return nil, IncorrectNumberOfArgsError{
 			required: 2,
@@ -203,6 +253,38 @@ func sinkForm(fr *Frame, args []Value) (Value, InterpreterError) {
 			return nil, err
 		}
 		return second, nil
+	}
+
+	return nil, MismatchedArgumentsError{
+		args: args,
+	}
+}
+
+func streamCloseForm(fr *Frame, args []Value) (Value, InterpreterError) {
+	if len(args) != 1 {
+		return nil, IncorrectNumberOfArgsError{
+			required: 1,
+			given:    len(args),
+		}
+	}
+
+	first, err := unlazy(args[0])
+	if err != nil {
+		return nil, err
+	}
+
+	if firstStream, ok := first.(StreamValue); ok {
+		if !firstStream.isClose() {
+			return nil, InvalidStreamCallbackError{
+				reason: "Cannot try to close to a non-close stream",
+			}
+		}
+
+		err := firstStream.callbacks.closer()
+		if err != nil {
+			return nil, err
+		}
+		return firstStream, nil
 	}
 
 	return nil, MismatchedArgumentsError{

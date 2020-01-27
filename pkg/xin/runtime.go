@@ -79,14 +79,16 @@ func loadAllDefaultForms(vm *Vm) {
 		"int":  intForm,
 		"frac": fracForm,
 
-		"str-get":  strGetForm,
-		"str-size": strSizeForm,
+		"str-get":   strGetForm,
+		"str-size":  strSizeForm,
+		"str-slice": strSliceForm,
 
-		"vec":      vecForm,
-		"vec-get":  vecGetForm,
-		"vec-set!": vecSetForm,
-		"vec-add!": vecAddForm,
-		"vec-size": vecSizeForm,
+		"vec":       vecForm,
+		"vec-get":   vecGetForm,
+		"vec-set!":  vecSetForm,
+		"vec-add!":  vecAddForm,
+		"vec-size":  vecSizeForm,
+		"vec-slice": vecSliceForm,
 
 		"map":      mapForm,
 		"map-get":  mapGetForm,
@@ -98,11 +100,16 @@ func loadAllDefaultForms(vm *Vm) {
 		"stream":             streamForm,
 		"stream-set-sink!":   streamSetSink,
 		"stream-set-source!": streamSetSource,
-		"->":                 sourceForm,
-		"<-":                 sinkForm,
+		"stream-set-close!":  streamSetClose,
+		"->":                 streamSourceForm,
+		"<-":                 streamSinkForm,
+		"stream-close!":      streamCloseForm,
 
-		"os::dump": osDumpForm,
-		"os::wait": osWaitForm,
+		"os::wait":   osWaitForm,
+		"os::read":   osReadForm,
+		"os::write":  osWriteForm,
+		"os::delete": osDeleteForm,
+		"os::dump":   osDumpForm,
 	}
 
 	fr := vm.Frame

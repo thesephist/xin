@@ -176,3 +176,54 @@ func vecSizeForm(fr *Frame, args []Value) (Value, InterpreterError) {
 		args: args,
 	}
 }
+
+func vecSliceForm(fr *Frame, args []Value) (Value, InterpreterError) {
+	if len(args) != 3 {
+		return nil, IncorrectNumberOfArgsError{
+			required: 3,
+			given:    len(args),
+		}
+	}
+
+	first, err := unlazy(args[0])
+	if err != nil {
+		return nil, err
+	}
+	second, err := unlazy(args[1])
+	if err != nil {
+		return nil, err
+	}
+	third, err := unlazy(args[2])
+	if err != nil {
+		return nil, err
+	}
+
+	firstVec, fok := first.(VecValue)
+	secondInt, sok := second.(IntValue)
+	thirdInt, tok := third.(IntValue)
+	if fok && sok && tok {
+		max := len(firstVec.underlying.items)
+		inRange := func(iv IntValue) bool {
+			return int(iv) >= 0 && int(iv) < max
+		}
+
+		if int(secondInt) >= max {
+			secondInt = IntValue(max) - 1
+		}
+		if int(thirdInt) >= max {
+			thirdInt = IntValue(max) - 1
+		}
+
+		if inRange(secondInt) && inRange(thirdInt) {
+			base := make([]Value, 0, thirdInt-secondInt)
+			items := append(base, firstVec.underlying.items[secondInt:thirdInt]...)
+			return NewVecValue(items), nil
+		}
+
+		return IntValue(0), nil
+	}
+
+	return nil, MismatchedArgumentsError{
+		args: args,
+	}
+}

@@ -1,7 +1,10 @@
 ; common list idioms
 
+(: list-all
+   (seq 100))
+
 (: list
-   (seq 10))
+   (vec-slice list-all 1 11))
 
 (log list)
 
