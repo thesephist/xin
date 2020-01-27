@@ -4,11 +4,21 @@ import (
 	"strings"
 )
 
-type VecValue []Value
+type vecUnderlying []Value
+
+type VecValue struct {
+	items vecUnderlying
+}
+
+func NewVecValue(items []Value) VecValue {
+	return VecValue{
+		items: items,
+	}
+}
 
 func (v VecValue) String() string {
-	ss := make([]string, len(v))
-	for i, item := range v {
+	ss := make([]string, len(v.items))
+	for i, item := range v.items {
 		ss[i] = item.String()
 	}
 	return "(<vec> " + strings.Join(ss, " ") + ")"
@@ -16,12 +26,12 @@ func (v VecValue) String() string {
 
 func (v VecValue) Equal(o Value) bool {
 	if ov, ok := o.(VecValue); ok {
-		if len(v) != len(ov) {
+		if len(v.items) != len(ov.items) {
 			return false
 		}
 
-		for i, x := range v {
-			if x != ov[i] {
+		for i, x := range v.items {
+			if x != ov.items[i] {
 				return false
 			}
 		}
@@ -41,7 +51,7 @@ func vecForm(fr *Frame, args []Value) (Value, InterpreterError) {
 		}
 		vecValues[i] = val
 	}
-	return VecValue(vecValues), nil
+	return NewVecValue(vecValues), nil
 }
 
 func vecGetForm(fr *Frame, args []Value) (Value, InterpreterError) {
@@ -64,8 +74,8 @@ func vecGetForm(fr *Frame, args []Value) (Value, InterpreterError) {
 	firstVec, fok := first.(VecValue)
 	secondInt, sok := second.(IntValue)
 	if fok && sok {
-		if int(secondInt) < len(firstVec) {
-			return firstVec[secondInt], nil
+		if int(secondInt) < len(firstVec.items) {
+			return firstVec.items[secondInt], nil
 		}
 
 		return VecValue{}, nil
@@ -100,12 +110,39 @@ func vecSetForm(fr *Frame, args []Value) (Value, InterpreterError) {
 	firstVec, fok := first.(VecValue)
 	secondInt, sok := second.(IntValue)
 	if fok && sok {
-		if int(secondInt) < len(firstVec) {
-			firstVec[secondInt] = third
+		if int(secondInt) < len(firstVec.items) {
+			firstVec.items[secondInt] = third
 			return third, nil
 		}
 
 		return VecValue{}, nil
+	}
+
+	return nil, MismatchedArgumentsError{
+		args: args,
+	}
+}
+
+func vecAddForm(fr *Frame, args []Value) (Value, InterpreterError) {
+	if len(args) != 2 {
+		return nil, IncorrectNumberOfArgsError{
+			required: 2,
+			given:    len(args),
+		}
+	}
+
+	first, err := unlazy(args[0])
+	if err != nil {
+		return nil, err
+	}
+	second, err := unlazy(args[1])
+	if err != nil {
+		return nil, err
+	}
+
+	if firstVec, fok := first.(VecValue); fok {
+		firstVec.items = append(firstVec.items, second)
+		return second, nil
 	}
 
 	return nil, MismatchedArgumentsError{
@@ -127,7 +164,7 @@ func vecSizeForm(fr *Frame, args []Value) (Value, InterpreterError) {
 	}
 
 	if firstVec, fok := first.(VecValue); fok {
-		return IntValue(len(firstVec)), nil
+		return IntValue(len(firstVec.items)), nil
 	}
 
 	return nil, MismatchedArgumentsError{

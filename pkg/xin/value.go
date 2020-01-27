@@ -1,6 +1,7 @@
 package xin
 
 import (
+	"bytes"
 	"fmt"
 	"strconv"
 	"strings"
@@ -11,7 +12,7 @@ type Value interface {
 	Equal(Value) bool
 }
 
-type StringValue string
+type StringValue []byte
 
 func (v StringValue) String() string {
 	return string(v)
@@ -19,7 +20,7 @@ func (v StringValue) String() string {
 
 func (v StringValue) Equal(o Value) bool {
 	if ov, ok := o.(StringValue); ok {
-		return strings.Compare(string(v), string(ov)) == 0
+		return bytes.Compare(v, ov) == 0
 	}
 
 	return false

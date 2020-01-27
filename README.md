@@ -1,6 +1,18 @@
-# Xin
+# Xin programming language
 
 Xin is a purely functional programming language inspired by lisp syntax and CSP ideas about concurrency and data sharing. Xin aspires to be an expressive, concise language built on a small number of simple elements that work well together.
+
+Here's the fibonacci sequence, written naively in Xin.
+
+```
+(: (fib n)
+   (if (| (= n 0) (= n 1))
+     1
+     (+ (fib (- n 1))
+        (fib (- n 2)))))
+
+(log (fib 20))
+```
 
 ## Goals
 

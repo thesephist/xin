@@ -77,9 +77,12 @@ func loadAllDefaultForms(vm *Vm) {
 		"int":    intForm,
 		"frac":   fracForm,
 
+		"size": sizeForm,
+
 		"vec":      vecForm,
 		"vec-get":  vecGetForm,
 		"vec-set!": vecSetForm,
+		"vec-add!": vecAddForm,
 		"vec-size": vecSizeForm,
 
 		"map":      mapForm,
@@ -149,11 +152,16 @@ func addForm(fr *Frame, args []Value) (Value, InterpreterError) {
 		}
 	case StringValue:
 		if cleanSecond, ok := second.(StringValue); ok {
-			return cleanFirst + cleanSecond, nil
+			// In this context, strings are immutable. i.e. concatenating
+			// strings should produce a completely new string whose modifications
+			// won't be observable by the original strings.
+			base := make([]byte, 0, len(cleanFirst)+len(cleanSecond))
+			base = append(base, cleanFirst...)
+			return StringValue(append(base, cleanSecond...)), nil
 		}
 	case VecValue:
 		if cleanSecond, ok := second.(VecValue); ok {
-			return VecValue(append(cleanFirst, cleanSecond...)), nil
+			return NewVecValue(append(cleanFirst.items, cleanSecond.items...)), nil
 		}
 	}
 
@@ -244,12 +252,12 @@ func multiplyForm(fr *Frame, args []Value) (Value, InterpreterError) {
 	case VecValue:
 		if cleanSecond, ok := second.(IntValue); ok {
 			result := make([]Value, 0)
-			copy(result, cleanFirst)
+			copy(result, cleanFirst.items)
 			max := int(cleanSecond)
 			for i := 0; i < max; i++ {
-				result = append(result, cleanFirst...)
+				result = append(result, cleanFirst.items...)
 			}
-			return VecValue(result), nil
+			return NewVecValue(result), nil
 		}
 	}
 
@@ -503,4 +511,24 @@ func equalForm(fr *Frame, args []Value) (Value, InterpreterError) {
 	} else {
 		return IntValue(0), nil
 	}
+}
+
+func sizeForm(fr *Frame, args []Value) (Value, InterpreterError) {
+	if len(args) != 1 {
+		return nil, IncorrectNumberOfArgsError{
+			required: 1,
+			given:    len(args),
+		}
+	}
+
+	first, err := unlazy(args[0])
+	if err != nil {
+		return nil, err
+	}
+
+	if firstString, ok := first.(StringValue); ok {
+		return IntValue(len(firstString)), nil
+	}
+
+	return IntValue(1), nil
 }

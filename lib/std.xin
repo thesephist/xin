@@ -11,6 +11,17 @@
    (-> os::stdin))
 
 ; iteration primitives: range, times
+(: (range start end step)
+   (do
+     (: (sub i acc)
+        (if (> i end)
+          acc
+          (do (vec-add! acc i)
+            (sub (+ i step) acc))))
+     (sub start (vec))))
+
+(: (xrange n)
+   (range 0 n 1))
 
 ; vec functions
 
