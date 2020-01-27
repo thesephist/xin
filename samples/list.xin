@@ -4,3 +4,26 @@
    (seq 10))
 
 (log list)
+
+(: reduced
+   (vec-reduce list
+               (: (f a b)
+                  (+ a b))
+               0))
+(log reduced)
+
+(vec-each list
+          (: (f x)
+             (log x)))
+
+(: (sq n)
+   (* n n))
+(: mapped
+   (vec-map list sq))
+(log mapped)
+
+(: (even? n)
+   (= (% n 2) 0))
+(: filtered
+   (vec-filter list even?))
+(log filtered)

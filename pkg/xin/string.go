@@ -1,6 +1,7 @@
 package xin
 
 import (
+	"bytes"
 	"fmt"
 	"strconv"
 	"strings"
@@ -54,4 +55,70 @@ func escapeString(s string) string {
 	}
 
 	return builder.String()
+}
+
+type StringValue []byte
+
+func (v StringValue) String() string {
+	return string(v)
+}
+
+func (v StringValue) Equal(o Value) bool {
+	if ov, ok := o.(StringValue); ok {
+		return bytes.Compare(v, ov) == 0
+	}
+
+	return false
+}
+
+func strSizeForm(fr *Frame, args []Value) (Value, InterpreterError) {
+	if len(args) != 1 {
+		return nil, IncorrectNumberOfArgsError{
+			required: 1,
+			given:    len(args),
+		}
+	}
+
+	first, err := unlazy(args[0])
+	if err != nil {
+		return nil, err
+	}
+
+	if firstString, ok := first.(StringValue); ok {
+		return IntValue(len(firstString)), nil
+	}
+
+	return IntValue(1), nil
+}
+
+func strGetForm(fr *Frame, args []Value) (Value, InterpreterError) {
+	if len(args) != 2 {
+		return nil, IncorrectNumberOfArgsError{
+			required: 2,
+			given:    len(args),
+		}
+	}
+
+	first, err := unlazy(args[0])
+	if err != nil {
+		return nil, err
+	}
+	second, err := unlazy(args[1])
+	if err != nil {
+		return nil, err
+	}
+
+	firstStr, fok := first.(StringValue)
+	secondInt, sok := second.(IntValue)
+	if fok && sok {
+		if int(secondInt) < len(firstStr) {
+			return firstStr[secondInt : secondInt+1], nil
+		}
+
+		return VecValue{}, nil
+	}
+
+	return nil, MismatchedArgumentsError{
+		args: args,
+	}
 }

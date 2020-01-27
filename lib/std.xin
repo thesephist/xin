@@ -6,7 +6,7 @@
 
 ; basic io
 (: (log s)
-   (<- os::stdout (+ (string s) '\n')))
+   (<- os::stdout (+ (str s) '\n')))
 (: (scan)
    (-> os::stdin))
 
@@ -34,10 +34,14 @@
      (sub 0 acc)))
 
 (: (vec-each v f)
-   (vec-reduce v
-               (: (g x)
-                  (f x))
-               0))
+   (do
+     (: max (vec-size v))
+     (: (sub i)
+        (if (< i max)
+          (do (f (vec-get v i) i)
+            (sub (+ i 1)))
+          0))
+     (sub 0)))
 
 (: (vec-map v f)
    (vec-reduce v
@@ -46,7 +50,12 @@
                (vec)))
 
 (: (vec-filter v f)
-   0)
+   (vec-reduce v
+               (: (g x acc i)
+                  (if (f x i)
+                    (vec-add! acc x)
+                    acc))
+               (vec)))
 
 ; set abstraction over map
 (: (set)
@@ -61,3 +70,28 @@
      false))
 
 ; string manipulations
+(: (str-reduce s f acc)
+   (do
+     (: max (str-size v))
+     (: (sub i acc)
+        (if (< i max)
+          (sub (+ i 1)
+               (f (str-get v i) acc i))
+          acc))
+     (sub 0 acc)))
+
+(: (str-join-vec v pad)
+   (vec-reduce v
+               (: (g s t)
+                  (+ s t))
+               pad))
+
+(: (str-split-vec v delim) 0)
+
+(: (str-index? s sub) 0)
+
+(: (str-has? s sub))
+
+(: (str-prefix? s sub) 0)
+
+(: (str-suffix? s sub) 0)

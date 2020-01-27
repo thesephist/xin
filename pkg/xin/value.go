@@ -1,7 +1,6 @@
 package xin
 
 import (
-	"bytes"
 	"fmt"
 	"strconv"
 	"strings"
@@ -10,20 +9,6 @@ import (
 type Value interface {
 	String() string
 	Equal(Value) bool
-}
-
-type StringValue []byte
-
-func (v StringValue) String() string {
-	return string(v)
-}
-
-func (v StringValue) Equal(o Value) bool {
-	if ov, ok := o.(StringValue); ok {
-		return bytes.Compare(v, ov) == 0
-	}
-
-	return false
 }
 
 type IntValue int64
@@ -55,6 +40,7 @@ func (v FracValue) Equal(o Value) bool {
 }
 
 type FormValue struct {
+	frame      *Frame
 	arguments  []string
 	definition *astNode
 }

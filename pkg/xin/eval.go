@@ -13,29 +13,50 @@ type Frame struct {
 }
 
 func newFrame(parent *Frame) *Frame {
-	if parent != nil {
+	if parent == nil {
 		return &Frame{
-			Vm:     parent.Vm,
-			Scope:  make(map[string]Value),
-			Parent: parent,
+			Scope: make(map[string]Value),
 		}
 	}
 
 	return &Frame{
-		Scope: make(map[string]Value),
+		Vm:     parent.Vm,
+		Scope:  make(map[string]Value),
+		Parent: parent,
 	}
 }
 
 func (fr *Frame) String() string {
 	ss := make([]string, 0, len(fr.Scope))
 	for name, val := range fr.Scope {
-		ss = append(ss, name+"\n\t\t-> "+val.String())
+		ss = append(ss, name+"\t"+val.String())
 	}
-	return fmt.Sprintf("(<frame dump>)\n\t%s", strings.Join(ss, "\n\t"))
+
+	parent := ""
+	if fr.Parent != nil {
+		parent = fr.Parent.String()
+	} else {
+		parent = "(<frame root>)"
+	}
+
+	return fmt.Sprintf("(<frame dump>)\n  %s\n%s",
+		strings.Join(ss, "\n  "),
+		parent,
+	)
 }
 
 func (fr *Frame) Get(name string, pos position) (Value, InterpreterError) {
 	if val, prs := fr.Scope[name]; prs {
+		if lzv, ok := val.(LazyValue); ok {
+			tmp, err := unlazy(lzv)
+			if err != nil {
+				return nil, err
+			}
+
+			fr.Scope[name] = tmp
+			return tmp, nil
+		}
+
 		return val, nil
 	} else if fr.Parent != nil {
 		return fr.Parent.Get(name, pos)
@@ -86,7 +107,7 @@ func evalForm(fr *Frame, node *astNode) (Value, InterpreterError) {
 	}
 
 	if form, ok := maybeForm.(FormValue); ok {
-		localFrame := newFrame(fr)
+		localFrame := newFrame(form.frame)
 		maxArgs := len(form.arguments)
 
 		for i, n := range node.leaves[1:] {
@@ -173,6 +194,7 @@ func evalBindForm(fr *Frame, args []*astNode) (Value, InterpreterError) {
 		}
 
 		form := FormValue{
+			frame:      fr,
 			arguments:  argNames,
 			definition: body,
 		}

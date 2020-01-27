@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"io"
+	"math"
 	"os"
 	"strings"
 )
@@ -64,6 +65,7 @@ func loadAllDefaultForms(vm *Vm) {
 		"-": subtractForm,
 		"*": multiplyForm,
 		"/": divideForm,
+		"%": modForm,
 
 		">": greaterForm,
 		"<": lessForm,
@@ -73,11 +75,12 @@ func loadAllDefaultForms(vm *Vm) {
 		"|": orForm,
 		"^": xorForm,
 
-		"string": stringForm,
-		"int":    intForm,
-		"frac":   fracForm,
+		"str":  stringForm,
+		"int":  intForm,
+		"frac": fracForm,
 
-		"size": sizeForm,
+		"str-get":  strGetForm,
+		"str-size": strSizeForm,
 
 		"vec":      vecForm,
 		"vec-get":  vecGetForm,
@@ -310,6 +313,53 @@ func divideForm(fr *Frame, args []Value) (Value, InterpreterError) {
 	}
 }
 
+func modForm(fr *Frame, args []Value) (Value, InterpreterError) {
+	if len(args) != 2 {
+		return nil, IncorrectNumberOfArgsError{
+			required: 2,
+			given:    len(args),
+		}
+	}
+
+	first, err := unlazy(args[0])
+	if err != nil {
+		return nil, err
+	}
+	second, err := unlazy(args[1])
+	if err != nil {
+		return nil, err
+	}
+
+	if firstInt, fok := first.(IntValue); fok {
+		if _, sok := second.(FracValue); sok {
+			first = FracValue(float64(firstInt))
+		}
+	} else if _, fok := first.(FracValue); fok {
+		if secondInt, sok := second.(IntValue); sok {
+			second = FracValue(float64(secondInt))
+		}
+	}
+
+	switch cleanFirst := first.(type) {
+	case IntValue:
+		if cleanSecond, ok := second.(IntValue); ok {
+			return cleanFirst % cleanSecond, nil
+		}
+	case FracValue:
+		if cleanSecond, ok := second.(FracValue); ok {
+			modulus := math.Mod(
+				float64(cleanFirst),
+				float64(cleanSecond),
+			)
+			return FracValue(modulus), nil
+		}
+	}
+
+	return nil, MismatchedArgumentsError{
+		args: args,
+	}
+}
+
 func andForm(fr *Frame, args []Value) (Value, InterpreterError) {
 	if len(args) != 2 {
 		return nil, IncorrectNumberOfArgsError{
@@ -512,24 +562,4 @@ func equalForm(fr *Frame, args []Value) (Value, InterpreterError) {
 	} else {
 		return IntValue(0), nil
 	}
-}
-
-func sizeForm(fr *Frame, args []Value) (Value, InterpreterError) {
-	if len(args) != 1 {
-		return nil, IncorrectNumberOfArgsError{
-			required: 1,
-			given:    len(args),
-		}
-	}
-
-	first, err := unlazy(args[0])
-	if err != nil {
-		return nil, err
-	}
-
-	if firstString, ok := first.(StringValue); ok {
-		return IntValue(len(firstString)), nil
-	}
-
-	return IntValue(1), nil
 }
