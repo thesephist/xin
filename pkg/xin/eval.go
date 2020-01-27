@@ -3,6 +3,7 @@ package xin
 import (
 	"fmt"
 	"strconv"
+	"strings"
 )
 
 type Frame struct {
@@ -23,6 +24,14 @@ func newFrame(parent *Frame) *Frame {
 	return &Frame{
 		Scope: make(map[string]Value),
 	}
+}
+
+func (fr *Frame) String() string {
+	ss := make([]string, 0, len(fr.Scope))
+	for name, val := range fr.Scope {
+		ss = append(ss, name+"\n\t\t-> "+val.String())
+	}
+	return fmt.Sprintf("(<frame dump>)\n\t%s", strings.Join(ss, "\n\t"))
 }
 
 func (fr *Frame) Get(name string, pos position) (Value, InterpreterError) {

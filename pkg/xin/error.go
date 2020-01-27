@@ -6,7 +6,7 @@ import (
 )
 
 func FormatError(e InterpreterError) string {
-	return e.Error() + "\n\t" + e.Position().String()
+	return e.Error() + "\n\t at " + e.Position().String()
 }
 
 type InterpreterError interface {
@@ -176,7 +176,7 @@ type InvalidStreamCallbackError struct {
 }
 
 func (e InvalidStreamCallbackError) Error() string {
-	return "Invalid stream callback:" + e.reason
+	return "Invalid stream callback: " + e.reason
 }
 
 func (e InvalidStreamCallbackError) Position() position {

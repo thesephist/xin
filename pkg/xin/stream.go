@@ -1,5 +1,7 @@
 package xin
 
+import "fmt"
+
 var streamId int64 = 0
 
 type sinkCallback func(Value) InterpreterError
@@ -29,7 +31,7 @@ func (v StreamValue) String() string {
 	if v.isSource() {
 		streamType += "source "
 	}
-	return "(" + streamType + "<stream>)"
+	return fmt.Sprintf("(%s<stream %d>)", streamType, v.id)
 }
 
 func (v StreamValue) Equal(o Value) bool {
@@ -48,7 +50,11 @@ func streamForm(fr *Frame, args []Value) (Value, InterpreterError) {
 		}
 	}
 
-	return StreamValue{}, nil
+	streamId++
+
+	return StreamValue{
+		id: streamId,
+	}, nil
 }
 
 func streamSetSink(fr *Frame, args []Value) (Value, InterpreterError) {
@@ -181,7 +187,7 @@ func sinkForm(fr *Frame, args []Value) (Value, InterpreterError) {
 	if firstStream, ok := first.(StreamValue); ok {
 		if !firstStream.isSink() {
 			return nil, InvalidStreamCallbackError{
-				reason: "Cannot try to sink from a non-sink stream",
+				reason: "Cannot try to sink to a non-sink stream",
 			}
 		}
 

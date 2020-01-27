@@ -51,3 +51,14 @@ func osWaitForm(fr *Frame, args []Value) (Value, InterpreterError) {
 
 	return IntValue(1), nil
 }
+
+func osDumpForm(fr *Frame, args []Value) (Value, InterpreterError) {
+	if len(args) != 0 {
+		return nil, IncorrectNumberOfArgsError{
+			required: 0,
+			given:    len(args),
+		}
+	}
+
+	return StringValue(fr.String()), nil
+}

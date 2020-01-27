@@ -9,3 +9,11 @@
    (<- os::stdout (+ s '\n')))
 (: (scan)
    (-> os::stdin))
+
+; iteration primitives: range, times
+
+; vec functions
+
+; set abstraction over map
+
+; string manipulations

@@ -89,6 +89,7 @@ func loadAllDefaultForms(vm *Vm) {
 		"->":                 sourceForm,
 		"<-":                 sinkForm,
 
+		"os::dump": osDumpForm,
 		"os::wait": osWaitForm,
 	}
 
