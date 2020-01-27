@@ -12,19 +12,52 @@
 
 ; iteration primitives: range, times
 (: (range start end step)
-   (do
-     (: (sub i acc)
-        (if (> i end)
-          acc
-          (do (vec-add! acc i)
-            (sub (+ i step) acc))))
+   (do (: (sub i acc)
+          (if (< i end)
+            (do (vec-add! acc i)
+              (sub (+ i step) acc))
+            acc))
      (sub start (vec))))
 
-(: (xrange n)
+(: (seq n)
    (range 0 n 1))
 
 ; vec functions
+(: (vec-reduce v f acc)
+   (do
+     (: max (vec-size v))
+     (: (sub i acc)
+        (if (< i max)
+          (sub (+ i 1)
+               (f (vec-get v i) acc i))
+          acc))
+     (sub 0 acc)))
+
+(: (vec-each v f)
+   (vec-reduce v
+               (: (g x)
+                  (f x))
+               0))
+
+(: (vec-map v f)
+   (vec-reduce v
+               (: (g x acc i)
+                  (vec-add! acc (f x i)))
+               (vec)))
+
+(: (vec-filter v f)
+   0)
 
 ; set abstraction over map
+(: (set)
+   (map))
+(: (set-add! v)
+   (map-set! v 0))
+(: (set-del! v)
+   (map-del! v))
+(: (set-has v)
+   (if (= (map-get v) 0)
+     true
+     false))
 
 ; string manipulations

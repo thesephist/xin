@@ -1,0 +1,6 @@
+; common list idioms
+
+(: list
+   (seq 10))
+
+(log list)

@@ -4,21 +4,26 @@ import (
 	"strings"
 )
 
-type vecUnderlying []Value
+// vecUnderlying provides a layer of indirection
+// we need to allow vecs to be mutable in-place
+// because Go slices are not in-place mutable.
+type vecUnderlying struct {
+	items []Value
+}
 
 type VecValue struct {
-	items vecUnderlying
+	underlying *vecUnderlying
 }
 
 func NewVecValue(items []Value) VecValue {
 	return VecValue{
-		items: items,
+		underlying: &vecUnderlying{items},
 	}
 }
 
 func (v VecValue) String() string {
-	ss := make([]string, len(v.items))
-	for i, item := range v.items {
+	ss := make([]string, len(v.underlying.items))
+	for i, item := range v.underlying.items {
 		ss[i] = item.String()
 	}
 	return "(<vec> " + strings.Join(ss, " ") + ")"
@@ -26,12 +31,12 @@ func (v VecValue) String() string {
 
 func (v VecValue) Equal(o Value) bool {
 	if ov, ok := o.(VecValue); ok {
-		if len(v.items) != len(ov.items) {
+		if len(v.underlying.items) != len(ov.underlying.items) {
 			return false
 		}
 
-		for i, x := range v.items {
-			if x != ov.items[i] {
+		for i, x := range v.underlying.items {
+			if x != ov.underlying.items[i] {
 				return false
 			}
 		}
@@ -74,8 +79,8 @@ func vecGetForm(fr *Frame, args []Value) (Value, InterpreterError) {
 	firstVec, fok := first.(VecValue)
 	secondInt, sok := second.(IntValue)
 	if fok && sok {
-		if int(secondInt) < len(firstVec.items) {
-			return firstVec.items[secondInt], nil
+		if int(secondInt) < len(firstVec.underlying.items) {
+			return firstVec.underlying.items[secondInt], nil
 		}
 
 		return VecValue{}, nil
@@ -110,9 +115,9 @@ func vecSetForm(fr *Frame, args []Value) (Value, InterpreterError) {
 	firstVec, fok := first.(VecValue)
 	secondInt, sok := second.(IntValue)
 	if fok && sok {
-		if int(secondInt) < len(firstVec.items) {
-			firstVec.items[secondInt] = third
-			return third, nil
+		if int(secondInt) < len(firstVec.underlying.items) {
+			firstVec.underlying.items[secondInt] = third
+			return firstVec, nil
 		}
 
 		return VecValue{}, nil
@@ -141,8 +146,8 @@ func vecAddForm(fr *Frame, args []Value) (Value, InterpreterError) {
 	}
 
 	if firstVec, fok := first.(VecValue); fok {
-		firstVec.items = append(firstVec.items, second)
-		return second, nil
+		firstVec.underlying.items = append(firstVec.underlying.items, second)
+		return firstVec, nil
 	}
 
 	return nil, MismatchedArgumentsError{
@@ -164,7 +169,7 @@ func vecSizeForm(fr *Frame, args []Value) (Value, InterpreterError) {
 	}
 
 	if firstVec, fok := first.(VecValue); fok {
-		return IntValue(len(firstVec.items)), nil
+		return IntValue(len(firstVec.underlying.items)), nil
 	}
 
 	return nil, MismatchedArgumentsError{

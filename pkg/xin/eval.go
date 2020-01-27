@@ -36,13 +36,7 @@ func (fr *Frame) String() string {
 
 func (fr *Frame) Get(name string, pos position) (Value, InterpreterError) {
 	if val, prs := fr.Scope[name]; prs {
-		tmp, err := unlazy(val)
-		if err != nil {
-			return nil, err
-		}
-
-		fr.Scope[name] = tmp
-		return tmp, nil
+		return val, nil
 	} else if fr.Parent != nil {
 		return fr.Parent.Get(name, pos)
 	}
@@ -86,7 +80,7 @@ func evalForm(fr *Frame, node *astNode) (Value, InterpreterError) {
 		}
 	}
 
-	maybeForm, err := eval(fr, formNode)
+	maybeForm, err := unlazyEval(fr, formNode)
 	if err != nil {
 		return nil, err
 	}
@@ -106,7 +100,10 @@ func evalForm(fr *Frame, node *astNode) (Value, InterpreterError) {
 			})
 		}
 
-		return eval(localFrame, form.definition)
+		return LazyValue{
+			frame: localFrame,
+			node:  form.definition,
+		}, nil
 	} else if form, ok := maybeForm.(DefaultFormValue); ok {
 		args := make([]Value, len(node.leaves)-1)
 		for i, n := range node.leaves[1:] {
@@ -123,7 +120,6 @@ func evalForm(fr *Frame, node *astNode) (Value, InterpreterError) {
 		node:     node,
 		position: node.position,
 	}
-
 }
 
 func evalAtom(fr *Frame, node *astNode) (Value, InterpreterError) {
@@ -189,7 +185,7 @@ func evalBindForm(fr *Frame, args []*astNode) (Value, InterpreterError) {
 		return nil, InvalidBindError{nodes: args}
 	}
 
-	val, err := eval(fr, body)
+	val, err := unlazyEval(fr, body)
 	if err != nil {
 		return nil, err
 	}
@@ -223,15 +219,18 @@ func evalIfForm(fr *Frame, args []*astNode) (Value, InterpreterError) {
 }
 
 func evalDoForm(fr *Frame, args []*astNode) (Value, InterpreterError) {
-	var final Value
-	var err InterpreterError
+	if len(args) == 0 {
+		return IntValue(0), nil
+	}
 
-	for _, node := range args {
-		final, err = eval(fr, node)
+	lastIndex := len(args) - 1
+
+	for _, node := range args[:lastIndex] {
+		_, err := unlazyEval(fr, node)
 		if err != nil {
 			return nil, err
 		}
 	}
 
-	return final, nil
+	return eval(fr, args[lastIndex])
 }

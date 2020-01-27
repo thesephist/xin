@@ -88,6 +88,7 @@ func loadAllDefaultForms(vm *Vm) {
 		"map":      mapForm,
 		"map-get":  mapGetForm,
 		"map-set!": mapSetForm,
+		"map-has":  mapHasForm,
 		"map-del!": mapDelForm,
 		"map-size": mapSizeForm,
 
@@ -161,7 +162,7 @@ func addForm(fr *Frame, args []Value) (Value, InterpreterError) {
 		}
 	case VecValue:
 		if cleanSecond, ok := second.(VecValue); ok {
-			return NewVecValue(append(cleanFirst.items, cleanSecond.items...)), nil
+			return NewVecValue(append(cleanFirst.underlying.items, cleanSecond.underlying.items...)), nil
 		}
 	}
 
@@ -252,10 +253,10 @@ func multiplyForm(fr *Frame, args []Value) (Value, InterpreterError) {
 	case VecValue:
 		if cleanSecond, ok := second.(IntValue); ok {
 			result := make([]Value, 0)
-			copy(result, cleanFirst.items)
+			copy(result, cleanFirst.underlying.items)
 			max := int(cleanSecond)
 			for i := 0; i < max; i++ {
-				result = append(result, cleanFirst.items...)
+				result = append(result, cleanFirst.underlying.items...)
 			}
 			return NewVecValue(result), nil
 		}

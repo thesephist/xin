@@ -100,7 +100,38 @@ func mapSetForm(fr *Frame, args []Value) (Value, InterpreterError) {
 	if firstMap, ok := first.(MapValue); ok {
 		firstMap[second] = third
 
-		return third, nil
+		return firstMap, nil
+	}
+
+	return nil, MismatchedArgumentsError{
+		args: args,
+	}
+}
+
+func mapHasForm(fr *Frame, args []Value) (Value, InterpreterError) {
+	if len(args) != 2 {
+		return nil, IncorrectNumberOfArgsError{
+			required: 2,
+			given:    len(args),
+		}
+	}
+
+	first, err := unlazy(args[0])
+	if err != nil {
+		return nil, err
+	}
+	second, err := unlazy(args[1])
+	if err != nil {
+		return nil, err
+	}
+
+	if firstMap, ok := first.(MapValue); ok {
+		_, prs := firstMap[second]
+		if prs {
+			return IntValue(1), nil
+		}
+
+		return IntValue(0), nil
 	}
 
 	return nil, MismatchedArgumentsError{
@@ -126,10 +157,10 @@ func mapDelForm(fr *Frame, args []Value) (Value, InterpreterError) {
 	}
 
 	if firstMap, ok := first.(MapValue); ok {
-		val, prs := firstMap[second]
+		_, prs := firstMap[second]
 		if prs {
 			delete(firstMap, second)
-			return val, nil
+			return firstMap, nil
 		}
 
 		return VecValue{}, nil

@@ -94,7 +94,7 @@ func streamSetSink(fr *Frame, args []Value) (Value, InterpreterError) {
 				localFrame := newFrame(fr)
 				localFrame.Put(secondForm.arguments[0], v)
 
-				_, err := eval(localFrame, secondForm.definition)
+				_, err := unlazyEval(localFrame, secondForm.definition)
 				return err
 			}
 
@@ -134,7 +134,6 @@ func streamSetSource(fr *Frame, args []Value) (Value, InterpreterError) {
 
 			firstStream.callbacks.source = func() (Value, InterpreterError) {
 				localFrame := newFrame(fr)
-
 				return eval(localFrame, secondForm.definition)
 			}
 
