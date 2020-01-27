@@ -1,0 +1,27 @@
+; find first N primes
+
+(: (int-sqrt n)
+   (+ 1 (int (sqrt n))))
+
+(: (is-prime n)
+   (if (< n 2)
+     false
+     (vec-reduce (range 2 (int-sqrt n) 1)
+                 (: (f small acc)
+                    (& acc (! (factor? n small))))
+                 true)))
+
+(: (primes-in-range ns)
+   (vec-filter ns is-prime))
+
+(: (count-primes-in-range ns)
+   (vec-size (primes-in-range ns)))
+
+; run a primality test for range under limit
+(: limit 1000)
+(: primes
+   (primes-in-range (seq limit)))
+(log (+ 'Number of primes under '
+        (+ (str limit)
+           (+ ': '
+              (str (vec-size primes))))))

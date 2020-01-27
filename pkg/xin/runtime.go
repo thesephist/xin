@@ -66,14 +66,16 @@ func loadAllDefaultForms(vm *Vm) {
 		"*": multiplyForm,
 		"/": divideForm,
 		"%": modForm,
+		"^": powForm,
 
 		">": greaterForm,
 		"<": lessForm,
 		"=": equalForm,
 
-		"&": andForm,
-		"|": orForm,
-		"^": xorForm,
+		"!":   notForm,
+		"&":   andForm,
+		"|":   orForm,
+		"xor": xorForm,
 
 		"str":  stringForm,
 		"int":  intForm,
@@ -361,6 +363,79 @@ func modForm(fr *Frame, args []Value) (Value, InterpreterError) {
 				float64(cleanSecond),
 			)
 			return FracValue(modulus), nil
+		}
+	}
+
+	return nil, MismatchedArgumentsError{
+		args: args,
+	}
+}
+
+func powForm(fr *Frame, args []Value) (Value, InterpreterError) {
+	if len(args) != 2 {
+		return nil, IncorrectNumberOfArgsError{
+			required: 2,
+			given:    len(args),
+		}
+	}
+
+	first, err := unlazy(args[0])
+	if err != nil {
+		return nil, err
+	}
+	second, err := unlazy(args[1])
+	if err != nil {
+		return nil, err
+	}
+
+	if firstInt, fok := first.(IntValue); fok {
+		if _, sok := second.(FracValue); sok {
+			first = FracValue(float64(firstInt))
+		}
+	} else if _, fok := first.(FracValue); fok {
+		if secondInt, sok := second.(IntValue); sok {
+			second = FracValue(float64(secondInt))
+		}
+	}
+
+	switch cleanFirst := first.(type) {
+	case IntValue:
+		if cleanSecond, ok := second.(IntValue); ok {
+			return IntValue(math.Pow(float64(cleanFirst), float64(cleanSecond))), nil
+		}
+	case FracValue:
+		if cleanSecond, ok := second.(FracValue); ok {
+			power := math.Pow(
+				float64(cleanFirst),
+				float64(cleanSecond),
+			)
+			return FracValue(power), nil
+		}
+	}
+
+	return nil, MismatchedArgumentsError{
+		args: args,
+	}
+}
+
+func notForm(fr *Frame, args []Value) (Value, InterpreterError) {
+	if len(args) != 1 {
+		return nil, IncorrectNumberOfArgsError{
+			required: 1,
+			given:    len(args),
+		}
+	}
+
+	first, err := unlazy(args[0])
+	if err != nil {
+		return nil, err
+	}
+
+	if firstInt, ok := first.(IntValue); ok {
+		if firstInt.Equal(IntValue(0)) {
+			return IntValue(1), nil
+		} else {
+			return IntValue(0), nil
 		}
 	}
 
