@@ -6,10 +6,14 @@
 (: (is-prime n)
    (if (< n 2)
      false
-     (vec-reduce (range 2 (int-sqrt n) 1)
-                 (: (f small acc)
-                    (& acc (! (factor? n small))))
-                 true)))
+     (do (: max (int-sqrt n))
+       (: (sub i)
+          (if (= i max)
+            true
+            (if (factor? n i)
+              false
+              (sub (+ i 1)))))
+       (sub 2))))
 
 (: (primes-in-range ns)
    (vec-filter ns is-prime))
@@ -18,7 +22,7 @@
    (vec-size (primes-in-range ns)))
 
 ; run a primality test for range under limit
-(: limit 1000)
+(: limit 5000)
 (: primes
    (primes-in-range (seq limit)))
 (log (+ 'Number of primes under '
