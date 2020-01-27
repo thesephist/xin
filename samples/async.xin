@@ -1,9 +1,8 @@
 (: (say-with-pause secs saying)
-   (os::wait
-     secs
-     (<- os::stdout (+ saying '\n'))))
+   (os::wait secs (log saying)))
 
-(do (say-with-pause 3 'after three -- should be last')
+(do
+  (say-with-pause 3 'after three -- should be last')
   (say-with-pause 2.5 'in the middle')
   (say-with-pause 2 'after two'))
 

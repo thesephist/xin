@@ -1,7 +1,6 @@
-; print your name
-(: (puts s)
-   (<- os::stdout (+ s '\n')))
+(: puts log)
 
+; print your name
 (puts 'What is your name?')
 
 (: user-name

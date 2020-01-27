@@ -7,6 +7,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 	"github.com/thesephist/xin/pkg/xin"
 )
@@ -47,7 +48,7 @@ func repl() {
 				fmt.Sprintf("_%d", replCount),
 				result,
 			)
-			fmt.Printf("%d ) %s\n\n", replCount, result)
+			color.Yellow("%d ) %s\n\n", replCount, result)
 
 			replCount++
 		}
