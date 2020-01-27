@@ -8,19 +8,31 @@ type sinkCallback func(Value) InterpreterError
 
 type sourceCallback func() (Value, InterpreterError)
 
-type StreamValue struct {
-	// id is used to compare and de-duplicate stream values in memory
-	id     int64
+type streamCallbacks struct {
 	sink   sinkCallback
 	source sourceCallback
 }
 
+type StreamValue struct {
+	// id is used to compare and de-duplicate stream values in memory
+	id        int64
+	callbacks *streamCallbacks
+}
+
+func NewStream() StreamValue {
+	streamId++
+	return StreamValue{
+		id:        streamId,
+		callbacks: &streamCallbacks{},
+	}
+}
+
 func (v StreamValue) isSink() bool {
-	return v.sink != nil
+	return v.callbacks.sink != nil
 }
 
 func (v StreamValue) isSource() bool {
-	return v.source != nil
+	return v.callbacks.source != nil
 }
 
 func (v StreamValue) String() string {
@@ -50,11 +62,7 @@ func streamForm(fr *Frame, args []Value) (Value, InterpreterError) {
 		}
 	}
 
-	streamId++
-
-	return StreamValue{
-		id: streamId,
-	}, nil
+	return NewStream(), nil
 }
 
 func streamSetSink(fr *Frame, args []Value) (Value, InterpreterError) {
@@ -82,7 +90,7 @@ func streamSetSink(fr *Frame, args []Value) (Value, InterpreterError) {
 				}
 			}
 
-			firstStream.sink = func(v Value) InterpreterError {
+			firstStream.callbacks.sink = func(v Value) InterpreterError {
 				localFrame := newFrame(fr)
 				localFrame.Put(secondForm.arguments[0], v)
 
@@ -124,7 +132,7 @@ func streamSetSource(fr *Frame, args []Value) (Value, InterpreterError) {
 				}
 			}
 
-			firstStream.source = func() (Value, InterpreterError) {
+			firstStream.callbacks.source = func() (Value, InterpreterError) {
 				localFrame := newFrame(fr)
 
 				return eval(localFrame, secondForm.definition)
@@ -159,7 +167,7 @@ func sourceForm(fr *Frame, args []Value) (Value, InterpreterError) {
 			}
 		}
 
-		return firstStream.source()
+		return firstStream.callbacks.source()
 	}
 
 	return nil, MismatchedArgumentsError{
@@ -191,7 +199,7 @@ func sinkForm(fr *Frame, args []Value) (Value, InterpreterError) {
 			}
 		}
 
-		err := firstStream.sink(second)
+		err := firstStream.callbacks.sink(second)
 		if err != nil {
 			return nil, err
 		}

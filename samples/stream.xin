@@ -9,8 +9,6 @@
   sm
   (: (f) 42))
 
-(log (os::dump))
-
 (log 'should print 42')
 (log (-> sm))
 (log 'should print 39')

@@ -34,27 +34,28 @@ func (v DefaultFormValue) Equal(o Value) bool {
 func loadAllDefaultValues(vm *Vm) {
 	fr := vm.Frame
 
-	fr.Put("os::stdout", StreamValue{
-		sink: func(v Value) InterpreterError {
-			fmt.Printf(v.String())
-			return nil
-		},
-	})
-	fr.Put("os::stdin", StreamValue{
-		source: func() (Value, InterpreterError) {
-			reader := bufio.NewReader(os.Stdin)
-			input, err := reader.ReadString('\n')
-			if err == io.EOF {
-				return StringValue(""), nil
-			} else if err != nil {
-				return nil, RuntimeError{
-					reason: "Cannot read from stdin",
-				}
-			}
+	stdoutStream := NewStream()
+	stdoutStream.callbacks.sink = func(v Value) InterpreterError {
+		fmt.Printf(v.String())
+		return nil
+	}
+	fr.Put("os::stdout", stdoutStream)
 
-			return StringValue(input[:len(input)-1]), nil
-		},
-	})
+	stdinStream := NewStream()
+	stdinStream.callbacks.source = func() (Value, InterpreterError) {
+		reader := bufio.NewReader(os.Stdin)
+		input, err := reader.ReadString('\n')
+		if err == io.EOF {
+			return StringValue(""), nil
+		} else if err != nil {
+			return nil, RuntimeError{
+				reason: "Cannot read from stdin",
+			}
+		}
+
+		return StringValue(input[:len(input)-1]), nil
+	}
+	fr.Put("os::stdin", stdinStream)
 }
 
 func loadAllDefaultForms(vm *Vm) {
@@ -71,6 +72,10 @@ func loadAllDefaultForms(vm *Vm) {
 		"&": andForm,
 		"|": orForm,
 		"^": xorForm,
+
+		"string": stringForm,
+		"int":    intForm,
+		"frac":   fracForm,
 
 		"vec":      vecForm,
 		"vec-get":  vecGetForm,
