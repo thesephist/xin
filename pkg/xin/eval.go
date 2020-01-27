@@ -93,7 +93,13 @@ func evalForm(fr *Frame, node *astNode) (Value, InterpreterError) {
 
 	if form, ok := maybeForm.(FormValue); ok {
 		localFrame := newFrame(fr)
+		maxArgs := len(form.arguments)
+
 		for i, n := range node.leaves[1:] {
+			if i >= maxArgs {
+				break
+			}
+
 			localFrame.Put(form.arguments[i], LazyValue{
 				frame: fr,
 				node:  n,

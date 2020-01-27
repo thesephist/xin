@@ -1,7 +1,24 @@
+; fibonacci sequence generator
+
+; naive approach
 (: (fib n)
    (if (| (= n 0) (= n 1))
      1
      (+ (fib (- n 1))
         (fib (- n 2)))))
 
-(log (fib 10))
+; more efficient, O(n) approach
+; that's tail-recursive
+(: (fibh n a b)
+   (if (| (= n 0) (= n 1))
+     b
+     (fibh (- n 1) b (+ a b))))
+(: (fibr n)
+   (fibh n 1 1))
+
+(: limit 23)
+
+(log 'Trying naively...')
+(log (fib limit))
+(log 'Trying tail-recursively...')
+(log (fibr limit))
