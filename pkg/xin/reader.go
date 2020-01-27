@@ -18,12 +18,22 @@ func (rdr *reader) done() bool {
 }
 
 func (rdr *reader) next() string {
-	rdr.index++
+	rdr.skip()
 	return rdr.source[rdr.index-1 : rdr.index]
 }
 
 func (rdr *reader) skip() {
 	rdr.index++
+	if rdr.done() {
+		return
+	}
+
+	if rdr.source[rdr.index] == '\n' {
+		rdr.line++
+		rdr.col = 0
+	} else {
+		rdr.col++
+	}
 }
 
 func (rdr *reader) lookback() string {
@@ -43,7 +53,10 @@ func (rdr *reader) upto(end string) string {
 }
 
 func (rdr *reader) currPos() position {
-	return rdr.position
+	return position{
+		line: rdr.position.line + 1,
+		col:  rdr.position.col + 1,
+	}
 }
 
 func newReader(r io.Reader) (reader, error) {
