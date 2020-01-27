@@ -2,8 +2,8 @@
    (os::wait secs (log saying)))
 
 (do
-  (say-with-pause 3 'after three -- should be last')
-  (say-with-pause 2.5 'in the middle')
-  (say-with-pause 2 'after two'))
+  (say-with-pause 2 'after two -- should be last')
+  (say-with-pause 1.5 'in the middle')
+  (say-with-pause 1 'after one'))
 
 (say-with-pause .5 'this should be first')

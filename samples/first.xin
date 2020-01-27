@@ -6,6 +6,9 @@
 (: (unless cond x y)
    (if cond y x))
 
-(unless 1
-  (* (vec 1 2 3) 3)
-  (add 4 limit 5))
+(: result
+   (unless 1
+     (* (vec 1 2 3) 3)
+     (add 4 limit 5)))
+
+(log result)

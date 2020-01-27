@@ -1,5 +1,4 @@
 ; recursive factorial
-
 (: (fact n)
    (if (= n 0)
      1

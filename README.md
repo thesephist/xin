@@ -1,5 +1,9 @@
 # Xin programming language
 
+[![GoDoc](https://godoc.org/github.com/thesephist/xin?status.svg)](https://godoc.org/github.com/thesephist/xin)
+[![Build Status](https://travis-ci.com/thesephist/xin.svg?branch=master)](https://travis-ci.com/thesephist/xin)
+
+
 Xin is a purely functional programming language inspired by lisp syntax and CSP ideas about concurrency and data sharing. Xin aspires to be an expressive, concise language built on a small number of simple elements that work well together.
 
 Here's the fibonacci sequence, written naively in Xin.
@@ -10,6 +14,19 @@ Here's the fibonacci sequence, written naively in Xin.
      1
      (+ (fib (- n 1))
         (fib (- n 2)))))
+
+(log (fib 20))
+```
+
+Xin supports proper tail calls, so we can write this in a faster (`O(n)`) tail-recursive form.
+
+```
+(: (fibh n a b)
+   (if (| (= n 0) (= n 1))
+     b
+     (fibh (- n 1) b (+ a b))))
+(: (fib n)
+   (fibh n 1 1))
 
 (log (fib 20))
 ```

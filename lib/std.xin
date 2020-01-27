@@ -1,4 +1,5 @@
 ; xin standard library
+; included by default into the built executable binary
 
 ; boolean aliases
 (: true 1)
