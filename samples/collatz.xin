@@ -1,0 +1,40 @@
+; find the longest collatz chain
+; starting from a number less than N
+
+(: (even? n)
+   (factor? n 2))
+
+(: (collatz-next n)
+   (if (even? n)
+     (/ n 2)
+     (+ 1 (* 3 n))))
+
+(: (collatz-seq start)
+   (do (: (sub n acc)
+          (do (: next (collatz-next n))
+            (if (= next 1)
+              (vec-add! acc next)
+              (sub next (vec-add! acc next)))))
+     (sub start (vec start))))
+
+(: (longest-collatz-seq ns)
+   (vec-reduce ns
+               (: (f x last)
+                  (do (: this-collatz (collatz-seq x))
+                    (if (> (vec-size this-collatz) (vec-size last))
+                      this-collatz
+                      last)))
+               (vec)))
+
+(: (longest-collatz-seq-below cap)
+   (longest-collatz-seq (range 1 cap 1)))
+
+; compute the longest collatz seq below given cap
+(: cap 500)
+(: longest-seq
+   (longest-collatz-seq-below cap))
+(log (+ 'Longest Collatz sequence length below '
+        (+ (str cap)
+           (+ ': '
+              (str (vec-size longest-seq))))))
+(log longest-seq)

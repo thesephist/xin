@@ -15,6 +15,7 @@ test:
 	./xin run ./samples/fact.xin
 	./xin run ./samples/fib.xin
 	./xin run ./samples/prime.xin
+	./xin run ./samples/collatz.xin
 	./xin run ./samples/list.xin
 	./xin run ./samples/async.xin
 	./xin run ./samples/stream.xin
