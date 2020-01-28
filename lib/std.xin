@@ -4,6 +4,8 @@
 ; boolean aliases
 (: true 1)
 (: false 0)
+(: and &)
+(: or |)
 (: (bool x)
    (if (= false x)
      'false' 'true'))

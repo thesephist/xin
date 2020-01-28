@@ -80,13 +80,6 @@ func eval(fr *Frame, node *astNode) (Value, InterpreterError) {
 }
 
 func evalForm(fr *Frame, node *astNode) (Value, InterpreterError) {
-	if len(node.leaves) == 0 {
-		return nil, InvalidFormError{
-			node:     node,
-			position: node.position,
-		}
-	}
-
 	formNode := node.leaves[0]
 
 	// Evaluate special forms
@@ -108,13 +101,7 @@ func evalForm(fr *Frame, node *astNode) (Value, InterpreterError) {
 
 	if form, ok := maybeForm.(FormValue); ok {
 		localFrame := newFrame(form.frame)
-		maxArgs := len(form.arguments)
-
-		for i, n := range node.leaves[1:] {
-			if i >= maxArgs {
-				break
-			}
-
+		for i, n := range node.leaves[1 : 1+len(form.arguments)] {
 			localFrame.Put(form.arguments[i], LazyValue{
 				frame: fr,
 				node:  n,
@@ -138,7 +125,6 @@ func evalForm(fr *Frame, node *astNode) (Value, InterpreterError) {
 	}
 
 	return nil, InvalidFormError{
-		node:     node,
 		position: node.position,
 	}
 }
@@ -169,8 +155,7 @@ func evalBindForm(fr *Frame, args []*astNode) (Value, InterpreterError) {
 		return nil, InvalidBindError{nodes: args}
 	}
 
-	specimen := args[0]
-	body := args[1]
+	specimen, body := args[0], args[1]
 
 	if specimen.isForm {
 		if len(specimen.leaves) < 1 {

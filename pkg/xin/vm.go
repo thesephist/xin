@@ -1,7 +1,6 @@
 package xin
 
 import (
-	"fmt"
 	"io"
 	"sync"
 )
@@ -31,11 +30,11 @@ func (vm *Vm) Eval(r io.Reader) (Value, InterpreterError) {
 
 	toks, err := lex(r)
 	if err != nil {
-		fmt.Printf("Lex error: %s", FormatError(err))
+		return nil, err
 	}
 	rootNode, err := parse(toks)
 	if err != nil {
-		fmt.Printf("Parse error: %s", FormatError(err))
+		return nil, err
 	}
 
 	vm.Lock()

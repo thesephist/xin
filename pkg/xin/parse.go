@@ -80,6 +80,12 @@ func parseForm(toks tokenStream) (astNode, int, InterpreterError) {
 		}
 	}
 
+	if toks[index].kind == tkCloseParen {
+		return astNode{}, 0, InvalidFormError{
+			position: toks[index].position,
+		}
+	}
+
 	for toks[index].kind != tkCloseParen {
 		n, delta, err := parseGeneric(toks[index:])
 		if err != nil {

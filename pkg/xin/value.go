@@ -72,18 +72,12 @@ func (v LazyValue) Equal(o Value) bool {
 }
 
 func unlazy(v Value) (Value, InterpreterError) {
-	var lzv LazyValue
-	var isLazy bool
 	var err InterpreterError
-
-	lzv, isLazy = v.(LazyValue)
-	for isLazy {
+	for lzv, isLazy := v.(LazyValue); isLazy; lzv, isLazy = v.(LazyValue) {
 		v, err = eval(lzv.frame, lzv.node)
 		if err != nil {
 			return nil, err
 		}
-
-		lzv, isLazy = v.(LazyValue)
 	}
 
 	return v, nil

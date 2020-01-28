@@ -28,12 +28,11 @@ func (e UndefinedNameError) Position() position {
 }
 
 type InvalidFormError struct {
-	node     *astNode
 	position position
 }
 
 func (e InvalidFormError) Error() string {
-	return fmt.Sprintf("Invalid form: %s", e.node)
+	return fmt.Sprintf("Invalid form")
 }
 
 func (e InvalidFormError) Position() position {
