@@ -6,6 +6,8 @@ import (
 	"strings"
 )
 
+const zeroValue = IntValue(0)
+
 type Frame struct {
 	Vm     *Vm
 	Scope  map[string]Value
@@ -223,7 +225,7 @@ func evalIfForm(fr *Frame, args []*astNode) (Value, InterpreterError) {
 	switch cond {
 	case IntValue(1):
 		return eval(fr, ifTrueNode)
-	case IntValue(0):
+	case zeroValue:
 		return eval(fr, ifFalseNode)
 	default:
 		return nil, InvalidIfConditionError{cond: cond}
@@ -232,7 +234,7 @@ func evalIfForm(fr *Frame, args []*astNode) (Value, InterpreterError) {
 
 func evalDoForm(fr *Frame, args []*astNode) (Value, InterpreterError) {
 	if len(args) == 0 {
-		return IntValue(0), nil
+		return zeroValue, nil
 	}
 
 	lastIndex := len(args) - 1

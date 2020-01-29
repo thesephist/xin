@@ -41,11 +41,11 @@ func intForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) {
 	case StringValue:
 		intVal, err := strconv.ParseInt(string(val), 10, 64)
 		if err != nil {
-			return IntValue(0), nil
+			return zeroValue, nil
 		}
 		return IntValue(intVal), nil
 	default:
-		return IntValue(0), nil
+		return zeroValue, nil
 	}
 }
 

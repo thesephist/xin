@@ -1,0 +1,27 @@
+; str standard library
+
+(: (str-reduce s f acc)
+   (do
+     (: max (str-size v))
+     (: (sub i acc)
+        (if (< i max)
+          (sub (+ i 1)
+               (f (str-get v i) acc i))
+          acc))
+     (sub 0 acc)))
+
+(: (str-join-vec v pad)
+   (vec-reduce v
+               (: (g s t)
+                  (+ s t))
+               pad))
+
+(: (str-index? s sub) 0)
+
+(: (str-split s delim) 0)
+
+(: (str-has? s sub) 0)
+
+(: (str-prefix? s sub) 0)
+
+(: (str-suffix? s sub) 0)

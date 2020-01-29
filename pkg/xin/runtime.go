@@ -318,10 +318,18 @@ func divideForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError
 	switch cleanFirst := first.(type) {
 	case IntValue:
 		if cleanSecond, ok := second.(IntValue); ok {
+			if cleanSecond == zeroValue {
+				return zeroValue, nil
+			}
+
 			return cleanFirst / cleanSecond, nil
 		}
 	case FracValue:
 		if cleanSecond, ok := second.(FracValue); ok {
+			if cleanSecond == FracValue(0) {
+				return zeroValue, nil
+			}
+
 			return cleanFirst / cleanSecond, nil
 		}
 	}
@@ -445,10 +453,10 @@ func notForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) {
 	}
 
 	if firstInt, ok := first.(IntValue); ok {
-		if firstInt.Equal(IntValue(0)) {
+		if firstInt.Equal(zeroValue) {
 			return IntValue(1), nil
 		} else {
-			return IntValue(0), nil
+			return zeroValue, nil
 		}
 	}
 
@@ -575,7 +583,7 @@ func greaterForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterErro
 			if cleanFirst > cleanSecond {
 				return IntValue(1), nil
 			} else {
-				return IntValue(0), nil
+				return zeroValue, nil
 			}
 		}
 	case StringValue:
@@ -584,7 +592,7 @@ func greaterForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterErro
 			if cmp == 1 {
 				return IntValue(1), nil
 			} else {
-				return IntValue(0), nil
+				return zeroValue, nil
 			}
 		}
 	}
@@ -618,7 +626,7 @@ func lessForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) 
 			if cleanFirst < cleanSecond {
 				return IntValue(1), nil
 			} else {
-				return IntValue(0), nil
+				return zeroValue, nil
 			}
 		}
 	case StringValue:
@@ -627,7 +635,7 @@ func lessForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) 
 			if cmp == -1 {
 				return IntValue(1), nil
 			} else {
-				return IntValue(0), nil
+				return zeroValue, nil
 			}
 		}
 	}
@@ -669,6 +677,6 @@ func equalForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError)
 	if first.Equal(second) {
 		return IntValue(1), nil
 	} else {
-		return IntValue(0), nil
+		return zeroValue, nil
 	}
 }

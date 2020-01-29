@@ -7,8 +7,7 @@
 (: and &)
 (: or |)
 (: (bool x)
-   (if (= false x)
-     'false' 'true'))
+   (if x 'true' 'false'))
 
 ; identity function
 (: (identity x) x)
@@ -40,72 +39,6 @@
 (: (seq n)
    (range 0 n 1))
 
-; vec functions
-(: (vec-head v)
-   (vec-get v 0))
-
-(: (vec-tail v)
-   (vec-slice v 1 (vec-size v)))
-
-(: (vec-last v)
-   (vec-get v (- (vec-size v) 1)))
-
-(: (vec-empty? v)
-   (= (vec-size v) 0))
-
-; TODO: unbreak
-(: (vec-reverse v)
-   (vec-add! (if (vec-empty? v)
-               (vec)
-               (vec-reverse (vec-tail v)))
-             (vec-head v)))
-
-(: (vec-cat v w)
-   (do (: (sub v w)
-          (if (vec-empty? w)
-            v
-            (sub (vec-add! v (vec-head w) (vec-tail w)))))
-     (sub (vec-clone v) w)))
-
-(: (vec-reduce v f acc)
-   (do
-     (: max (vec-size v))
-     (: (sub i acc)
-        (if (< i max)
-          (sub (+ i 1)
-               (f (vec-get v i) acc i))
-          acc))
-     (sub 0 acc)))
-
-(: (vec-each v f)
-   (do
-     (: max (vec-size v))
-     (: (sub i)
-        (if (< i max)
-          (do (f (vec-get v i) i)
-            (sub (+ i 1)))
-          0))
-     (sub 0)))
-
-(: (vec-map v f)
-   (vec-reduce v
-               (: (g x acc i)
-                  (vec-add! acc (f x i)))
-               (vec)))
-
-; the fastest way to clone a xin vec
-; is to use the native vec-slice
-(: (vec-clone v)
-   (vec-slice v 0 (vec-size v)))
-
-(: (vec-filter v f)
-   (vec-reduce v
-               (: (g x acc i)
-                  (if (f x i)
-                    (vec-add! acc x)
-                    acc))
-               (vec)))
-
 ; set abstraction over map
 (: (set)
    (map))
@@ -117,30 +50,3 @@
    (if (= (map-get v) 0)
      true
      false))
-
-; string manipulations
-(: (str-reduce s f acc)
-   (do
-     (: max (str-size v))
-     (: (sub i acc)
-        (if (< i max)
-          (sub (+ i 1)
-               (f (str-get v i) acc i))
-          acc))
-     (sub 0 acc)))
-
-(: (str-join-vec v pad)
-   (vec-reduce v
-               (: (g s t)
-                  (+ s t))
-               pad))
-
-(: (str-index? s sub) 0)
-
-(: (str-split s delim) 0)
-
-(: (str-has? s sub) 0)
-
-(: (str-prefix? s sub) 0)
-
-(: (str-suffix? s sub) 0)

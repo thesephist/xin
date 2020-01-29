@@ -43,7 +43,7 @@ func strGetForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError
 			return firstStr[secondInt : secondInt+1], nil
 		}
 
-		return IntValue(0), nil
+		return zeroValue, nil
 	}
 
 	return nil, MismatchedArgumentsError{
@@ -121,7 +121,7 @@ func strSliceForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterErr
 			return StringValue(destSlice), nil
 		}
 
-		return IntValue(0), nil
+		return zeroValue, nil
 	}
 
 	return nil, MismatchedArgumentsError{

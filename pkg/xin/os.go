@@ -75,7 +75,7 @@ func osReadForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError
 	if firstStr, ok := first.(StringValue); ok {
 		file, err := os.Open(string(firstStr))
 		if err != nil {
-			return IntValue(0), nil
+			return zeroValue, nil
 		}
 
 		fileStream := NewStream()
@@ -84,13 +84,13 @@ func osReadForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError
 
 		fileStream.callbacks.source = func() (Value, InterpreterError) {
 			if closed {
-				return IntValue(0), nil
+				return zeroValue, nil
 			}
 
 			buffer := make([]byte, readBufferSize)
 			readBytes, err := reader.Read(buffer)
 			if err != nil {
-				return IntValue(0), nil
+				return zeroValue, nil
 			}
 
 			return StringValue(buffer[:readBytes]), nil
@@ -129,7 +129,7 @@ func osWriteForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterErro
 		flag := os.O_CREATE | os.O_WRONLY
 		file, err := os.OpenFile(string(firstStr), flag, 0644)
 		if err != nil {
-			return IntValue(0), nil
+			return zeroValue, nil
 		}
 
 		fileStream := NewStream()
@@ -187,7 +187,7 @@ func osDeleteForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterErr
 	if firstStr, ok := first.(StringValue); ok {
 		err := os.RemoveAll(string(firstStr))
 		if err != nil {
-			return IntValue(0), nil
+			return zeroValue, nil
 		}
 
 		return IntValue(1), nil

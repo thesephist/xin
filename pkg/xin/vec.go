@@ -72,7 +72,7 @@ func vecGetForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError
 			return firstVec.underlying.items[secondInt], nil
 		}
 
-		return IntValue(0), nil
+		return zeroValue, nil
 	}
 
 	return nil, MismatchedArgumentsError{
@@ -111,7 +111,7 @@ func vecSetForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError
 			return firstVec, nil
 		}
 
-		return IntValue(0), nil
+		return zeroValue, nil
 	}
 
 	return nil, MismatchedArgumentsError{
@@ -217,7 +217,7 @@ func vecSliceForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterErr
 			return NewVecValue(items), nil
 		}
 
-		return IntValue(0), nil
+		return zeroValue, nil
 	}
 
 	return nil, MismatchedArgumentsError{

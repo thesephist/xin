@@ -15,6 +15,8 @@ func loadStandardLibrary(vm *Vm) {
 
 	libFiles := []string{
 		"std.xin",
+		"str.xin",
+		"vec.xin",
 		"tensor.xin",
 	}
 
