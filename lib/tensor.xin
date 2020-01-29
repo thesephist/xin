@@ -16,7 +16,7 @@
 (: (vec-sum v)
    (vec-reduce v (: (f a b) (+ a b)) 0))
 (: (vec-prod v)
-   (vec-reduce v (: (f a b) (* a b)) 0))
+   (vec-reduce v (: (f a b) (* a b)) 1))
 
 ; elementwise operators
 (: ++ (vec-compose +))
