@@ -31,6 +31,9 @@ func repl() {
 	replCount := 0
 	reader := bufio.NewReader(os.Stdin)
 	for {
+		// TODO: capture SIGINT and just continue loop
+		// this requires running the VM in a Context{}
+
 		fmt.Printf("%d ) ", replCount)
 
 		text, err := reader.ReadString('\n')
@@ -40,7 +43,7 @@ func repl() {
 			fmt.Println("Repl error:", err.Error())
 		}
 
-		result, ierr := vm.Eval(strings.NewReader(text))
+		result, ierr := vm.Eval(fmt.Sprintf("input %d", replCount), strings.NewReader(text))
 		if ierr != nil {
 			fmt.Println("Eval error:", xin.FormatError(ierr))
 		} else {

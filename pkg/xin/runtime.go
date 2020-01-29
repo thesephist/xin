@@ -9,15 +9,15 @@ import (
 	"strings"
 )
 
-type formEvaler func(*Frame, []Value) (Value, InterpreterError)
+type formEvaler func(*Frame, []Value, *astNode) (Value, InterpreterError)
 
 type DefaultFormValue struct {
 	name   string
 	evaler formEvaler
 }
 
-func (v DefaultFormValue) eval(fr *Frame, args []Value) (Value, InterpreterError) {
-	return v.evaler(fr, args)
+func (v DefaultFormValue) eval(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) {
+	return v.evaler(fr, args, node)
 }
 
 func (v DefaultFormValue) String() string {
@@ -129,9 +129,10 @@ func loadDefaultForm(vm *Vm, fr *Frame, name string, evaler formEvaler) {
 	})
 }
 
-func addForm(fr *Frame, args []Value) (Value, InterpreterError) {
+func addForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) {
 	if len(args) != 2 {
 		return nil, IncorrectNumberOfArgsError{
+			node:     node,
 			required: 2,
 			given:    len(args),
 		}
@@ -181,13 +182,15 @@ func addForm(fr *Frame, args []Value) (Value, InterpreterError) {
 	}
 
 	return nil, MismatchedArgumentsError{
+		node: node,
 		args: args,
 	}
 }
 
-func subtractForm(fr *Frame, args []Value) (Value, InterpreterError) {
+func subtractForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) {
 	if len(args) != 2 {
 		return nil, IncorrectNumberOfArgsError{
+			node:     node,
 			required: 2,
 			given:    len(args),
 		}
@@ -224,13 +227,15 @@ func subtractForm(fr *Frame, args []Value) (Value, InterpreterError) {
 	}
 
 	return nil, MismatchedArgumentsError{
+		node: node,
 		args: args,
 	}
 }
 
-func multiplyForm(fr *Frame, args []Value) (Value, InterpreterError) {
+func multiplyForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) {
 	if len(args) != 2 {
 		return nil, IncorrectNumberOfArgsError{
+			node:     node,
 			required: 2,
 			given:    len(args),
 		}
@@ -277,13 +282,15 @@ func multiplyForm(fr *Frame, args []Value) (Value, InterpreterError) {
 	}
 
 	return nil, MismatchedArgumentsError{
+		node: node,
 		args: args,
 	}
 }
 
-func divideForm(fr *Frame, args []Value) (Value, InterpreterError) {
+func divideForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) {
 	if len(args) != 2 {
 		return nil, IncorrectNumberOfArgsError{
+			node:     node,
 			required: 2,
 			given:    len(args),
 		}
@@ -320,13 +327,15 @@ func divideForm(fr *Frame, args []Value) (Value, InterpreterError) {
 	}
 
 	return nil, MismatchedArgumentsError{
+		node: node,
 		args: args,
 	}
 }
 
-func modForm(fr *Frame, args []Value) (Value, InterpreterError) {
+func modForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) {
 	if len(args) != 2 {
 		return nil, IncorrectNumberOfArgsError{
+			node:     node,
 			required: 2,
 			given:    len(args),
 		}
@@ -367,13 +376,15 @@ func modForm(fr *Frame, args []Value) (Value, InterpreterError) {
 	}
 
 	return nil, MismatchedArgumentsError{
+		node: node,
 		args: args,
 	}
 }
 
-func powForm(fr *Frame, args []Value) (Value, InterpreterError) {
+func powForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) {
 	if len(args) != 2 {
 		return nil, IncorrectNumberOfArgsError{
+			node:     node,
 			required: 2,
 			given:    len(args),
 		}
@@ -414,13 +425,15 @@ func powForm(fr *Frame, args []Value) (Value, InterpreterError) {
 	}
 
 	return nil, MismatchedArgumentsError{
+		node: node,
 		args: args,
 	}
 }
 
-func notForm(fr *Frame, args []Value) (Value, InterpreterError) {
+func notForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) {
 	if len(args) != 1 {
 		return nil, IncorrectNumberOfArgsError{
+			node:     node,
 			required: 1,
 			given:    len(args),
 		}
@@ -440,13 +453,15 @@ func notForm(fr *Frame, args []Value) (Value, InterpreterError) {
 	}
 
 	return nil, MismatchedArgumentsError{
+		node: node,
 		args: args,
 	}
 }
 
-func andForm(fr *Frame, args []Value) (Value, InterpreterError) {
+func andForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) {
 	if len(args) != 2 {
 		return nil, IncorrectNumberOfArgsError{
+			node:     node,
 			required: 2,
 			given:    len(args),
 		}
@@ -469,13 +484,15 @@ func andForm(fr *Frame, args []Value) (Value, InterpreterError) {
 	}
 
 	return nil, MismatchedArgumentsError{
+		node: node,
 		args: args,
 	}
 }
 
-func orForm(fr *Frame, args []Value) (Value, InterpreterError) {
+func orForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) {
 	if len(args) != 2 {
 		return nil, IncorrectNumberOfArgsError{
+			node:     node,
 			required: 2,
 			given:    len(args),
 		}
@@ -498,13 +515,15 @@ func orForm(fr *Frame, args []Value) (Value, InterpreterError) {
 	}
 
 	return nil, MismatchedArgumentsError{
+		node: node,
 		args: args,
 	}
 }
 
-func xorForm(fr *Frame, args []Value) (Value, InterpreterError) {
+func xorForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) {
 	if len(args) != 2 {
 		return nil, IncorrectNumberOfArgsError{
+			node:     node,
 			required: 2,
 			given:    len(args),
 		}
@@ -527,13 +546,15 @@ func xorForm(fr *Frame, args []Value) (Value, InterpreterError) {
 	}
 
 	return nil, MismatchedArgumentsError{
+		node: node,
 		args: args,
 	}
 }
 
-func greaterForm(fr *Frame, args []Value) (Value, InterpreterError) {
+func greaterForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) {
 	if len(args) != 2 {
 		return nil, IncorrectNumberOfArgsError{
+			node:     node,
 			required: 2,
 			given:    len(args),
 		}
@@ -569,12 +590,14 @@ func greaterForm(fr *Frame, args []Value) (Value, InterpreterError) {
 	}
 
 	return nil, MismatchedArgumentsError{
+		node: node,
 		args: args,
 	}
 }
-func lessForm(fr *Frame, args []Value) (Value, InterpreterError) {
+func lessForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) {
 	if len(args) != 2 {
 		return nil, IncorrectNumberOfArgsError{
+			node:     node,
 			required: 2,
 			given:    len(args),
 		}
@@ -610,13 +633,15 @@ func lessForm(fr *Frame, args []Value) (Value, InterpreterError) {
 	}
 
 	return nil, MismatchedArgumentsError{
+		node: node,
 		args: args,
 	}
 }
 
-func equalForm(fr *Frame, args []Value) (Value, InterpreterError) {
+func equalForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) {
 	if len(args) != 2 {
 		return nil, IncorrectNumberOfArgsError{
+			node:     node,
 			required: 2,
 			given:    len(args),
 		}

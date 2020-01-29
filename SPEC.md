@@ -64,6 +64,8 @@ Xin has these types:
 - `map`: a heteroogenous hashmap of values
 - `stream`: a sink / source stream of values for I/O. Stream operations are not pure.
 
+`form`, `vec`, `map`, and `stream` types are passed and equality-checked by reference, all others are passed and equality checked by value.
+
 ## Evaluation
 
 ### Special forms

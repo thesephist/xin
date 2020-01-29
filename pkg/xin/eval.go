@@ -101,8 +101,13 @@ func evalForm(fr *Frame, node *astNode) (Value, InterpreterError) {
 
 	if form, ok := maybeForm.(FormValue); ok {
 		localFrame := newFrame(form.frame)
-		for i, n := range node.leaves[1 : 1+len(form.arguments)] {
-			localFrame.Put(form.arguments[i], LazyValue{
+
+		nargs := len(*form.arguments)
+		if len(node.leaves)-1 < nargs {
+			nargs = len(node.leaves) - 1
+		}
+		for i, n := range node.leaves[1 : nargs+1] {
+			localFrame.Put((*form.arguments)[i], LazyValue{
 				frame: fr,
 				node:  n,
 			})
@@ -121,7 +126,7 @@ func evalForm(fr *Frame, node *astNode) (Value, InterpreterError) {
 			}
 		}
 
-		return form.eval(fr, args)
+		return form.eval(fr, args, node)
 	}
 
 	return nil, InvalidFormError{
@@ -168,9 +173,9 @@ func evalBindForm(fr *Frame, args []*astNode) (Value, InterpreterError) {
 			formName = formNameNode.token.value
 		}
 
-		argList := specimen.leaves[1:]
-		argNames := make([]string, len(argList))
-		for i, n := range argList {
+		args := specimen.leaves[1:]
+		argNames := make(argList, len(args))
+		for i, n := range args {
 			if !n.isForm && n.token.kind == tkName {
 				argNames[i] = n.token.value
 			} else {
@@ -180,7 +185,7 @@ func evalBindForm(fr *Frame, args []*astNode) (Value, InterpreterError) {
 
 		form := FormValue{
 			frame:      fr,
-			arguments:  argNames,
+			arguments:  &argNames,
 			definition: body,
 		}
 		fr.Put(formName, form)

@@ -6,6 +6,7 @@ import (
 	"strconv"
 	"strings"
 	"unicode"
+	"unicode/utf8"
 )
 
 const (
@@ -53,13 +54,62 @@ func (toks tokenStream) String() string {
 }
 
 type position struct {
-	filePath string
-	line     int
-	col      int
+	path string
+	line int
+	col  int
 }
 
 func (p position) String() string {
-	return fmt.Sprintf("%s:%d:%d", p.filePath, p.line, p.col)
+	return fmt.Sprintf("%s:%d:%d", p.path, p.line, p.col)
+}
+
+func charFromEscaper(escaper byte) rune {
+	switch escaper {
+	case 'n':
+		return '\n'
+	case 'r':
+		return '\r'
+	case 't':
+		return '\t'
+	case '\\':
+		return '\\'
+	case '\'':
+		return '\''
+	default:
+		return '?'
+	}
+}
+
+func escapeString(s string) string {
+	builder := strings.Builder{}
+	max := len(s)
+
+	for i := 0; i < max; i++ {
+		c := s[i]
+		if c == '\\' {
+			i++
+			next := s[i]
+			if next == 'x' {
+				hex := s[i+1 : i+3]
+				i += 2
+
+				codepoint, err := strconv.ParseInt(hex, 16, 32)
+				fmt.Println("codepoint number:", hex, codepoint)
+				if err != nil || !utf8.ValidRune(rune(codepoint)) {
+					builder.WriteRune('?')
+					continue
+				}
+
+				builder.WriteRune(rune(codepoint))
+			} else {
+				builder.WriteRune(charFromEscaper(next))
+			}
+		} else {
+			builder.WriteByte(c)
+		}
+	}
+
+	return builder.String()
 }
 
 func bufToToken(s string, pos position) token {
@@ -100,9 +150,9 @@ func bufToToken(s string, pos position) token {
 	}
 }
 
-func lex(r io.Reader) (tokenStream, InterpreterError) {
+func lex(path string, r io.Reader) (tokenStream, InterpreterError) {
 	toks := make([]token, 0)
-	rdr, err := newReader(r)
+	rdr, err := newReader(path, r)
 	if err != nil {
 		return toks, nil
 	}

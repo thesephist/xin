@@ -6,6 +6,14 @@ import (
 	"strings"
 )
 
+// Value represents a value in the Xin runtime.
+//
+// It is important that Value types are:
+// (1) freely copyable without losing information
+// 	(i.e. copying Values around should not alter language semantics)
+// (2) hashable, for use as a MapValue key. StringValue is a special
+// 	exception to this case, where a proxy Value type is used instead
+// 	which is hashable.
 type Value interface {
 	String() string
 	Equal(Value) bool
@@ -39,14 +47,18 @@ func (v FracValue) Equal(o Value) bool {
 	return false
 }
 
+type argList []string
+
 type FormValue struct {
-	frame      *Frame
-	arguments  []string
+	frame *Frame
+	// this level of indirection is to allow FormValue
+	// to be hashable for inclusion in a MapValue
+	arguments  *argList
 	definition *astNode
 }
 
 func (v FormValue) String() string {
-	return "(<form> " + strings.Join(v.arguments, " ") + ") " + v.definition.String()
+	return "(<form> " + strings.Join(*v.arguments, " ") + ") " + v.definition.String()
 }
 
 func (v FormValue) Equal(o Value) bool {

@@ -1,0 +1,16 @@
+; map tests
+
+; test that we can set each type as the key
+(: m (map))
+(: (should-key k)
+   (map-set! m k 0))
+
+(should-key 1)
+(should-key 3.141592)
+(should-key 'hello world')
+(should-key should-key)
+(should-key (vec))
+(should-key (map))
+(should-key (stream))
+
+(log 'All Xin types can be used as <map> keys')

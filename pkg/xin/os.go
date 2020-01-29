@@ -9,9 +9,10 @@ import (
 
 const readBufferSize = 4096
 
-func osWaitForm(fr *Frame, args []Value) (Value, InterpreterError) {
+func osWaitForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) {
 	if len(args) != 2 {
 		return nil, IncorrectNumberOfArgsError{
+			node:     node,
 			required: 2,
 			given:    len(args),
 		}
@@ -29,6 +30,7 @@ func osWaitForm(fr *Frame, args []Value) (Value, InterpreterError) {
 		duration = float64(firstFrac)
 	} else {
 		return nil, MismatchedArgumentsError{
+			node: node,
 			args: args,
 		}
 	}
@@ -56,9 +58,10 @@ func osWaitForm(fr *Frame, args []Value) (Value, InterpreterError) {
 	return IntValue(1), nil
 }
 
-func osReadForm(fr *Frame, args []Value) (Value, InterpreterError) {
+func osReadForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) {
 	if len(args) != 1 {
 		return nil, IncorrectNumberOfArgsError{
+			node:     node,
 			required: 1,
 			given:    len(args),
 		}
@@ -103,13 +106,15 @@ func osReadForm(fr *Frame, args []Value) (Value, InterpreterError) {
 	}
 
 	return nil, MismatchedArgumentsError{
+		node: node,
 		args: args,
 	}
 }
 
-func osWriteForm(fr *Frame, args []Value) (Value, InterpreterError) {
+func osWriteForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) {
 	if len(args) != 1 {
 		return nil, IncorrectNumberOfArgsError{
+			node:     node,
 			required: 1,
 			given:    len(args),
 		}
@@ -145,6 +150,7 @@ func osWriteForm(fr *Frame, args []Value) (Value, InterpreterError) {
 			}
 
 			return MismatchedArgumentsError{
+				node: node,
 				args: []Value{v},
 			}
 		}
@@ -159,13 +165,15 @@ func osWriteForm(fr *Frame, args []Value) (Value, InterpreterError) {
 	}
 
 	return nil, MismatchedArgumentsError{
+		node: node,
 		args: args,
 	}
 }
 
-func osDeleteForm(fr *Frame, args []Value) (Value, InterpreterError) {
+func osDeleteForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) {
 	if len(args) != 1 {
 		return nil, IncorrectNumberOfArgsError{
+			node:     node,
 			required: 1,
 			given:    len(args),
 		}
@@ -186,13 +194,15 @@ func osDeleteForm(fr *Frame, args []Value) (Value, InterpreterError) {
 	}
 
 	return nil, MismatchedArgumentsError{
+		node: node,
 		args: args,
 	}
 }
 
-func osArgsForm(fr *Frame, args []Value) (Value, InterpreterError) {
+func osArgsForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) {
 	if len(args) != 0 {
 		return nil, IncorrectNumberOfArgsError{
+			node:     node,
 			required: 0,
 			given:    len(args),
 		}
@@ -205,9 +215,10 @@ func osArgsForm(fr *Frame, args []Value) (Value, InterpreterError) {
 	return NewVecValue(argsVec), nil
 }
 
-func debugDumpForm(fr *Frame, args []Value) (Value, InterpreterError) {
+func debugDumpForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) {
 	if len(args) != 0 {
 		return nil, IncorrectNumberOfArgsError{
+			node:     node,
 			required: 0,
 			given:    len(args),
 		}

@@ -138,23 +138,23 @@ func (e RuntimeError) Position() position {
 }
 
 type IncorrectNumberOfArgsError struct {
+	node     *astNode
 	required int
 	given    int
-	position position
 }
 
 func (e IncorrectNumberOfArgsError) Error() string {
-	return fmt.Sprintf("Incorrect number of arguments: requires %d but got %d",
-		e.required, e.given)
+	return fmt.Sprintf("Incorrect number of args in %s: requires %d but got %d",
+		e.node, e.required, e.given)
 }
 
 func (e IncorrectNumberOfArgsError) Position() position {
-	return e.position
+	return e.node.position
 }
 
 type MismatchedArgumentsError struct {
-	args     []Value
-	position position
+	node *astNode
+	args []Value
 }
 
 func (e MismatchedArgumentsError) Error() string {
@@ -162,11 +162,11 @@ func (e MismatchedArgumentsError) Error() string {
 	for i, n := range e.args {
 		ss[i] = n.String()
 	}
-	return fmt.Sprintf("Mismatched arguments: %s", strings.Join(ss, " "))
+	return fmt.Sprintf("Mismatched arguments to %s: %s", e.node, strings.Join(ss, " "))
 }
 
 func (e MismatchedArgumentsError) Position() position {
-	return e.position
+	return e.node.position
 }
 
 type InvalidStreamCallbackError struct {

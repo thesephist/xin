@@ -26,15 +26,15 @@ func init() {
 	rootCmd.AddCommand(runCmd)
 }
 
-func run(filePath string) {
-	file, err := os.Open(filePath)
+func run(path string) {
+	file, err := os.Open(path)
 	defer file.Close()
 	if err != nil {
 		fmt.Println("Error opening file:", err)
 	}
 
 	vm := xin.NewVm()
-	_, ierr := vm.Eval(file)
+	_, ierr := vm.Eval(path, file)
 	if ierr != nil {
 		fmt.Println("Error:", xin.FormatError(ierr))
 		return

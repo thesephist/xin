@@ -4,7 +4,7 @@ import (
 	"strconv"
 )
 
-func stringForm(fr *Frame, args []Value) (Value, InterpreterError) {
+func stringForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) {
 	if len(args) != 1 {
 		return nil, IncorrectNumberOfArgsError{
 			required: 1,
@@ -19,7 +19,8 @@ func stringForm(fr *Frame, args []Value) (Value, InterpreterError) {
 
 	return StringValue(first.String()), nil
 }
-func intForm(fr *Frame, args []Value) (Value, InterpreterError) {
+
+func intForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) {
 	if len(args) != 1 {
 		return nil, IncorrectNumberOfArgsError{
 			required: 1,
@@ -48,7 +49,7 @@ func intForm(fr *Frame, args []Value) (Value, InterpreterError) {
 	}
 }
 
-func fracForm(fr *Frame, args []Value) (Value, InterpreterError) {
+func fracForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) {
 	if len(args) != 1 {
 		return nil, IncorrectNumberOfArgsError{
 			required: 1,

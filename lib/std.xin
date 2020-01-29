@@ -10,6 +10,9 @@
    (if (= false x)
      'false' 'true'))
 
+; identity function
+(: (identity x) x)
+
 ; basic io
 (: (log s)
    (<- os::stdout (+ (str s) '\n')))
@@ -38,6 +41,32 @@
    (range 0 n 1))
 
 ; vec functions
+(: (vec-head v)
+   (vec-get v 0))
+
+(: (vec-tail v)
+   (vec-slice v 1 (vec-size v)))
+
+(: (vec-last v)
+   (vec-get v (- (vec-size v) 1)))
+
+(: (vec-empty? v)
+   (= (vec-size v) 0))
+
+; TODO: unbreak
+(: (vec-reverse v)
+   (vec-add! (if (vec-empty? v)
+               (vec)
+               (vec-reverse (vec-tail v)))
+             (vec-head v)))
+
+(: (vec-cat v w)
+   (do (: (sub v w)
+          (if (vec-empty? w)
+            v
+            (sub (vec-add! v (vec-head w) (vec-tail w)))))
+     (sub (vec-clone v) w)))
+
 (: (vec-reduce v f acc)
    (do
      (: max (vec-size v))
@@ -63,6 +92,11 @@
                (: (g x acc i)
                   (vec-add! acc (f x i)))
                (vec)))
+
+; the fastest way to clone a xin vec
+; is to use the native vec-slice
+(: (vec-clone v)
+   (vec-slice v 0 (vec-size v)))
 
 (: (vec-filter v f)
    (vec-reduce v

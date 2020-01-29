@@ -64,9 +64,10 @@ func (v StreamValue) Equal(o Value) bool {
 	return false
 }
 
-func streamForm(fr *Frame, args []Value) (Value, InterpreterError) {
+func streamForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) {
 	if len(args) != 0 {
 		return nil, IncorrectNumberOfArgsError{
+			node:     node,
 			required: 0,
 			given:    len(args),
 		}
@@ -75,9 +76,10 @@ func streamForm(fr *Frame, args []Value) (Value, InterpreterError) {
 	return NewStream(), nil
 }
 
-func streamSetSink(fr *Frame, args []Value) (Value, InterpreterError) {
+func streamSetSink(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) {
 	if len(args) != 2 {
 		return nil, IncorrectNumberOfArgsError{
+			node:     node,
 			required: 2,
 			given:    len(args),
 		}
@@ -94,7 +96,7 @@ func streamSetSink(fr *Frame, args []Value) (Value, InterpreterError) {
 
 	if firstStream, ok := first.(StreamValue); ok {
 		if secondForm, ok := second.(FormValue); ok {
-			if len(secondForm.arguments) != 1 {
+			if len(*secondForm.arguments) != 1 {
 				return nil, InvalidStreamCallbackError{
 					reason: "Mismatched argument count in callback",
 				}
@@ -102,7 +104,7 @@ func streamSetSink(fr *Frame, args []Value) (Value, InterpreterError) {
 
 			firstStream.callbacks.sink = func(v Value) InterpreterError {
 				localFrame := newFrame(fr)
-				localFrame.Put(secondForm.arguments[0], v)
+				localFrame.Put((*secondForm.arguments)[0], v)
 
 				_, err := unlazyEval(localFrame, secondForm.definition)
 				return err
@@ -113,13 +115,15 @@ func streamSetSink(fr *Frame, args []Value) (Value, InterpreterError) {
 	}
 
 	return nil, MismatchedArgumentsError{
+		node: node,
 		args: args,
 	}
 }
 
-func streamSetSource(fr *Frame, args []Value) (Value, InterpreterError) {
+func streamSetSource(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) {
 	if len(args) != 2 {
 		return nil, IncorrectNumberOfArgsError{
+			node:     node,
 			required: 2,
 			given:    len(args),
 		}
@@ -136,7 +140,7 @@ func streamSetSource(fr *Frame, args []Value) (Value, InterpreterError) {
 
 	if firstStream, ok := first.(StreamValue); ok {
 		if secondForm, ok := second.(FormValue); ok {
-			if len(secondForm.arguments) != 0 {
+			if len(*secondForm.arguments) != 0 {
 				return nil, InvalidStreamCallbackError{
 					reason: "Mismatched argument count in callback",
 				}
@@ -152,13 +156,15 @@ func streamSetSource(fr *Frame, args []Value) (Value, InterpreterError) {
 	}
 
 	return nil, MismatchedArgumentsError{
+		node: node,
 		args: args,
 	}
 }
 
-func streamSetClose(fr *Frame, args []Value) (Value, InterpreterError) {
+func streamSetClose(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) {
 	if len(args) != 2 {
 		return nil, IncorrectNumberOfArgsError{
+			node:     node,
 			required: 2,
 			given:    len(args),
 		}
@@ -175,7 +181,7 @@ func streamSetClose(fr *Frame, args []Value) (Value, InterpreterError) {
 
 	if firstStream, ok := first.(StreamValue); ok {
 		if secondForm, ok := second.(FormValue); ok {
-			if len(secondForm.arguments) != 0 {
+			if len(*secondForm.arguments) != 0 {
 				return nil, InvalidStreamCallbackError{
 					reason: "Mismatched argument count in callback",
 				}
@@ -192,13 +198,15 @@ func streamSetClose(fr *Frame, args []Value) (Value, InterpreterError) {
 	}
 
 	return nil, MismatchedArgumentsError{
+		node: node,
 		args: args,
 	}
 }
 
-func streamSourceForm(fr *Frame, args []Value) (Value, InterpreterError) {
+func streamSourceForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) {
 	if len(args) != 1 {
 		return nil, IncorrectNumberOfArgsError{
+			node:     node,
 			required: 1,
 			given:    len(args),
 		}
@@ -220,13 +228,15 @@ func streamSourceForm(fr *Frame, args []Value) (Value, InterpreterError) {
 	}
 
 	return nil, MismatchedArgumentsError{
+		node: node,
 		args: args,
 	}
 }
 
-func streamSinkForm(fr *Frame, args []Value) (Value, InterpreterError) {
+func streamSinkForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) {
 	if len(args) != 2 {
 		return nil, IncorrectNumberOfArgsError{
+			node:     node,
 			required: 2,
 			given:    len(args),
 		}
@@ -256,13 +266,15 @@ func streamSinkForm(fr *Frame, args []Value) (Value, InterpreterError) {
 	}
 
 	return nil, MismatchedArgumentsError{
+		node: node,
 		args: args,
 	}
 }
 
-func streamCloseForm(fr *Frame, args []Value) (Value, InterpreterError) {
+func streamCloseForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) {
 	if len(args) != 1 {
 		return nil, IncorrectNumberOfArgsError{
+			node:     node,
 			required: 1,
 			given:    len(args),
 		}
@@ -288,6 +300,7 @@ func streamCloseForm(fr *Frame, args []Value) (Value, InterpreterError) {
 	}
 
 	return nil, MismatchedArgumentsError{
+		node: node,
 		args: args,
 	}
 }

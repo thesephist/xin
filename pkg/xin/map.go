@@ -1,53 +1,72 @@
 package xin
 
-import (
-	"strings"
-)
+// StringValue is of type []byte, which is unhashable
+// so we convert StringValues to hashable string type
+// before using as map keys
+type hashableStringProxyValue string
 
-type MapValue map[Value]Value
+func (v hashableStringProxyValue) String() string {
+	return "(<string proxy> " + string(v) + ")"
+}
+
+func (v hashableStringProxyValue) Equal(ov Value) bool {
+	panic("hashableStringProxyValue should not be equality-checked")
+}
+
+func hashable(v Value) Value {
+	if asStr, ok := v.(StringValue); ok {
+		return hashableStringProxyValue(asStr)
+	}
+
+	return v
+}
+
+type mapItems map[Value]Value
+
+type MapValue struct {
+	// indirection used to allow MapValue to be hashable
+	// and correctly equality-checked
+	items *mapItems
+}
 
 func (v MapValue) String() string {
-	i := 0
-	ss := make([]string, len(v))
-	for k, val := range v {
-		ss[i] = k.String() + "->" + val.String()
-		i++
+	ss := ""
+	for k, val := range *v.items {
+		ss += " " + k.String() + "->" + val.String()
 	}
-	return "(<map> " + strings.Join(ss, " ") + ")"
+	return "(<map>" + ss + ")"
 }
 
 func (v MapValue) Equal(o Value) bool {
 	if ov, ok := o.(MapValue); ok {
-		if len(v) != len(ov) {
-			return false
-		}
-
-		for i, x := range v {
-			if x != ov[i] {
-				return false
-			}
-		}
-
-		return true
+		return v.items == ov.items
 	}
 
 	return false
 }
 
-func mapForm(fr *Frame, args []Value) (Value, InterpreterError) {
+func NewMapValue() MapValue {
+	return MapValue{
+		items: &mapItems{},
+	}
+}
+
+func mapForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) {
 	if len(args) != 0 {
 		return nil, IncorrectNumberOfArgsError{
+			node:     node,
 			required: 0,
 			given:    len(args),
 		}
 	}
 
-	return make(MapValue), nil
+	return NewMapValue(), nil
 }
 
-func mapGetForm(fr *Frame, args []Value) (Value, InterpreterError) {
+func mapGetForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) {
 	if len(args) != 2 {
 		return nil, IncorrectNumberOfArgsError{
+			node:     node,
 			required: 2,
 			given:    len(args),
 		}
@@ -63,7 +82,7 @@ func mapGetForm(fr *Frame, args []Value) (Value, InterpreterError) {
 	}
 
 	if firstMap, ok := first.(MapValue); ok {
-		val, prs := firstMap[second]
+		val, prs := (*firstMap.items)[hashable(second)]
 		if prs {
 			return val, nil
 		}
@@ -72,13 +91,15 @@ func mapGetForm(fr *Frame, args []Value) (Value, InterpreterError) {
 	}
 
 	return nil, MismatchedArgumentsError{
+		node: node,
 		args: args,
 	}
 }
 
-func mapSetForm(fr *Frame, args []Value) (Value, InterpreterError) {
+func mapSetForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) {
 	if len(args) != 3 {
 		return nil, IncorrectNumberOfArgsError{
+			node:     node,
 			required: 3,
 			given:    len(args),
 		}
@@ -98,19 +119,20 @@ func mapSetForm(fr *Frame, args []Value) (Value, InterpreterError) {
 	}
 
 	if firstMap, ok := first.(MapValue); ok {
-		firstMap[second] = third
-
+		(*firstMap.items)[hashable(second)] = third
 		return firstMap, nil
 	}
 
 	return nil, MismatchedArgumentsError{
+		node: node,
 		args: args,
 	}
 }
 
-func mapHasForm(fr *Frame, args []Value) (Value, InterpreterError) {
+func mapHasForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) {
 	if len(args) != 2 {
 		return nil, IncorrectNumberOfArgsError{
+			node:     node,
 			required: 2,
 			given:    len(args),
 		}
@@ -126,7 +148,7 @@ func mapHasForm(fr *Frame, args []Value) (Value, InterpreterError) {
 	}
 
 	if firstMap, ok := first.(MapValue); ok {
-		_, prs := firstMap[second]
+		_, prs := (*firstMap.items)[hashable(second)]
 		if prs {
 			return IntValue(1), nil
 		}
@@ -135,13 +157,15 @@ func mapHasForm(fr *Frame, args []Value) (Value, InterpreterError) {
 	}
 
 	return nil, MismatchedArgumentsError{
+		node: node,
 		args: args,
 	}
 }
 
-func mapDelForm(fr *Frame, args []Value) (Value, InterpreterError) {
+func mapDelForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) {
 	if len(args) != 2 {
 		return nil, IncorrectNumberOfArgsError{
+			node:     node,
 			required: 2,
 			given:    len(args),
 		}
@@ -157,9 +181,9 @@ func mapDelForm(fr *Frame, args []Value) (Value, InterpreterError) {
 	}
 
 	if firstMap, ok := first.(MapValue); ok {
-		_, prs := firstMap[second]
+		_, prs := (*firstMap.items)[hashable(second)]
 		if prs {
-			delete(firstMap, second)
+			delete(*firstMap.items, second)
 			return firstMap, nil
 		}
 
@@ -167,13 +191,15 @@ func mapDelForm(fr *Frame, args []Value) (Value, InterpreterError) {
 	}
 
 	return nil, MismatchedArgumentsError{
+		node: node,
 		args: args,
 	}
 }
 
-func mapSizeForm(fr *Frame, args []Value) (Value, InterpreterError) {
+func mapSizeForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) {
 	if len(args) != 1 {
 		return nil, IncorrectNumberOfArgsError{
+			node:     node,
 			required: 1,
 			given:    len(args),
 		}
@@ -185,10 +211,11 @@ func mapSizeForm(fr *Frame, args []Value) (Value, InterpreterError) {
 	}
 
 	if firstMap, fok := first.(MapValue); fok {
-		return IntValue(len(firstMap)), nil
+		return IntValue(len(*firstMap.items)), nil
 	}
 
 	return nil, MismatchedArgumentsError{
+		node: node,
 		args: args,
 	}
 }

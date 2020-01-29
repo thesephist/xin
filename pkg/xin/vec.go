@@ -1,13 +1,11 @@
 package xin
 
-import (
-	"strings"
-)
-
 // vecUnderlying provides a layer of indirection
 // we need to allow vecs to be mutable in-place
 // because Go slices are not in-place mutable.
 type vecUnderlying struct {
+	// TODO: can this type just be []Value, or does
+	// it have to be a struct like this that wraps []Value?
 	items []Value
 }
 
@@ -22,32 +20,22 @@ func NewVecValue(items []Value) VecValue {
 }
 
 func (v VecValue) String() string {
-	ss := make([]string, len(v.underlying.items))
-	for i, item := range v.underlying.items {
-		ss[i] = item.String()
+	ss := ""
+	for _, item := range v.underlying.items {
+		ss += " " + item.String()
 	}
-	return "(<vec> " + strings.Join(ss, " ") + ")"
+	return "(<vec>" + ss + ")"
 }
 
 func (v VecValue) Equal(o Value) bool {
 	if ov, ok := o.(VecValue); ok {
-		if len(v.underlying.items) != len(ov.underlying.items) {
-			return false
-		}
-
-		for i, x := range v.underlying.items {
-			if x != ov.underlying.items[i] {
-				return false
-			}
-		}
-
-		return true
+		return v.underlying == ov.underlying
 	}
 
 	return false
 }
 
-func vecForm(fr *Frame, args []Value) (Value, InterpreterError) {
+func vecForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) {
 	vecValues := make([]Value, len(args))
 	for i, a := range args {
 		val, err := unlazy(a)
@@ -59,9 +47,10 @@ func vecForm(fr *Frame, args []Value) (Value, InterpreterError) {
 	return NewVecValue(vecValues), nil
 }
 
-func vecGetForm(fr *Frame, args []Value) (Value, InterpreterError) {
+func vecGetForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) {
 	if len(args) != 2 {
 		return nil, IncorrectNumberOfArgsError{
+			node:     node,
 			required: 2,
 			given:    len(args),
 		}
@@ -87,13 +76,15 @@ func vecGetForm(fr *Frame, args []Value) (Value, InterpreterError) {
 	}
 
 	return nil, MismatchedArgumentsError{
+		node: node,
 		args: args,
 	}
 }
 
-func vecSetForm(fr *Frame, args []Value) (Value, InterpreterError) {
+func vecSetForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) {
 	if len(args) != 3 {
 		return nil, IncorrectNumberOfArgsError{
+			node:     node,
 			required: 3,
 			given:    len(args),
 		}
@@ -124,13 +115,15 @@ func vecSetForm(fr *Frame, args []Value) (Value, InterpreterError) {
 	}
 
 	return nil, MismatchedArgumentsError{
+		node: node,
 		args: args,
 	}
 }
 
-func vecAddForm(fr *Frame, args []Value) (Value, InterpreterError) {
+func vecAddForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) {
 	if len(args) != 2 {
 		return nil, IncorrectNumberOfArgsError{
+			node:     node,
 			required: 2,
 			given:    len(args),
 		}
@@ -151,13 +144,15 @@ func vecAddForm(fr *Frame, args []Value) (Value, InterpreterError) {
 	}
 
 	return nil, MismatchedArgumentsError{
+		node: node,
 		args: args,
 	}
 }
 
-func vecSizeForm(fr *Frame, args []Value) (Value, InterpreterError) {
+func vecSizeForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) {
 	if len(args) != 1 {
 		return nil, IncorrectNumberOfArgsError{
+			node:     node,
 			required: 1,
 			given:    len(args),
 		}
@@ -173,13 +168,15 @@ func vecSizeForm(fr *Frame, args []Value) (Value, InterpreterError) {
 	}
 
 	return nil, MismatchedArgumentsError{
+		node: node,
 		args: args,
 	}
 }
 
-func vecSliceForm(fr *Frame, args []Value) (Value, InterpreterError) {
+func vecSliceForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) {
 	if len(args) != 3 {
 		return nil, IncorrectNumberOfArgsError{
+			node:     node,
 			required: 3,
 			given:    len(args),
 		}
@@ -204,14 +201,14 @@ func vecSliceForm(fr *Frame, args []Value) (Value, InterpreterError) {
 	if fok && sok && tok {
 		max := len(firstVec.underlying.items)
 		inRange := func(iv IntValue) bool {
-			return int(iv) >= 0 && int(iv) < max
+			return int(iv) >= 0 && int(iv) <= max
 		}
 
-		if int(secondInt) >= max {
-			secondInt = IntValue(max) - 1
+		if int(secondInt) > max {
+			secondInt = IntValue(max)
 		}
-		if int(thirdInt) >= max {
-			thirdInt = IntValue(max) - 1
+		if int(thirdInt) > max {
+			thirdInt = IntValue(max)
 		}
 
 		if inRange(secondInt) && inRange(thirdInt) {
@@ -224,6 +221,7 @@ func vecSliceForm(fr *Frame, args []Value) (Value, InterpreterError) {
 	}
 
 	return nil, MismatchedArgumentsError{
+		node: node,
 		args: args,
 	}
 }

@@ -8,7 +8,7 @@ init:
 	go get github.com/rakyll/statik
 
 
-test:
+test: gen
 	go build -race -o ./xin
 	./xin run ./samples/first.xin
 	./xin run ./samples/hello.xin
@@ -16,6 +16,7 @@ test:
 	./xin run ./samples/fib.xin
 	./xin run ./samples/prime.xin
 	./xin run ./samples/collatz.xin
+	./xin run ./samples/map.xin
 	./xin run ./samples/list.xin
 	./xin run ./samples/async.xin
 	./xin run ./samples/stream.xin
@@ -26,7 +27,7 @@ test:
 
 
 # start interactive repl
-repl:
+repl: gen
 	${XIN} repl
 
 

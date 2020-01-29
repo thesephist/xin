@@ -13,6 +13,20 @@ type reader struct {
 	position
 }
 
+func newReader(path string, r io.Reader) (*reader, error) {
+	allBytes, err := ioutil.ReadAll(r)
+	if err != nil {
+		return nil, err
+	}
+
+	asString := string(allBytes)
+	rdr := reader{
+		source: asString,
+		max:    len(asString),
+	}
+	rdr.position.path = path
+	return &rdr, nil
+}
 func (rdr *reader) done() bool {
 	return rdr.index >= rdr.max
 }
@@ -54,21 +68,8 @@ func (rdr *reader) upto(end string) string {
 
 func (rdr *reader) currPos() position {
 	return position{
+		path: rdr.path,
 		line: rdr.position.line + 1,
 		col:  rdr.position.col + 1,
 	}
-}
-
-func newReader(r io.Reader) (reader, error) {
-	allBytes, err := ioutil.ReadAll(r)
-	if err != nil {
-		return reader{}, err
-	}
-
-	asString := string(allBytes)
-	rdr := reader{
-		source: asString,
-		max:    len(asString),
-	}
-	return rdr, nil
 }
