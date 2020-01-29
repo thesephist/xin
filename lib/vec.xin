@@ -21,10 +21,10 @@
      false))
 
 (: (vec-reverse v)
-   (vec-add! (if (vec-empty? v)
-               (vec)
-               (vec-reverse (vec-tail v)))
-             (vec-head v)))
+   (if (vec-empty? v)
+     (vec)
+     (vec-add! (vec-reverse (vec-tail v))
+               (vec-head v))))
 
 (: (vec-cat v w)
    (do (: (sub v w)
@@ -72,8 +72,47 @@
                     acc))
                (vec)))
 
-; TODO: implement below
+; quicksort using hoare partition
+(: (vec-sort-with v cmp)
+   (do (: size (vec-size v))
+     (: (swap! i j)
+        (do (: tmp (vec-get v i))
+          (vec-set! v i (vec-get v j))
+          (vec-set! v j tmp)))
+     (: (partition v lo hi)
+        (do (: pivot (vec-get v lo))
+          (: (lsub i)
+             (if (>= (vec-get v i) pivot)
+               i (lsub (+ i 1))))
+          (: (rsub j)
+             (if (<= (vec-get v j) pivot)
+               j (rsub (- j 1))))
+          (: (sub i j)
+             (do
+               (: i (lsub i))
+               (: j (rsub j))
+               (if (>= i j)
+                 j
+                 (do (swap! i j)
+                   (sub (+ i 1) (- j 1))))))
+          (sub lo hi)))
+     (: (quicksort v lo hi)
+        (if (vec-empty? v)
+          v
+          (if (< lo hi)
+            (do (: p (partition v lo hi))
+              (quicksort v lo p)
+              (quicksort v (+ p 1) hi))
+            v)))
+     (quicksort v 0 (- size 1))))
 
-(: (vec-sort v cmp) 0)
+(: (vec-sort-by v pred)
+   (vec-sort-with v (: (f a b)
+                       (do (: pa (pred a))
+                         (: pb (pred b))
+                         (if (> pa pb)
+                           -1
+                           (if (< pa pb) 1 0))))))
 
-(: (vec-sort-by v pred) 0)
+(: (vec-sort v)
+   (vec-sort-by v identity))
