@@ -3,9 +3,9 @@ package xin
 // vecUnderlying provides a layer of indirection
 // we need to allow vecs to be mutable in-place
 // because Go slices are not in-place mutable.
+// This also allows VecValue to be hashable for use
+// in a MapValue as a key.
 type vecUnderlying struct {
-	// TODO: can this type just be []Value, or does
-	// it have to be a struct like this that wraps []Value?
 	items []Value
 }
 
@@ -72,7 +72,7 @@ func vecGetForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError
 			return firstVec.underlying.items[secondInt], nil
 		}
 
-		return VecValue{}, nil
+		return IntValue(0), nil
 	}
 
 	return nil, MismatchedArgumentsError{
@@ -111,7 +111,7 @@ func vecSetForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError
 			return firstVec, nil
 		}
 
-		return VecValue{}, nil
+		return IntValue(0), nil
 	}
 
 	return nil, MismatchedArgumentsError{

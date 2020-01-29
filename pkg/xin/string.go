@@ -43,7 +43,7 @@ func strGetForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError
 			return firstStr[secondInt : secondInt+1], nil
 		}
 
-		return VecValue{}, nil
+		return IntValue(0), nil
 	}
 
 	return nil, MismatchedArgumentsError{

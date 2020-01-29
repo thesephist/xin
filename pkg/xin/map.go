@@ -87,7 +87,7 @@ func mapGetForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError
 			return val, nil
 		}
 
-		return VecValue{}, nil
+		return IntValue(0), nil
 	}
 
 	return nil, MismatchedArgumentsError{
@@ -187,7 +187,7 @@ func mapDelForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError
 			return firstMap, nil
 		}
 
-		return VecValue{}, nil
+		return IntValue(0), nil
 	}
 
 	return nil, MismatchedArgumentsError{
