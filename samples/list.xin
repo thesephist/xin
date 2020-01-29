@@ -30,3 +30,9 @@
 (: filtered
    (vec-filter list even?))
 (log filtered)
+
+(log 'sort')
+(: list (vec 45 2 64 4 -3 7 23 5 1 0 4 -4 3 2))
+(log (vec-sort list))
+(log 'original')
+(log list)
