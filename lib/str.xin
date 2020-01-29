@@ -1,5 +1,14 @@
 ; str standard library
 
+(: (str-blank? s)
+   (= s ''))
+
+(: (str-reverse s)
+   (if (str-blank? s)
+     ''
+     (+ (str-reverse (str-slice s 1 (str-size s)))
+        (str-get s 0))))
+
 (: (str-reduce s f acc)
    (do
      (: max (str-size v))
@@ -16,6 +25,8 @@
                   (+ s t))
                pad))
 
+; TODO: implement below
+
 (: (str-index? s sub) 0)
 
 (: (str-split s delim) 0)
@@ -25,3 +36,11 @@
 (: (str-prefix? s sub) 0)
 
 (: (str-suffix? s sub) 0)
+
+(: (str-upcase s) 0)
+
+(: (str-downcase s) 0)
+
+(: (str-upper? s) 0)
+
+(: (str-lower? s) 0)

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 	"github.com/thesephist/xin/pkg/xin"
 )
@@ -30,13 +31,13 @@ func run(path string) {
 	file, err := os.Open(path)
 	defer file.Close()
 	if err != nil {
-		fmt.Println("Error opening file:", err)
+		color.Red("Error opening file: %s\n", err)
 	}
 
 	vm := xin.NewVm()
 	_, ierr := vm.Eval(path, file)
 	if ierr != nil {
-		fmt.Println("Error:", xin.FormatError(ierr))
+		color.Red("Error: %s\n", xin.FormatError(ierr))
 		return
 	}
 }

@@ -40,12 +40,12 @@ func repl() {
 		if err == io.EOF {
 			break
 		} else if err != nil {
-			fmt.Println("Repl error:", err.Error())
+			color.Red("Repl error: %s\n\n", err.Error())
 		}
 
 		result, ierr := vm.Eval(fmt.Sprintf("input %d", replCount), strings.NewReader(text))
 		if ierr != nil {
-			fmt.Println("Eval error:", xin.FormatError(ierr))
+			color.Red("Eval error: %s\n\n", xin.FormatError(ierr))
 		} else {
 			vm.Frame.Put(
 				fmt.Sprintf("_%d", replCount),

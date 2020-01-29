@@ -1,11 +1,11 @@
 ; xin standard library
-; included by default into the built executable binary
 
 ; boolean aliases
 (: true 1)
 (: false 0)
 (: and &)
 (: or |)
+(: not !)
 (: (bool x)
    (if x 'true' 'false'))
 
@@ -19,13 +19,18 @@
    (-> os::stdin))
 
 ; basic math
-(: (sqrt x) (^ x .5))
+(: (!= a b) (! (= a b)))
 (: (>= a b) (! (< a b)))
 (: (<= a b) (! (> a b)))
+(: (sqrt x) (^ x .5))
 (: (pos? n) (> n 0))
 (: (neg? n) (< n 0))
 (: (factor? big small)
    (= (% big small) 0))
+(: (max a b)
+   (if (> a b) a b))
+(: (min a b)
+   (if (< a b) a b))
 
 ; iteration primitives: range, seq
 (: (range start end step)

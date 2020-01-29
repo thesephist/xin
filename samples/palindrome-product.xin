@@ -1,0 +1,17 @@
+; largest palindrome product of 3-digit numbers
+; project euler: https://projecteuler.net/problem=4
+
+(: (palindrome? n)
+   (= (str n) (str-reverse (str n))))
+
+(: (palindrome-prod-between v w)
+   (vec-filter (vec-combine v w (: (f a b) (* a b))) palindrome?))
+
+(: (max-palindrome-prod-between v w)
+   (vec-max (palindrome-prod-between v w)))
+
+(: (max-palindrome-prod-under n)
+   (do (: nums (seq n))
+     (max-palindrome-prod-between nums nums)))
+
+(log (max-palindrome-prod-under 100))

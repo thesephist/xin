@@ -12,6 +12,14 @@
 (: (vec-empty? v)
    (= (vec-size v) 0))
 
+(: (vec-eq? v w)
+   (if (= (vec-size v) (vec-size w))
+     (vec-reduce v
+                 (: (f x acc i)
+                    (& acc (= x (vec-get w i))))
+                 true)
+     false))
+
 (: (vec-reverse v)
    (vec-add! (if (vec-empty? v)
                (vec)
@@ -63,3 +71,9 @@
                     (vec-add! acc x)
                     acc))
                (vec)))
+
+; TODO: implement below
+
+(: (vec-sort v cmp) 0)
+
+(: (vec-sort-by v pred) 0)

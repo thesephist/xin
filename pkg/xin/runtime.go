@@ -269,11 +269,20 @@ func multiplyForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterErr
 		if cleanSecond, ok := second.(FracValue); ok {
 			return cleanFirst * cleanSecond, nil
 		}
+	case StringValue:
+		if cleanSecond, ok := second.(IntValue); ok {
+			max := int(cleanSecond)
+			result, iter := "", string(cleanFirst)
+			for i := 0; i < max; i++ {
+				result += iter
+			}
+			return StringValue(result), nil
+		}
 	case VecValue:
 		if cleanSecond, ok := second.(IntValue); ok {
-			result := make([]Value, 0)
-			copy(result, cleanFirst.underlying.items)
 			max := int(cleanSecond)
+			result := make([]Value, 0, max*len(cleanFirst.underlying.items))
+			copy(result, cleanFirst.underlying.items)
 			for i := 0; i < max; i++ {
 				result = append(result, cleanFirst.underlying.items...)
 			}
@@ -318,7 +327,7 @@ func divideForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError
 	switch cleanFirst := first.(type) {
 	case IntValue:
 		if cleanSecond, ok := second.(IntValue); ok {
-			if cleanSecond == zeroValue {
+			if cleanSecond == IntValue(0) {
 				return zeroValue, nil
 			}
 
@@ -371,10 +380,18 @@ func modForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) {
 	switch cleanFirst := first.(type) {
 	case IntValue:
 		if cleanSecond, ok := second.(IntValue); ok {
+			if cleanSecond == IntValue(0) {
+				return zeroValue, nil
+			}
+
 			return cleanFirst % cleanSecond, nil
 		}
 	case FracValue:
 		if cleanSecond, ok := second.(FracValue); ok {
+			if cleanSecond == FracValue(0) {
+				return zeroValue, nil
+			}
+
 			modulus := math.Mod(
 				float64(cleanFirst),
 				float64(cleanSecond),

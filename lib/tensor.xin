@@ -13,6 +13,14 @@
             (: (f) x)))
 
 ; aggregator functions
+(: (vec-max v)
+   (if (vec-empty? v)
+     0
+     (vec-reduce v max (vec-get v 0))))
+(: (vec-min v)
+   (if (vec-empty? v)
+     0
+     (vec-reduce v min (vec-get v 0))))
 (: (vec-sum v)
    (vec-reduce v (: (f a b) (+ a b)) 0))
 (: (vec-prod v)
@@ -34,6 +42,12 @@
 (: (v/ v s)
    (// v (vec-of-size (vec-size v) s)))
 
-; dot and cross products
+; dot and cross products, other combinators
+(: (vec-flat v)
+   (vec-reduce v (: (f w acc) (vec-cat acc w)) (vec)))
 (: (vec-dot v w)
    (vec-sum (** v w)))
+(: (vec-combine v w op)
+   (vec-map (vec-flat (vec-of-size (vec-size w) v))
+            (: (f x i)
+               (op x (vec-get w (/ i (vec-size w)))))))
