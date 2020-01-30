@@ -1,6 +1,9 @@
 " place this in the init path (.vimrc)
 au BufNewFile,BufRead *.xin set filetype=xin
 
+" auto-format on write
+au BufWritePre *.xin normal gg=G''
+
 " place this in $HOME/.vim/syntax/ink.vim
 if exists("b:current_syntax")
     finish
