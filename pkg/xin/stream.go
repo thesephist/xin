@@ -65,19 +65,11 @@ func (v StreamValue) Equal(o Value) bool {
 }
 
 func streamForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) {
-	if len(args) != 0 {
-		return nil, IncorrectNumberOfArgsError{
-			node:     node,
-			required: 0,
-			given:    len(args),
-		}
-	}
-
 	return NewStream(), nil
 }
 
 func streamSetSink(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) {
-	if len(args) != 2 {
+	if len(args) < 2 {
 		return nil, IncorrectNumberOfArgsError{
 			node:     node,
 			required: 2,
@@ -121,7 +113,7 @@ func streamSetSink(fr *Frame, args []Value, node *astNode) (Value, InterpreterEr
 }
 
 func streamSetSource(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) {
-	if len(args) != 2 {
+	if len(args) < 2 {
 		return nil, IncorrectNumberOfArgsError{
 			node:     node,
 			required: 2,
@@ -162,7 +154,7 @@ func streamSetSource(fr *Frame, args []Value, node *astNode) (Value, Interpreter
 }
 
 func streamSetClose(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) {
-	if len(args) != 2 {
+	if len(args) < 2 {
 		return nil, IncorrectNumberOfArgsError{
 			node:     node,
 			required: 2,
@@ -204,7 +196,7 @@ func streamSetClose(fr *Frame, args []Value, node *astNode) (Value, InterpreterE
 }
 
 func streamSourceForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) {
-	if len(args) != 1 {
+	if len(args) < 1 {
 		return nil, IncorrectNumberOfArgsError{
 			node:     node,
 			required: 1,
@@ -234,7 +226,7 @@ func streamSourceForm(fr *Frame, args []Value, node *astNode) (Value, Interprete
 }
 
 func streamSinkForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) {
-	if len(args) != 2 {
+	if len(args) < 2 {
 		return nil, IncorrectNumberOfArgsError{
 			node:     node,
 			required: 2,
@@ -272,7 +264,7 @@ func streamSinkForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterE
 }
 
 func streamCloseForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) {
-	if len(args) != 1 {
+	if len(args) < 1 {
 		return nil, IncorrectNumberOfArgsError{
 			node:     node,
 			required: 1,

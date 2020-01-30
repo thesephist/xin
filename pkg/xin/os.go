@@ -10,7 +10,7 @@ import (
 const readBufferSize = 4096
 
 func osWaitForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) {
-	if len(args) != 2 {
+	if len(args) < 2 {
 		return nil, IncorrectNumberOfArgsError{
 			node:     node,
 			required: 2,
@@ -59,7 +59,7 @@ func osWaitForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError
 }
 
 func osReadForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) {
-	if len(args) != 1 {
+	if len(args) < 1 {
 		return nil, IncorrectNumberOfArgsError{
 			node:     node,
 			required: 1,
@@ -112,7 +112,7 @@ func osReadForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError
 }
 
 func osWriteForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) {
-	if len(args) != 1 {
+	if len(args) < 1 {
 		return nil, IncorrectNumberOfArgsError{
 			node:     node,
 			required: 1,
@@ -171,7 +171,7 @@ func osWriteForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterErro
 }
 
 func osDeleteForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) {
-	if len(args) != 1 {
+	if len(args) < 1 {
 		return nil, IncorrectNumberOfArgsError{
 			node:     node,
 			required: 1,
@@ -200,14 +200,6 @@ func osDeleteForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterErr
 }
 
 func osArgsForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) {
-	if len(args) != 0 {
-		return nil, IncorrectNumberOfArgsError{
-			node:     node,
-			required: 0,
-			given:    len(args),
-		}
-	}
-
 	argsVec := make([]Value, len(os.Args))
 	for i, a := range os.Args {
 		argsVec[i] = StringValue(a)
@@ -216,13 +208,5 @@ func osArgsForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError
 }
 
 func debugDumpForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) {
-	if len(args) != 0 {
-		return nil, IncorrectNumberOfArgsError{
-			node:     node,
-			required: 0,
-			given:    len(args),
-		}
-	}
-
 	return StringValue(fr.String()), nil
 }

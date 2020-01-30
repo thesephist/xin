@@ -5,7 +5,7 @@ import (
 )
 
 func stringForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) {
-	if len(args) != 1 {
+	if len(args) < 1 {
 		return nil, IncorrectNumberOfArgsError{
 			required: 1,
 			given:    len(args),
@@ -21,7 +21,7 @@ func stringForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError
 }
 
 func intForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) {
-	if len(args) != 1 {
+	if len(args) < 1 {
 		return nil, IncorrectNumberOfArgsError{
 			required: 1,
 			given:    len(args),
@@ -50,7 +50,7 @@ func intForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) {
 }
 
 func fracForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) {
-	if len(args) != 1 {
+	if len(args) < 1 {
 		return nil, IncorrectNumberOfArgsError{
 			required: 1,
 			given:    len(args),
@@ -75,5 +75,100 @@ func fracForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) 
 		return FracValue(floatVal), nil
 	default:
 		return FracValue(0), nil
+	}
+}
+
+func equalForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) {
+	if len(args) < 2 {
+		return nil, IncorrectNumberOfArgsError{
+			node:     node,
+			required: 2,
+			given:    len(args),
+		}
+	}
+
+	first, err := unlazy(args[0])
+	if err != nil {
+		return nil, err
+	}
+	second, err := unlazy(args[1])
+	if err != nil {
+		return nil, err
+	}
+
+	if firstInt, fok := first.(IntValue); fok {
+		if _, sok := second.(FracValue); sok {
+			first = FracValue(float64(firstInt))
+		}
+	} else if _, fok := first.(FracValue); fok {
+		if secondInt, sok := second.(IntValue); sok {
+			second = FracValue(float64(secondInt))
+		}
+	}
+
+	if first.Equal(second) {
+		return IntValue(1), nil
+	} else {
+		return zeroValue, nil
+	}
+}
+
+func typeForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) {
+	if len(args) < 1 {
+		return nil, IncorrectNumberOfArgsError{
+			node:     node,
+			required: 1,
+			given:    len(args),
+		}
+	}
+
+	first, err := unlazy(args[0])
+	if err != nil {
+		return nil, err
+	}
+
+	switch first.(type) {
+	case IntValue:
+		return DefaultFormValue{
+			name:   "int",
+			evaler: intForm,
+		}, nil
+	case FracValue:
+		return DefaultFormValue{
+			name:   "frac",
+			evaler: fracForm,
+		}, nil
+	case StringValue:
+		return DefaultFormValue{
+			name:   "str",
+			evaler: streamForm,
+		}, nil
+	case VecValue:
+		return DefaultFormValue{
+			name:   "vec",
+			evaler: vecForm,
+		}, nil
+	case MapValue:
+		return DefaultFormValue{
+			name:   "map",
+			evaler: mapForm,
+		}, nil
+	case StreamValue:
+		return DefaultFormValue{
+			name:   "stream",
+			evaler: streamForm,
+		}, nil
+	case FormValue, DefaultFormValue:
+		return DefaultFormValue{
+			name: "form",
+			evaler: func(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) {
+				panic("form constructor as type should never be called")
+			},
+		}, nil
+	}
+
+	return nil, MismatchedArgumentsError{
+		node: node,
+		args: args,
 	}
 }

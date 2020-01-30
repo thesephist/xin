@@ -19,7 +19,7 @@ func (v StringValue) Equal(o Value) bool {
 }
 
 func strGetForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) {
-	if len(args) != 2 {
+	if len(args) < 2 {
 		return nil, IncorrectNumberOfArgsError{
 			node:     node,
 			required: 2,
@@ -53,7 +53,7 @@ func strGetForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError
 }
 
 func strSizeForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) {
-	if len(args) != 1 {
+	if len(args) < 1 {
 		return nil, IncorrectNumberOfArgsError{
 			node:     node,
 			required: 1,
@@ -77,7 +77,7 @@ func strSizeForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterErro
 }
 
 func strSliceForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) {
-	if len(args) != 3 {
+	if len(args) < 3 {
 		return nil, IncorrectNumberOfArgsError{
 			node:     node,
 			required: 3,

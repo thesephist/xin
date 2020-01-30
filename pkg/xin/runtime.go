@@ -131,7 +131,7 @@ func loadDefaultForm(vm *Vm, fr *Frame, name string, evaler formEvaler) {
 }
 
 func addForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) {
-	if len(args) != 2 {
+	if len(args) < 2 {
 		return nil, IncorrectNumberOfArgsError{
 			node:     node,
 			required: 2,
@@ -189,7 +189,7 @@ func addForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) {
 }
 
 func subtractForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) {
-	if len(args) != 2 {
+	if len(args) < 2 {
 		return nil, IncorrectNumberOfArgsError{
 			node:     node,
 			required: 2,
@@ -234,7 +234,7 @@ func subtractForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterErr
 }
 
 func multiplyForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) {
-	if len(args) != 2 {
+	if len(args) < 2 {
 		return nil, IncorrectNumberOfArgsError{
 			node:     node,
 			required: 2,
@@ -298,7 +298,7 @@ func multiplyForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterErr
 }
 
 func divideForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) {
-	if len(args) != 2 {
+	if len(args) < 2 {
 		return nil, IncorrectNumberOfArgsError{
 			node:     node,
 			required: 2,
@@ -351,7 +351,7 @@ func divideForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError
 }
 
 func modForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) {
-	if len(args) != 2 {
+	if len(args) < 2 {
 		return nil, IncorrectNumberOfArgsError{
 			node:     node,
 			required: 2,
@@ -408,7 +408,7 @@ func modForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) {
 }
 
 func powForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) {
-	if len(args) != 2 {
+	if len(args) < 2 {
 		return nil, IncorrectNumberOfArgsError{
 			node:     node,
 			required: 2,
@@ -457,7 +457,7 @@ func powForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) {
 }
 
 func notForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) {
-	if len(args) != 1 {
+	if len(args) < 1 {
 		return nil, IncorrectNumberOfArgsError{
 			node:     node,
 			required: 1,
@@ -485,7 +485,7 @@ func notForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) {
 }
 
 func andForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) {
-	if len(args) != 2 {
+	if len(args) < 2 {
 		return nil, IncorrectNumberOfArgsError{
 			node:     node,
 			required: 2,
@@ -516,7 +516,7 @@ func andForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) {
 }
 
 func orForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) {
-	if len(args) != 2 {
+	if len(args) < 2 {
 		return nil, IncorrectNumberOfArgsError{
 			node:     node,
 			required: 2,
@@ -547,7 +547,7 @@ func orForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) {
 }
 
 func xorForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) {
-	if len(args) != 2 {
+	if len(args) < 2 {
 		return nil, IncorrectNumberOfArgsError{
 			node:     node,
 			required: 2,
@@ -578,7 +578,7 @@ func xorForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) {
 }
 
 func greaterForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) {
-	if len(args) != 2 {
+	if len(args) < 2 {
 		return nil, IncorrectNumberOfArgsError{
 			node:     node,
 			required: 2,
@@ -621,7 +621,7 @@ func greaterForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterErro
 	}
 }
 func lessForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) {
-	if len(args) != 2 {
+	if len(args) < 2 {
 		return nil, IncorrectNumberOfArgsError{
 			node:     node,
 			required: 2,
@@ -656,103 +656,6 @@ func lessForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) 
 				return zeroValue, nil
 			}
 		}
-	}
-
-	return nil, MismatchedArgumentsError{
-		node: node,
-		args: args,
-	}
-}
-
-// TODO: for incorrectnumberofargs, check <, not !=,
-// so we can do things like pass + directly to reduce
-func equalForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) {
-	if len(args) != 2 {
-		return nil, IncorrectNumberOfArgsError{
-			node:     node,
-			required: 2,
-			given:    len(args),
-		}
-	}
-
-	first, err := unlazy(args[0])
-	if err != nil {
-		return nil, err
-	}
-	second, err := unlazy(args[1])
-	if err != nil {
-		return nil, err
-	}
-
-	if firstInt, fok := first.(IntValue); fok {
-		if _, sok := second.(FracValue); sok {
-			first = FracValue(float64(firstInt))
-		}
-	} else if _, fok := first.(FracValue); fok {
-		if secondInt, sok := second.(IntValue); sok {
-			second = FracValue(float64(secondInt))
-		}
-	}
-
-	if first.Equal(second) {
-		return IntValue(1), nil
-	} else {
-		return zeroValue, nil
-	}
-}
-
-func typeForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) {
-	if len(args) < 1 {
-		return nil, IncorrectNumberOfArgsError{
-			node:     node,
-			required: 1,
-			given:    len(args),
-		}
-	}
-
-	first, err := unlazy(args[0])
-	if err != nil {
-		return nil, err
-	}
-
-	switch first.(type) {
-	case IntValue:
-		return DefaultFormValue{
-			name:   "int",
-			evaler: intForm,
-		}, nil
-	case FracValue:
-		return DefaultFormValue{
-			name:   "frac",
-			evaler: fracForm,
-		}, nil
-	case StringValue:
-		return DefaultFormValue{
-			name:   "str",
-			evaler: streamForm,
-		}, nil
-	case VecValue:
-		return DefaultFormValue{
-			name:   "vec",
-			evaler: vecForm,
-		}, nil
-	case MapValue:
-		return DefaultFormValue{
-			name:   "map",
-			evaler: mapForm,
-		}, nil
-	case StreamValue:
-		return DefaultFormValue{
-			name:   "stream",
-			evaler: streamForm,
-		}, nil
-	case FormValue, DefaultFormValue:
-		return DefaultFormValue{
-			name: "form",
-			evaler: func(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) {
-				panic("form constructor as type should never be called")
-			},
-		}, nil
 	}
 
 	return nil, MismatchedArgumentsError{

@@ -48,7 +48,7 @@ func vecForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) {
 }
 
 func vecGetForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) {
-	if len(args) != 2 {
+	if len(args) < 2 {
 		return nil, IncorrectNumberOfArgsError{
 			node:     node,
 			required: 2,
@@ -91,7 +91,7 @@ func vecGetForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError
 }
 
 func vecSetForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) {
-	if len(args) != 3 {
+	if len(args) < 3 {
 		return nil, IncorrectNumberOfArgsError{
 			node:     node,
 			required: 3,
@@ -139,7 +139,7 @@ func vecSetForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError
 }
 
 func vecAddForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) {
-	if len(args) != 2 {
+	if len(args) < 2 {
 		return nil, IncorrectNumberOfArgsError{
 			node:     node,
 			required: 2,
@@ -168,7 +168,7 @@ func vecAddForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError
 }
 
 func vecSizeForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) {
-	if len(args) != 1 {
+	if len(args) < 1 {
 		return nil, IncorrectNumberOfArgsError{
 			node:     node,
 			required: 1,
@@ -192,7 +192,7 @@ func vecSizeForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterErro
 }
 
 func vecSliceForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) {
-	if len(args) != 3 {
+	if len(args) < 3 {
 		return nil, IncorrectNumberOfArgsError{
 			node:     node,
 			required: 3,
