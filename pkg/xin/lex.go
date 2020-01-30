@@ -88,13 +88,17 @@ func escapeString(s string) string {
 		c := s[i]
 		if c == '\\' {
 			i++
+
+			if i >= len(s) {
+				return builder.String()
+			}
 			next := s[i]
+
 			if next == 'x' {
 				hex := s[i+1 : i+3]
 				i += 2
 
 				codepoint, err := strconv.ParseInt(hex, 16, 32)
-				fmt.Println("codepoint number:", hex, codepoint)
 				if err != nil || !utf8.ValidRune(rune(codepoint)) {
 					builder.WriteRune('?')
 					continue
@@ -177,6 +181,8 @@ func lex(path string, r io.Reader) (tokenStream, InterpreterError) {
 
 			content := rdr.upto("'")
 			for rdr.lookback() == "\\" {
+				rdr.skip()
+				content += "'"
 				content += rdr.upto("'")
 			}
 
