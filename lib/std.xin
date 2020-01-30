@@ -9,6 +9,23 @@
 (: (bool x)
    (if x 'true' 'false'))
 
+; type assertions
+(: (int? x)
+   (= (type x) int))
+(: (frac? x)
+   (= (type x) frac))
+(: (str? x)
+   (= (type x) str))
+(: (vec? x)
+   (= (type x) vec))
+(: (map? x)
+   (= (type x) map))
+(: (stream? x)
+   (= (type x) stream))
+(: form (type type))
+(: (form? x)
+   (= (type x) form))
+
 ; identity function
 (: (identity x) x)
 
