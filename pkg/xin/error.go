@@ -6,12 +6,12 @@ import (
 )
 
 func FormatError(e InterpreterError) string {
-	return e.Error() + "\n\t at " + e.Position().String()
+	return e.Error() + "\n\t at " + e.pos().String()
 }
 
 type InterpreterError interface {
 	error
-	Position() position
+	pos() position
 }
 
 type UndefinedNameError struct {
@@ -23,7 +23,7 @@ func (e UndefinedNameError) Error() string {
 	return fmt.Sprintf("Undefined name %s", e.name)
 }
 
-func (e UndefinedNameError) Position() position {
+func (e UndefinedNameError) pos() position {
 	return e.position
 }
 
@@ -35,7 +35,7 @@ func (e InvalidFormError) Error() string {
 	return fmt.Sprintf("Invalid form")
 }
 
-func (e InvalidFormError) Position() position {
+func (e InvalidFormError) pos() position {
 	return e.position
 }
 
@@ -52,7 +52,7 @@ func (e InvalidBindError) Error() string {
 	return fmt.Sprintf("Invalid bind error: %s", strings.Join(ss, " "))
 }
 
-func (e InvalidBindError) Position() position {
+func (e InvalidBindError) pos() position {
 	return e.position
 }
 
@@ -69,7 +69,7 @@ func (e InvalidIfError) Error() string {
 	return fmt.Sprintf("Invalid if error: %s", strings.Join(ss, " "))
 }
 
-func (e InvalidIfError) Position() position {
+func (e InvalidIfError) pos() position {
 	return e.position
 }
 
@@ -82,7 +82,7 @@ func (e InvalidIfConditionError) Error() string {
 	return fmt.Sprintf("Invalid if condition: %s", e.cond)
 }
 
-func (e InvalidIfConditionError) Position() position {
+func (e InvalidIfConditionError) pos() position {
 	return e.position
 }
 
@@ -95,7 +95,7 @@ func (e UnexpectedCharacterError) Error() string {
 	return fmt.Sprintf("Unexpected character %s", e.char)
 }
 
-func (e UnexpectedCharacterError) Position() position {
+func (e UnexpectedCharacterError) pos() position {
 	return e.position
 }
 
@@ -108,7 +108,7 @@ func (e UnexpectedTokenError) Error() string {
 	return fmt.Sprintf("Unexpected token %s", e.token)
 }
 
-func (e UnexpectedTokenError) Position() position {
+func (e UnexpectedTokenError) pos() position {
 	return e.position
 }
 
@@ -120,7 +120,7 @@ func (e UnexpectedEndingError) Error() string {
 	return "Unexpected ending"
 }
 
-func (e UnexpectedEndingError) Position() position {
+func (e UnexpectedEndingError) pos() position {
 	return e.position
 }
 
@@ -133,7 +133,7 @@ func (e RuntimeError) Error() string {
 	return "Runtime error:" + e.reason
 }
 
-func (e RuntimeError) Position() position {
+func (e RuntimeError) pos() position {
 	return e.position
 }
 
@@ -148,7 +148,7 @@ func (e IncorrectNumberOfArgsError) Error() string {
 		e.node, e.required, e.given)
 }
 
-func (e IncorrectNumberOfArgsError) Position() position {
+func (e IncorrectNumberOfArgsError) pos() position {
 	return e.node.position
 }
 
@@ -165,7 +165,7 @@ func (e MismatchedArgumentsError) Error() string {
 	return fmt.Sprintf("Mismatched arguments to %s: %s", e.node, strings.Join(ss, " "))
 }
 
-func (e MismatchedArgumentsError) Position() position {
+func (e MismatchedArgumentsError) pos() position {
 	return e.node.position
 }
 
@@ -178,6 +178,6 @@ func (e InvalidStreamCallbackError) Error() string {
 	return "Invalid stream callback: " + e.reason
 }
 
-func (e InvalidStreamCallbackError) Position() position {
+func (e InvalidStreamCallbackError) pos() position {
 	return e.position
 }
