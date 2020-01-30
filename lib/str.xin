@@ -19,11 +19,13 @@
           acc))
      (sub 0 acc)))
 
-(: (str-join-vec v pad)
-   (vec-reduce v
-               (: (g s t)
-                  (+ s t))
-               pad))
+(: (str-join v pad)
+   (if (vec-empty? v)
+     ''
+     (vec-reduce (vec-tail v)
+                 (: (f s acc)
+                    (+ acc (+ pad s)))
+                 (vec-head v))))
 
 ; TODO: implement below
 
