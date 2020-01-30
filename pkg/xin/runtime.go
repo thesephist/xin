@@ -77,9 +77,10 @@ func loadAllDefaultForms(vm *Vm) {
 		"|":   orForm,
 		"xor": xorForm,
 
-		"str":  stringForm,
 		"int":  intForm,
 		"frac": fracForm,
+		"str":  stringForm,
+		"type": typeForm,
 
 		"str-get":   strGetForm,
 		"str-size":  strSizeForm,
@@ -663,6 +664,8 @@ func lessForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) 
 	}
 }
 
+// TODO: for incorrectnumberofargs, check <, not !=,
+// so we can do things like pass + directly to reduce
 func equalForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) {
 	if len(args) != 2 {
 		return nil, IncorrectNumberOfArgsError{
@@ -695,5 +698,65 @@ func equalForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError)
 		return IntValue(1), nil
 	} else {
 		return zeroValue, nil
+	}
+}
+
+func typeForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) {
+	if len(args) < 1 {
+		return nil, IncorrectNumberOfArgsError{
+			node:     node,
+			required: 1,
+			given:    len(args),
+		}
+	}
+
+	first, err := unlazy(args[0])
+	if err != nil {
+		return nil, err
+	}
+
+	switch first.(type) {
+	case IntValue:
+		return DefaultFormValue{
+			name:   "int",
+			evaler: intForm,
+		}, nil
+	case FracValue:
+		return DefaultFormValue{
+			name:   "frac",
+			evaler: fracForm,
+		}, nil
+	case StringValue:
+		return DefaultFormValue{
+			name:   "str",
+			evaler: streamForm,
+		}, nil
+	case VecValue:
+		return DefaultFormValue{
+			name:   "vec",
+			evaler: vecForm,
+		}, nil
+	case MapValue:
+		return DefaultFormValue{
+			name:   "map",
+			evaler: mapForm,
+		}, nil
+	case StreamValue:
+		return DefaultFormValue{
+			name:   "stream",
+			evaler: streamForm,
+		}, nil
+	case FormValue, DefaultFormValue:
+		return DefaultFormValue{
+			name: "form",
+			evaler: func(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) {
+				panic("form constructor as type should never be called")
+			},
+		}, nil
+	}
+
+	return nil, MismatchedArgumentsError{
+		node: node,
+		args: args,
 	}
 }
