@@ -33,8 +33,9 @@
 (: cap 500)
 (: longest-seq
    (longest-collatz-seq-below cap))
-(log (+ 'Longest Collatz sequence length below '
-        (+ (str cap)
-           (+ ': '
-              (str (vec-size longest-seq))))))
+(log (str-join (vec 'Longest Collatz sequence length below '
+                    (str cap)
+                    ': '
+                    (str (vec-size longest-seq)))
+               ''))
 (log longest-seq)

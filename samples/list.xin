@@ -15,9 +15,7 @@
                0))
 (log reduced)
 
-(vec-each list
-          (: (f x)
-             (log x)))
+(vec-each list log)
 
 (: (sq n)
    (* n n))
@@ -31,7 +29,7 @@
    (vec-filter list even?))
 (log filtered)
 
-(log 'sort')
+(log 'sorted')
 (: list (vec 45 2 64 4 -3 7 23 5 1 0 4 -4 3 2))
 (log (vec-sort list))
 (log 'original')

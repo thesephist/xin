@@ -1,13 +1,12 @@
 " place this in the init path (.vimrc)
-au BufNewFile,BufRead *.xin set filetype=xin
+" au BufNewFile,BufRead *.xin set filetype=xin
 
-" auto-format on write
-au BufWritePre *.xin normal gg=G''
-
-" place this in $HOME/.vim/syntax/ink.vim
 if exists("b:current_syntax")
     finish
 endif
+
+" auto-format on write
+au BufWritePre *.xin normal gg=G''
 
 " xin syntax definition for vi/vim
 syntax sync fromstart
@@ -54,7 +53,7 @@ syntax match xinTodo "\v(TODO\(.*\)|TODO)" contained
 syntax keyword xinTodo XXX contained
 highlight link xinTodo Todo
 
-syntax region inkForm start="(" end=")" transparent fold
+syntax region xinForm start="(" end=")" transparent fold
 set foldmethod=syntax
 set foldlevel=20
 

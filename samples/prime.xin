@@ -25,7 +25,8 @@
 (: limit 5000)
 (: primes
    (primes-in-range (seq limit)))
-(log (+ 'Number of primes under '
-        (+ (str limit)
-           (+ ': '
-              (str (vec-size primes))))))
+(log (str-join (vec 'Number of primes numder '
+                    (str limit)
+                    ': '
+                    (str (vec-size primes)))
+               ''))

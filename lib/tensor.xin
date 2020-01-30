@@ -22,9 +22,9 @@
      0
      (vec-reduce v min (vec-head v))))
 (: (vec-sum v)
-   (vec-reduce v (: (f a b) (+ a b)) 0))
+   (vec-reduce v + 0))
 (: (vec-prod v)
-   (vec-reduce v (: (f a b) (* a b)) 1))
+   (vec-reduce v * 1))
 
 ; elementwise operators
 (: ++ (vec-compose +))
