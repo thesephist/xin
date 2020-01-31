@@ -74,8 +74,7 @@
 
 ; quicksort using hoare partition
 (: (vec-sort-by v pred)
-   (do (: size (vec-size v))
-     (: v-pred (vec-map v pred))
+   (do (: v-pred (vec-map v pred))
      (: (swap! i j)
         (do
           (: tmp (vec-get v i))
@@ -109,7 +108,7 @@
               (quicksort v lo p)
               (quicksort v (+ p 1) hi))
             v)))
-     (quicksort v 0 (- size 1))))
+     (quicksort v 0 (- (vec-size v) 1))))
 
 (: (vec-sort! v)
    (vec-sort-by v identity))

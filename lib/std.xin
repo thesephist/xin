@@ -64,11 +64,7 @@
 ; set abstraction over map
 (: (set)
    (map))
-(: (set-add! v)
-   (map-set! v 0))
-(: (set-del! v)
-   (map-del! v))
-(: (set-has v)
-   (if (= (map-get v) 0)
-     true
-     false))
+(: (set-add! s v)
+   (map-set! s v 0))
+(: set-del! map-del!)
+(: set-has map-has)

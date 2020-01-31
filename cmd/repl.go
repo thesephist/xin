@@ -46,14 +46,14 @@ func repl() {
 		result, ierr := vm.Eval(fmt.Sprintf("input %d", replCount), strings.NewReader(text))
 		if ierr != nil {
 			color.Red("Eval error: %s\n\n", xin.FormatError(ierr))
-		} else {
-			vm.Frame.Put(
-				fmt.Sprintf("_%d", replCount),
-				result,
-			)
-			color.Yellow("%d ) %s\n\n", replCount, result)
-
-			replCount++
 		}
+
+		vm.Frame.Put(
+			fmt.Sprintf("_%d", replCount),
+			result,
+		)
+		color.Yellow("%d ) %s\n\n", replCount, result)
+
+		replCount++
 	}
 }

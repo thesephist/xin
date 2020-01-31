@@ -7,7 +7,7 @@ import (
 var rootCmd = &cobra.Command{
 	Use:   "xin",
 	Short: "Xin interpreter",
-	Long:  "Xin is a purely functional, lisp-like concurrent general-purpose programming language.",
+	Long:  "Xin is an extensible, functional, lisp-like general-purpose programming language.",
 }
 
 func Execute() error {

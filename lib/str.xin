@@ -39,10 +39,10 @@
 
 (: (str-suffix? s sub) 0)
 
-(: (str-upcase s) 0)
-
-(: (str-downcase s) 0)
-
 (: (str-upper? s) 0)
 
 (: (str-lower? s) 0)
+
+(: (str-upcase s) 0)
+
+(: (str-downcase s) 0)
