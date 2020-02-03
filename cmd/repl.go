@@ -41,6 +41,7 @@ func repl() {
 			break
 		} else if err != nil {
 			color.Red("Repl error: %s\n\n", err.Error())
+			continue
 		}
 
 		result, ierr := vm.Eval(fmt.Sprintf("input %d", replCount), strings.NewReader(text))
