@@ -3,7 +3,7 @@
 ; test that we can set each type as the key
 (: m (map))
 (: (should-key k)
-   (map-set! m k 0))
+   (map::set! m k 0))
 
 (should-key 1)
 (should-key 3.141592)

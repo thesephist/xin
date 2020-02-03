@@ -4,33 +4,33 @@
    (seq 100))
 
 (: list
-   (vec-slice list-all 1 11))
+   (vec::slice list-all 1 11))
 
 (log list)
 
 (: reduced
-   (vec-reduce list
-               (: (f a b)
-                  (+ a b))
-               0))
+   (vec::reduce list
+                (: (f a b)
+                   (+ a b))
+                0))
 (log reduced)
 
-(vec-each list log)
+(vec::each list log)
 
 (: (sq n)
    (* n n))
 (: mapped
-   (vec-map list sq))
+   (vec::map list sq))
 (log mapped)
 
 (: (even? n)
    (= (% n 2) 0))
 (: filtered
-   (vec-filter list even?))
+   (vec::filter list even?))
 (log filtered)
 
 (log 'sorted')
 (: list (vec 45 2 64 4 -3 7 23 5 1 0 4 -4 3 2))
-(log (vec-sort list))
+(log (vec::sort list))
 (log 'original')
 (log list)

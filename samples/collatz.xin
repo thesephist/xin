@@ -13,18 +13,18 @@
    (do (: (sub n acc)
           (do (: next (collatz-next n))
             (if (= next 1)
-              (vec-add! acc next)
-              (sub next (vec-add! acc next)))))
+              (vec::add! acc next)
+              (sub next (vec::add! acc next)))))
      (sub start (vec start))))
 
 (: (longest-collatz-seq ns)
-   (vec-reduce ns
-               (: (f x last)
-                  (do (: this-collatz (collatz-seq x))
-                    (if (> (vec-size this-collatz) (vec-size last))
-                      this-collatz
-                      last)))
-               (vec)))
+   (vec::reduce ns
+                (: (f x last)
+                   (do (: this-collatz (collatz-seq x))
+                     (if (> (vec::size this-collatz) (vec::size last))
+                       this-collatz
+                       last)))
+                (vec)))
 
 (: (longest-collatz-seq-below cap)
    (longest-collatz-seq (range 1 cap 1)))
@@ -33,9 +33,9 @@
 (: cap 500)
 (: longest-seq
    (longest-collatz-seq-below cap))
-(log (str-join (vec 'Longest Collatz sequence length below '
-                    (str cap)
-                    ': '
-                    (str (vec-size longest-seq)))
-               ''))
+(log (str::join (vec 'Longest Collatz sequence length below '
+                     (str cap)
+                     ': '
+                     (str (vec::size longest-seq)))
+                ''))
 (log longest-seq)

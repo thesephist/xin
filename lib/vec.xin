@@ -150,13 +150,13 @@
 
 ; scalar operators
 (: (v+ v s)
-   (++ v (of (vec:size v) s)))
+   (++ v (of (vec::size v) s)))
 (: (v- v s)
-   (-- v (of (vec:size v) s)))
+   (-- v (of (vec::size v) s)))
 (: (v* v s)
-   (** v (of (vec:size v) s)))
+   (** v (of (vec::size v) s)))
 (: (v/ v s)
-   (// v (of (vec:size v) s)))
+   (// v (of (vec::size v) s)))
 
 ; dot and cross products, other combinators
 (: (flat v)
@@ -164,6 +164,6 @@
 (: (dot v w)
    (sum (** v w)))
 (: (combine v w op)
-   (map (flat (of (vec:size w) v))
+   (map (flat (of (vec::size w) v))
         (: (f x i)
-           (op x (vec::get w (/ i (vec:size w)))))))
+           (op x (vec::get w (/ i (vec::size w)))))))

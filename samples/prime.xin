@@ -16,17 +16,17 @@
        (sub 2))))
 
 (: (primes-in-range ns)
-   (vec-filter ns is-prime))
+   (vec::filter ns is-prime))
 
 (: (count-primes-in-range ns)
-   (vec-size (primes-in-range ns)))
+   (vec::size (primes-in-range ns)))
 
 ; run a primality test for range under limit
 (: limit 5000)
 (: primes
    (primes-in-range (seq limit)))
-(log (str-join (vec 'Number of primes numder '
-                    (str limit)
-                    ': '
-                    (str (vec-size primes)))
-               ''))
+(log (str::join (vec 'Number of primes numder '
+                     (str limit)
+                     ': '
+                     (str (vec::size primes)))
+                ''))

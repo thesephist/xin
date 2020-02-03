@@ -3,9 +3,9 @@
 
 (: ones (map))
 (: (add-ones n word)
-   (map-set! ones n word))
+   (map::set! ones n word))
 (: (get-ones n)
-   (map-get ones n))
+   (map::get ones n))
 (add-ones 0 '')
 (add-ones 1 'one')
 (add-ones 2 'two')
@@ -19,9 +19,9 @@
 
 (: tens (map))
 (: (add-tens n word)
-   (map-set! tens n word))
+   (map::set! tens n word))
 (: (get-tens n)
-   (map-get tens n))
+   (map::get tens n))
 (add-tens 0 '')
 (add-tens 1 'ten')
 (add-tens 2 'twenty')
@@ -36,11 +36,11 @@
 ; special cases that don't follow normal rules
 (: special (map))
 (: (add-special n word)
-   (map-set! special n word))
+   (map::set! special n word))
 (: (get-special n)
-   (map-get special n))
+   (map::get special n))
 (: (is-special n)
-   (map-has special n))
+   (map::has special n))
 (add-special 11 'eleven')
 (add-special 12 'twelve')
 (add-special 13 'thirteen')
@@ -52,7 +52,7 @@
 (add-special 19 'nineteen')
 
 (: (count-digits n)
-   (str-size (str n)))
+   (str::size (str n)))
 
 (: (write-single-digit n)
    (get-ones n))
@@ -85,7 +85,7 @@
        (+ (get-ones thousands-digit)
           (+ 'thousand'
              (if (= hundreds-digit 0)
-               (if (str-blank? triple-digit)
+               (if (str::blank? triple-digit)
                  ''
                  (+ 'and' triple-digit))
                triple-digit))))))
@@ -100,8 +100,8 @@
          (write-single-digit n)))))
 
 (: (count-letters n)
-   (str-size (write-number n)))
+   (str::size (write-number n)))
 
 (: (letters-count-to cap)
-   (vec-sum (vec-map (range 1 (+ 1 cap) 1) count-letters)))
+   (vec::sum (vec::map (range 1 (+ 1 cap) 1) count-letters)))
 (log (letters-count-to 1000))

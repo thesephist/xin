@@ -1,11 +1,11 @@
 ; streams example
 (: sm (stream))
 
-(stream-set-sink!
+(stream::set-sink!
   sm
   (: (f x) (log x)))
 
-(stream-set-source!
+(stream::set-source!
   sm
   (: (f) 42))
 
