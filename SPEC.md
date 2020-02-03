@@ -120,3 +120,41 @@ A Xin program can import values defined in another Xin program with the `import`
 ; available under the namespace `user-model::xxx`
 (import core::models::user user-model)
 ```
+## Proposals
+
+This proposals section documents ideas about additions and changes to the language that I have considered or others have suggested, but I don't think are well aligned with the current values of the language or are too early in their specifications to be included in the implementation or specification.
+
+### Spread syntax
+
+Spread syntax enables Xin programmers to "collect" or "spread" arbitrary segments of the arguments to a form in its invocation or definition, and refer to it as a vector.
+
+### Composite type literals
+
+Add literal syntax for vectors and maps.
+
+Vector literals are delimited with square brackets:
+
+```
+(: my-vec [1 2 3 4 [5 6]])
+
+; equivalent to
+
+(: my-vec
+   (vec 1 2 3 4 (vec 5 6)))
+```
+
+Map literals are delimited with braces and use the arrow `->`:
+
+```
+(: letter-counts
+   {'hi' -> 2 'hello' -> 5 'bye' -> 3})
+
+; equivalent to
+
+(: letter-counts
+   (do (: m (map))
+     (map-set! m 'hi' 2)
+     (map-set! m 'hello' 5)
+     (map-set! m 'bye' 3)))
+```
+
