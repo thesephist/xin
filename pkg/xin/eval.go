@@ -116,10 +116,19 @@ func evalForm(fr *Frame, node *astNode) (Value, InterpreterError) {
 			nargs = len(node.leaves) - 1
 		}
 		for i, n := range node.leaves[1 : nargs+1] {
-			localFrame.Put((*form.arguments)[i], LazyValue{
-				frame: fr,
-				node:  n,
-			})
+			if n.isLiteral() {
+				val, err := evalAtom(fr, n)
+				if err != nil {
+					return nil, err
+				}
+
+				localFrame.Put((*form.arguments)[i], val)
+			} else {
+				localFrame.Put((*form.arguments)[i], LazyValue{
+					frame: fr,
+					node:  n,
+				})
+			}
 		}
 
 		return LazyValue{
@@ -129,9 +138,18 @@ func evalForm(fr *Frame, node *astNode) (Value, InterpreterError) {
 	case DefaultFormValue:
 		args := make([]Value, len(node.leaves)-1)
 		for i, n := range node.leaves[1:] {
-			args[i] = LazyValue{
-				frame: fr,
-				node:  n,
+			if n.isLiteral() {
+				val, err := evalAtom(fr, n)
+				if err != nil {
+					return nil, err
+				}
+
+				args[i] = val
+			} else {
+				args[i] = LazyValue{
+					frame: fr,
+					node:  n,
+				}
 			}
 		}
 

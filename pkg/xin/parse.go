@@ -23,6 +23,10 @@ func (n astNode) String() string {
 	}
 }
 
+func (n *astNode) isLiteral() bool {
+	return n.token.kind != tkName && !n.isForm
+}
+
 func parse(toks tokenStream) (astNode, InterpreterError) {
 	root := astNode{
 		isForm: true,
