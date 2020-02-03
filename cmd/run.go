@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"fmt"
-	"os"
 
 	"github.com/fatih/color"
 	"github.com/spf13/cobra"
@@ -28,21 +27,14 @@ func init() {
 }
 
 func run(path string) {
-	file, err := os.Open(path)
-	defer file.Close()
+	vm, err := xin.NewVm()
 	if err != nil {
-		color.Red("Error opening file: %s\n", err)
-	}
-
-	vm, ierr := xin.NewVm()
-	if ierr != nil {
-		color.Red("Error creating Xin VM: %s", xin.FormatError(ierr))
+		color.Red("Error creating Xin VM: %s\n", xin.FormatError(err))
 		return
 	}
 
-	_, ierr = vm.Eval(path, file)
-	if ierr != nil {
-		color.Red("Error: %s\n", xin.FormatError(ierr))
-		return
+	err = vm.Exec(path)
+	if err != nil {
+		color.Red("Error: %s\n", xin.FormatError(err))
 	}
 }

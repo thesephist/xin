@@ -28,7 +28,7 @@ func init() {
 func repl() {
 	vm, err := xin.NewVm()
 	if err != nil {
-		color.Red("Error creating Xin VM: %s", xin.FormatError(err))
+		color.Red("Error creating Xin VM: %s\n", xin.FormatError(err))
 		return
 	}
 

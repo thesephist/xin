@@ -3,6 +3,8 @@ package xin
 import (
 	"fmt"
 	"io"
+	"os"
+	osPath "path"
 	"sync"
 )
 
@@ -36,10 +38,20 @@ type Vm struct {
 }
 
 func NewVm() (*Vm, InterpreterError) {
+
 	vm := &Vm{
-		Frame: newFrame(nil), // no parent frame
+		Frame:   newFrame(nil), // no parent frame
+		imports: make(map[string]*Frame),
 	}
 	vm.Frame.Vm = vm
+
+	cwd, osErr := os.Getwd()
+	if osErr != nil {
+		return nil, RuntimeError{
+			reason: "Cannot find working directory",
+		}
+	}
+	vm.Frame.cwd = &cwd
 
 	loadAllDefaultValues(vm)
 	loadAllDefaultForms(vm)
@@ -81,13 +93,29 @@ func (vm *Vm) Eval(path string, r io.Reader) (Value, InterpreterError) {
 	vm.Lock()
 	defer vm.Unlock()
 
-	// every file runs in a child frame of the global
-	// root frame
-	fr := newFrame(vm.Frame)
-	val, err := unlazyEval(fr, &rootNode)
+	val, err := unlazyEval(vm.Frame, &rootNode)
 	if err != nil {
 		return nil, err
 	}
 
 	return val, nil
+}
+
+func (vm *Vm) Exec(path string) InterpreterError {
+	file, err := os.Open(path)
+	defer file.Close()
+	if err != nil {
+		return RuntimeError{
+			reason: fmt.Sprintf("Error opening file: %s", err),
+		}
+	}
+
+	cwd := osPath.Dir(path)
+	vm.Frame.cwd = &cwd
+	_, ierr := vm.Eval(path, file)
+	if ierr != nil {
+		return ierr
+	}
+
+	return nil
 }

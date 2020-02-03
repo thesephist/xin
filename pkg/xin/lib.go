@@ -3,6 +3,7 @@ package xin
 import (
 	"fmt"
 	"os"
+	osPath "path"
 
 	"github.com/rakyll/statik/fs"
 	_ "github.com/thesephist/xin/statik"
@@ -70,6 +71,52 @@ func loadStandardLibrary(vm *Vm) InterpreterError {
 	return nil
 }
 
+func importFrame(fr *Frame, importPath string) (*Frame, InterpreterError) {
+	importFile, osErr := os.Open(importPath)
+	if osErr != nil {
+		return nil, RuntimeError{
+			reason: fmt.Sprintf("Could not open imported file %s", importPath),
+		}
+	}
+	toks, err := lex(importPath, importFile)
+	if err != nil {
+		return nil, err
+	}
+	rootNode, err := parse(toks)
+	if err != nil {
+		return nil, err
+	}
+
+	// import runs in a new top-level frame in
+	// the same VM (execution lock)
+	importFrame := newFrame(fr.Vm.Frame)
+	importCwd := osPath.Dir(importPath)
+	importFrame.cwd = &importCwd
+	_, err = unlazyEval(importFrame, &rootNode)
+	if err != nil {
+		return nil, err
+	}
+
+	return importFrame, nil
+}
+
+func deduplicatedImportFrame(fr *Frame, importPath string) (*Frame, InterpreterError) {
+	importMap := fr.Vm.imports
+
+	if dedupFrame, prs := importMap[importPath]; prs {
+		return dedupFrame, nil
+	}
+
+	dedupFrame, err := importFrame(fr, importPath)
+	if err != nil {
+		return nil, err
+	}
+
+	importMap[importPath] = dedupFrame
+
+	return dedupFrame, nil
+}
+
 func evalImportForm(fr *Frame, args []*astNode) (Value, InterpreterError) {
 	if len(args) == 0 {
 		return nil, InvalidImportError{nodes: args}
@@ -86,31 +133,12 @@ func evalImportForm(fr *Frame, args []*astNode) (Value, InterpreterError) {
 		return nil, InvalidImportError{nodes: args}
 	}
 
-	importPath := string(cleanPath) + ".xin"
-
-	importFile, osErr := os.Open(importPath)
-	if osErr != nil {
-		return nil, RuntimeError{
-			reason:   fmt.Sprintf("Could not open imported file %s", importPath),
-			position: pathNode.position,
-		}
-	}
-	toks, err := lex(importPath, importFile)
+	importPath := osPath.Join(*fr.cwd, string(cleanPath)+".xin")
+	importFramePtr, err := deduplicatedImportFrame(fr, importPath)
 	if err != nil {
 		return nil, err
 	}
-	rootNode, err := parse(toks)
-	if err != nil {
-		return nil, err
-	}
-
-	// import runs in a new top-level frame in
-	// the same VM (execution lock)
-	importFrame := newFrame(fr.Vm.Frame)
-	_, err = unlazyEval(importFrame, &rootNode)
-	if err != nil {
-		return nil, err
-	}
+	importFrame := *importFramePtr
 
 	alias := ""
 	if len(args) > 1 {
@@ -119,7 +147,6 @@ func evalImportForm(fr *Frame, args []*astNode) (Value, InterpreterError) {
 			alias = aliasNode.token.value
 		}
 	}
-
 	if alias == "" {
 		for name, value := range importFrame.Scope {
 			fr.Put(name, value)

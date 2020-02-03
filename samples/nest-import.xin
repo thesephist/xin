@@ -1,0 +1,8 @@
+; test nested imports by importing import.xin
+
+(log 'Warming up import cache...')
+(import 'fact')
+(import 'fib')
+
+(log 'Testing nested imports...')
+(import 'import')

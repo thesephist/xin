@@ -21,6 +21,7 @@ test: gen
 	./xin run ./samples/async.xin
 	./xin run ./samples/stream.xin
 	./xin run ./samples/file.xin
+	./xin run ./samples/nest-import.xin
 	# we echo in some input for prompt.xin testing stdin
 	echo "Linus" | ./xin run ./samples/prompt.xin
 	rm ./xin

@@ -1,13 +1,15 @@
 ; testing imports
 
-(log 'Testing imports, each prog should log only once:')
+(log 'Testing imports, should only print fact 10 / fib 10:')
 
-(import 'samples/fact')
-(import 'samples/fib' fibonacci)
+(import 'fact')
+(import 'fib' fibonacci)
 
+(log 'fact 10')
 (log (fact 10))
+(log 'fib 10')
 (log (fibonacci::fib 10))
 
 ; import again to test vm-wide import cache
-(import 'samples/fact' factorial)
-(import 'samples/fib')
+(import 'fact' factorial)
+(import 'fib')

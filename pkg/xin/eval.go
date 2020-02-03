@@ -12,6 +12,8 @@ type Frame struct {
 	Vm     *Vm
 	Scope  map[string]Value
 	Parent *Frame
+
+	cwd *string
 }
 
 func newFrame(parent *Frame) *Frame {
@@ -25,6 +27,7 @@ func newFrame(parent *Frame) *Frame {
 		Vm:     parent.Vm,
 		Scope:  make(map[string]Value),
 		Parent: parent,
+		cwd:    parent.cwd,
 	}
 }
 
