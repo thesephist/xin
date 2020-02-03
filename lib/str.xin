@@ -1,48 +1,48 @@
 ; str standard library
 
-(: (str-blank? s)
+(: (blank? s)
    (= s ''))
 
-(: (str-reverse s)
-   (if (str-blank? s)
+(: (reverse s)
+   (if (blank? s)
      ''
-     (+ (str-reverse (str-slice s 1 (str-size s)))
-        (str-get s 0))))
+     (+ (reverse (str::slice s 1 (str::size s)))
+        (str::get s 0))))
 
-(: (str-reduce s f acc)
+(: (reduce s f acc)
    (do
-     (: max (str-size v))
+     (: max (str::size v))
      (: (sub i acc)
         (if (< i max)
           (sub (+ i 1)
-               (f (str-get v i) acc i))
+               (f (str::get v i) acc i))
           acc))
      (sub 0 acc)))
 
-(: (str-join v pad)
-   (if (vec-empty? v)
+(: (join v pad)
+   (if (vec::empty? v)
      ''
-     (vec-reduce (vec-tail v)
-                 (: (f s acc)
-                    (+ acc (+ pad s)))
-                 (vec-head v))))
+     (vec::reduce (vec::tail v)
+                  (: (f s acc)
+                     (+ acc (+ pad s)))
+                  (vec::head v))))
 
 ; TODO: implement below
 
-(: (str-index? s sub) 0)
+(: (index? s sub) 0)
 
-(: (str-split s delim) 0)
+(: (split s delim) 0)
 
-(: (str-has? s sub) 0)
+(: (has? s sub) 0)
 
-(: (str-prefix? s sub) 0)
+(: (prefix? s sub) 0)
 
-(: (str-suffix? s sub) 0)
+(: (suffix? s sub) 0)
 
-(: (str-upper? s) 0)
+(: (upper? s) 0)
 
-(: (str-lower? s) 0)
+(: (lower? s) 0)
 
-(: (str-upcase s) 0)
+(: (upcase s) 0)
 
-(: (str-downcase s) 0)
+(: (downcase s) 0)

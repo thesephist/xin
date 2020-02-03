@@ -1,0 +1,13 @@
+; testing imports
+
+(log 'Testing imports, each prog should log only once:')
+
+(import 'samples/fact')
+(import 'samples/fib' fibonacci)
+
+(log (fact 10))
+(log (fibonacci::fib 10))
+
+; import again to test vm-wide import cache
+(import 'samples/fact' factorial)
+(import 'samples/fib')

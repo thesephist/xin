@@ -86,6 +86,23 @@ func (e InvalidIfConditionError) pos() position {
 	return e.position
 }
 
+type InvalidImportError struct {
+	nodes    []*astNode
+	position position
+}
+
+func (e InvalidImportError) Error() string {
+	ss := make([]string, len(e.nodes))
+	for i, n := range e.nodes {
+		ss[i] = n.String()
+	}
+	return fmt.Sprintf("Invalid import: %s", strings.Join(ss, " "))
+}
+
+func (e InvalidImportError) pos() position {
+	return e.position
+}
+
 type UnexpectedCharacterError struct {
 	char     string
 	position position
@@ -130,7 +147,7 @@ type RuntimeError struct {
 }
 
 func (e RuntimeError) Error() string {
-	return "Runtime error:" + e.reason
+	return "Runtime error: " + e.reason
 }
 
 func (e RuntimeError) pos() position {

@@ -28,13 +28,14 @@ func (sr stackRecord) String() string {
 type Vm struct {
 	Frame *Frame
 
-	stack *stackRecord
+	stack   *stackRecord
+	imports map[string]*Frame
 
 	sync.Mutex
 	waiter sync.WaitGroup
 }
 
-func NewVm() *Vm {
+func NewVm() (*Vm, InterpreterError) {
 	vm := &Vm{
 		Frame: newFrame(nil), // no parent frame
 	}
@@ -42,9 +43,12 @@ func NewVm() *Vm {
 
 	loadAllDefaultValues(vm)
 	loadAllDefaultForms(vm)
-	loadStandardLibrary(vm)
+	err := loadStandardLibrary(vm)
+	if err != nil {
+		return nil, err
+	}
 
-	return vm
+	return vm, nil
 }
 
 func (vm *Vm) pushStack(node *astNode) {
@@ -56,7 +60,7 @@ func (vm *Vm) pushStack(node *astNode) {
 
 func (vm *Vm) popStack() {
 	if vm.stack == nil {
-		panic("Attempt to unwind an empty call stack!")
+		panic("Attempted to unwind an empty call stack!")
 	}
 
 	vm.stack = vm.stack.parent
@@ -77,7 +81,10 @@ func (vm *Vm) Eval(path string, r io.Reader) (Value, InterpreterError) {
 	vm.Lock()
 	defer vm.Unlock()
 
-	val, err := unlazyEval(vm.Frame, &rootNode)
+	// every file runs in a child frame of the global
+	// root frame
+	fr := newFrame(vm.Frame)
+	val, err := unlazyEval(fr, &rootNode)
 	if err != nil {
 		return nil, err
 	}

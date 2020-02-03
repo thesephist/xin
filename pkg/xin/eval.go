@@ -95,6 +95,8 @@ func evalForm(fr *Frame, node *astNode) (Value, InterpreterError) {
 			return evalIfForm(fr, node.leaves[1:])
 		case "do":
 			return evalDoForm(fr, node.leaves[1:])
+		case "import":
+			return evalImportForm(fr, node.leaves[1:])
 		}
 
 		// In the common case that the form head is a named reference,

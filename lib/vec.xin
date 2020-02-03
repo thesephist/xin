@@ -1,95 +1,94 @@
 ; vec standard library
 
-(: (vec-head v)
-   (vec-get v 0))
+(: (head v)
+   (vec::get v 0))
 
-(: (vec-tail v)
-   (vec-slice v 1 (vec-size v)))
+(: (tail v)
+   (vec::slice v 1 (vec::size v)))
 
-(: (vec-last v)
-   (vec-get v (- (vec-size v) 1)))
+(: (last v)
+   (vec::get v (- (vec::size v) 1)))
 
-(: (vec-empty? v)
-   (= (vec-size v) 0))
+(: (empty? v)
+   (= (vec::size v) 0))
 
-(: (vec-eq? v w)
-   (if (= (vec-size v) (vec-size w))
-     (vec-reduce v
-                 (: (f x acc i)
-                    (& acc (= x (vec-get w i))))
-                 true)
+(: (eq? v w)
+   (if (= (vec::size v) (vec::size w))
+     (reduce v
+             (: (f x acc i)
+                (& acc (= x (vec::get w i))))
+             true)
      false))
 
-(: (vec-reverse v)
-   (if (vec-empty? v)
+(: (reverse v)
+   (if (empty? v)
      (vec)
-     (vec-add! (vec-reverse (vec-tail v))
-               (vec-head v))))
+     (vec::add! (reverse (tail v)) (head v))))
 
-(: (vec-cat v w)
+(: (cat v w)
    (do (: (sub v w)
-          (if (vec-empty? w)
+          (if (empty? w)
             v
-            (sub (vec-add! v (vec-head w)) (vec-tail w))))
-     (sub (vec-clone v) w)))
+            (sub (vec::add! v (head w)) (tail w))))
+     (sub (clone v) w)))
 
-(: (vec-reduce v f acc)
+(: (reduce v f acc)
    (do
-     (: max (vec-size v))
+     (: max (vec::size v))
      (: (sub i acc)
         (if (< i max)
           (sub (+ i 1)
-               (f (vec-get v i) acc i))
+               (f (vec::get v i) acc i))
           acc))
      (sub 0 acc)))
 
-(: (vec-each v f)
+(: (each v f)
    (do
-     (: max (vec-size v))
+     (: max (vec::size v))
      (: (sub i)
         (if (< i max)
-          (do (f (vec-get v i) i)
+          (do (f (vec::get v i) i)
             (sub (+ i 1)))
           0))
      (sub 0)))
 
-(: (vec-map v f)
-   (vec-reduce v
-               (: (g x acc i)
-                  (vec-add! acc (f x i)))
-               (vec)))
+(: (map v f)
+   (reduce v
+           (: (g x acc i)
+              (vec::add! acc (f x i)))
+           (vec)))
 
 ; the fastest way to clone a xin vec
-; is to use the native vec-slice
-(: (vec-clone v)
-   (vec-slice v 0 (vec-size v)))
+; is to use the native vec::slice
+(: (clone v)
+   (vec::slice v 0 (vec::size v)))
 
-(: (vec-filter v f)
-   (vec-reduce v
-               (: (g x acc i)
-                  (if (f x i)
-                    (vec-add! acc x)
-                    acc))
-               (vec)))
+(: (filter v f)
+   (reduce v
+           (: (g x acc i)
+              (if (f x i)
+                (vec::add! acc x)
+                acc))
+           (vec)))
 
 ; quicksort using hoare partition
-(: (vec-sort-by v pred)
-   (do (: v-pred (vec-map v pred))
+(: (sort-by v pred)
+   (do (: v-pred (map v pred))
      (: (swap! i j)
         (do
-          (: tmp (vec-get v i))
-          (: tmp-pred (vec-get v-pred i))
-          (vec-set! v i (vec-get v j))
-          (vec-set! v j tmp)
-          (vec-set! v-pred i (vec-get v-pred j))
-          (vec-set! v-pred j tmp-pred)))
+          (: tmp (vec::get v i))
+          (: tmp-pred (vec::get v-pred i))
+          (vec::set! v i (vec::get v j))
+          (vec::set! v j tmp)
+          (vec::set! v-pred i (vec::get v-pred j))
+          (vec::set! v-pred j tmp-pred)))
      (: (partition v lo hi)
-        (do (: pivot (vec-get v-pred lo))
+        (do (: pivot (vec::get v-pred lo))
           (: (lsub i)
-             (if (>= (vec-get v-pred i) pivot)
+             (if (>= (vec::get v-pred i) pivot)
                i (lsub (+ i 1))))
           (: (rsub j)
-             (if (<= (vec-get v-pred j) pivot)
+             (if (<= (vec::get v-pred j) pivot)
                j (rsub (- j 1))))
           (: (sub i j)
              (do
@@ -101,16 +100,70 @@
                    (sub (+ i 1) (- j 1))))))
           (sub lo hi)))
      (: (quicksort v lo hi)
-        (if (vec-empty? v)
+        (if (empty? v)
           v
           (if (< lo hi)
             (do (: p (partition v lo hi))
               (quicksort v lo p)
               (quicksort v (+ p 1) hi))
             v)))
-     (quicksort v 0 (- (vec-size v) 1))))
+     (quicksort v 0 (- (vec::size v) 1))))
 
-(: (vec-sort! v)
-   (vec-sort-by v identity))
-(: (vec-sort v)
-   (vec-sort! (vec-clone v)))
+(: (sort! v)
+   (sort-by v identity))
+(: (sort v)
+   (sort! (clone v)))
+
+; building blocks to allow us to compose vector ops
+(: (compose op)
+   (: (? v w)
+      (reduce v
+              (: (f x acc i)
+                 (vec::add! acc (op x (vec::get w i))))
+              (vec))))
+
+; vec of size n with elements of x
+(: (of n x)
+   (map (seq n) (: (f) x)))
+
+; accumulator functions
+(: std::max max)
+(: (max v)
+   (if (empty? v)
+     0
+     (reduce v std::max (head v))))
+(: std::min min)
+(: (min v)
+   (if (empty? v)
+     0
+     (reduce v std::min (head v))))
+(: (sum v)
+   (reduce v + 0))
+(: (prod v)
+   (reduce v * 1))
+
+; elementwise operators
+(: ++ (compose +))
+(: -- (compose -))
+(: ** (compose *))
+(: // (compose /))
+
+; scalar operators
+(: (v+ v s)
+   (++ v (of (vec:size v) s)))
+(: (v- v s)
+   (-- v (of (vec:size v) s)))
+(: (v* v s)
+   (** v (of (vec:size v) s)))
+(: (v/ v s)
+   (// v (of (vec:size v) s)))
+
+; dot and cross products, other combinators
+(: (flat v)
+   (reduce v (: (f w acc) (cat acc w)) (vec)))
+(: (dot v w)
+   (sum (** v w)))
+(: (combine v w op)
+   (map (flat (of (vec:size w) v))
+        (: (f x i)
+           (op x (vec::get w (/ i (vec:size w)))))))

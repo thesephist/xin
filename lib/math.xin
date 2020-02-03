@@ -1,0 +1,3 @@
+; mathematics library
+
+(: (gcd a b) 0)

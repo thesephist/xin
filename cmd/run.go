@@ -34,8 +34,13 @@ func run(path string) {
 		color.Red("Error opening file: %s\n", err)
 	}
 
-	vm := xin.NewVm()
-	_, ierr := vm.Eval(path, file)
+	vm, ierr := xin.NewVm()
+	if ierr != nil {
+		color.Red("Error creating Xin VM: %s", xin.FormatError(ierr))
+		return
+	}
+
+	_, ierr = vm.Eval(path, file)
 	if ierr != nil {
 		color.Red("Error: %s\n", xin.FormatError(ierr))
 		return

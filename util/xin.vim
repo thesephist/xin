@@ -25,6 +25,7 @@ highlight link xinNumber Number
 " builtin functions
 syntax keyword xinKeyword if contained
 syntax keyword xinKeyword do contained
+syntax keyword xinKeyword import contained
 highlight link xinKeyword Keyword
 
 " functions

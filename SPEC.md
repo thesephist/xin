@@ -70,11 +70,12 @@ Xin has these types:
 
 ### Special forms
 
-Xin has 3 special forms.
+Xin has 4 special forms.
 
 - `:`: define a new name in the current lexical scope and set it to reference a given value
 - `if`: an if-else
 - `do`: sequentially evaluate multiple following expressions
+- `import`: import external files as Xin programs
 
 ### Streams
 
@@ -105,20 +106,17 @@ Evaluation of all expressions and forms in Xin are deferred until they are coerc
 
 ## Packages and imports
 
-Xin includes by default a set of standard packages like `os`, `math`, `string`, and `stream`. Xin programmers can also define their own packages by writing and referencing files with the import name.
+Xin includes by default a set of standard packages like `os`, `math`, `vec`, and `str` (string). Xin programmers can also define their own packages by writing and referencing files with the import name.
 
 A Xin program can import values defined in another Xin program with the `import` form. There are two ways to import.
 
-- `(import import-specifier)`: find file described by `import-specifier` and make all values defined in that file available under the `import-specifier::` namespace.
-- `(import import-specifier alias)`: find file described by `import-specifier` and make values available under _only_ the alias `alias::` namespace.
+- `(import path)`: find file described by `path` and make all values defined in that file available under the current global namespace.
+- `(import path alias)`: find file described by `path` and make values available under _only_ the alias `alias::` namespace.
 
 ```
-; import forms defined in math standard package
-; makes math::sqrt, math::sin, math::cos, etc available
-(import math)
-; makes forms defined in file 'core/models/user.xin'
+; makes forms and values defined in file 'core/models/user.xin'
 ; available under the namespace `user-model::xxx`
-(import core::models::user user-model)
+(import 'core/models/user' user-model)
 ```
 ## Proposals
 
@@ -153,8 +151,8 @@ Map literals are delimited with braces and use the arrow `->`:
 
 (: letter-counts
    (do (: m (map))
-     (map-set! m 'hi' 2)
-     (map-set! m 'hello' 5)
-     (map-set! m 'bye' 3)))
+     (map::set! m 'hi' 2)
+     (map::set! m 'hello' 5)
+     (map::set! m 'bye' 3)))
 ```
 

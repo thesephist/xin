@@ -1,4 +1,4 @@
-; xin standard library
+; standard library
 
 ; boolean aliases
 (: true 1)
@@ -53,7 +53,7 @@
 (: (range start end step)
    (do (: (sub i acc)
           (if (< i end)
-            (do (vec-add! acc i)
+            (do (vec::add! acc i)
               (sub (+ i step) acc))
             acc))
      (sub start (vec))))
@@ -64,7 +64,7 @@
 ; set abstraction over map
 (: (set)
    (map))
-(: (set-add! s v)
-   (map-set! s v 0))
-(: set-del! map-del!)
-(: set-has map-has)
+(: (set::add! s v)
+   (map::set! s v 0))
+(: set::del! map::del!)
+(: set::has map::has)

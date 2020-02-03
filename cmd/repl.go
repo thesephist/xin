@@ -26,7 +26,11 @@ func init() {
 }
 
 func repl() {
-	vm := xin.NewVm()
+	vm, err := xin.NewVm()
+	if err != nil {
+		color.Red("Error creating Xin VM: %s", xin.FormatError(err))
+		return
+	}
 
 	replCount := 0
 	reader := bufio.NewReader(os.Stdin)
@@ -47,6 +51,7 @@ func repl() {
 		result, ierr := vm.Eval(fmt.Sprintf("input %d", replCount), strings.NewReader(text))
 		if ierr != nil {
 			color.Red("Eval error: %s\n\n", xin.FormatError(ierr))
+			continue
 		}
 
 		vm.Frame.Put(
