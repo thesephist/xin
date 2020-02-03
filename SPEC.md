@@ -17,7 +17,7 @@ Xin's grammar is simple. Here is the complete BNF grammar for Xin. Notably, any 
 
 <atom> ::= <name> | <number> | <string>
 
-<form> ::= "(" <name> <atom>* ")"
+<form> ::= "(" (<atom> | <form>)+ ")"
 
 <program> ::= <form>*
 ```

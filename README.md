@@ -93,4 +93,4 @@ Xin expresses all I/O operations as operations to streams.
 
 ### Syntax minimalism and extensibility
 
-Xin is unusual among even toy programming languages in that there are only three special forms defined in the language spec: `:` (called "bind"), `if`, and `do`. All other language constructs, like loops, switch cases, and lambdas are defined in the standard library as Xin forms, not in the runtime as special cases.
+Xin is unusual among even toy programming languages in that there are only four special forms defined in the language spec: `:` (called "bind"), `if`, `do`, and `import`. All other language constructs, like loops, switch cases, and `unless` are defined in the standard library as Xin forms, not in the runtime as special cases.
