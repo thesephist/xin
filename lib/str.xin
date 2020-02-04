@@ -11,13 +11,27 @@
 
 (: (reduce s f acc)
    (do
-     (: max (str::size v))
+     (: max (str::size s))
      (: (sub i acc)
         (if (< i max)
           (sub (+ i 1)
-               (f (str::get v i) acc i))
+               (f (str::get s i) acc i))
           acc))
      (sub 0 acc)))
+
+(: (map s f)
+   (reduce s
+           (: (g c acc i)
+              (+ acc (f c i)))
+           ''))
+
+(: (filter s f)
+   (reduce s
+           (: (g c acc i)
+              (if (f c i)
+                (+ acc c)
+                acc))
+           ''))
 
 (: (join v pad)
    (if (vec::empty? v)
@@ -27,22 +41,53 @@
                      (+ acc (+ pad s)))
                   (vec::head v))))
 
-; TODO: implement below
+(: (index s sub)
+   (do (: (rec i)
+          (if (> i (str::size s))
+            -1
+            (if (= (str::slice s i (+ i (str::size sub))) sub)
+              i
+              (rec (+ i 1)))))
+     (rec 0)))
 
-(: (index? s sub) 0)
+(: (has? s sub)
+   (> (index s sub) -1))
+
+(: (prefix? s sub)
+   (= sub (str::slice s
+                      0
+                      (str::size sub))))
+
+(: (suffix? s sub)
+   (= sub (str::slice s
+                      (- (str::size s) (str::size sub))
+                      (str::size s))))
+
+; utility to check ascii ranges
+(: (is-in-range n min max)
+   (& (>= n min) (<= n max)))
+
+(: (digit? s)
+   (is-in-range (str::enc s) 48 57))
+
+(: (upper? s)
+   (is-in-range (str::enc s) 65 90))
+
+(: (lower? s)
+   (is-in-range (str::enc s) 97 122))
+
+(: (upcase s)
+   (map s
+        (: (f c)
+           (if (lower? c)
+             (str::dec (- (str::enc c) 32))
+             c))))
+
+(: (downcase s)
+   (map s
+        (: (f c)
+           (if (upper? c)
+             (str::dec (+ (str::enc c) 32))
+             c))))
 
 (: (split s delim) 0)
-
-(: (has? s sub) 0)
-
-(: (prefix? s sub) 0)
-
-(: (suffix? s sub) 0)
-
-(: (upper? s) 0)
-
-(: (lower? s) 0)
-
-(: (upcase s) 0)
-
-(: (downcase s) 0)

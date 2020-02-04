@@ -114,7 +114,7 @@ func strSliceForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterErr
 			thirdInt = IntValue(max)
 		}
 
-		if inRange(secondInt) && inRange(thirdInt) {
+		if inRange(secondInt) && inRange(thirdInt) && secondInt <= thirdInt {
 			byteSlice := firstStr[secondInt:thirdInt]
 			destSlice := make([]byte, len(byteSlice))
 			copy(destSlice, byteSlice)
