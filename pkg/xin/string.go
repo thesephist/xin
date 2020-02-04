@@ -129,3 +129,59 @@ func strSliceForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterErr
 		args: args,
 	}
 }
+
+func strEncForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) {
+	if len(args) < 1 {
+		return nil, IncorrectNumberOfArgsError{
+			node:     node,
+			required: 1,
+			given:    len(args),
+		}
+	}
+
+	first, err := unlazy(args[0])
+	if err != nil {
+		return nil, err
+	}
+
+	if firstStr, ok := first.(StringValue); ok {
+		if len(firstStr) < 1 {
+			return zeroValue, nil
+		}
+
+		return IntValue(firstStr[0]), nil
+	}
+
+	return nil, MismatchedArgumentsError{
+		node: node,
+		args: args,
+	}
+}
+
+func strDecForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) {
+	if len(args) < 1 {
+		return nil, IncorrectNumberOfArgsError{
+			node:     node,
+			required: 1,
+			given:    len(args),
+		}
+	}
+
+	first, err := unlazy(args[0])
+	if err != nil {
+		return nil, err
+	}
+
+	if firstInt, ok := first.(IntValue); ok {
+		if firstInt < 0 || firstInt > 255 {
+			return zeroValue, nil
+		}
+
+		return StringValue([]byte{byte(firstInt)}), nil
+	}
+
+	return nil, MismatchedArgumentsError{
+		node: node,
+		args: args,
+	}
+}

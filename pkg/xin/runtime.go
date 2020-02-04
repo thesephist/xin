@@ -85,6 +85,8 @@ func loadAllDefaultForms(vm *Vm) {
 		"str::get":   strGetForm,
 		"str::size":  strSizeForm,
 		"str::slice": strSliceForm,
+		"str::enc":   strEncForm,
+		"str::dec":   strDecForm,
 
 		"vec":        vecForm,
 		"vec::get":   vecGetForm,
