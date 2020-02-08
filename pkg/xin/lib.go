@@ -20,6 +20,7 @@ func loadStandardLibrary(vm *Vm) InterpreterError {
 		"math",
 		"vec",
 		"str",
+		"test",
 	}
 
 	vm.Lock()

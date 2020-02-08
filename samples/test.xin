@@ -1,0 +1,82 @@
+; xin test suite
+
+(: sc test::scope)
+(: case test::case)
+(: assert test::assert)
+(: assert-false test::assert-false)
+(: eq test::assert-eq)
+
+(sc 'Arithmetic'
+    (vec
+      (case 'Add two numbers'
+        (eq (+ 1 1) 2))
+      (case 'Subtract numbers'
+        (eq (- 10 2) (- 6 -2)))
+      (case 'Multiply numbers'
+        (eq (* 10 2) (* 4 5)))
+      (case 'Integer division'
+        (eq (/ 15 4) 3))
+      (case 'Fractional division'
+        (eq (/ 15.0 4) 3.75))
+      (case 'Power'
+        (eq (^ 10 2) 100))
+      (case 'Modulus'
+        (eq (% 100 17) 15))
+      (case 'Negative modulus'
+        (eq (% -10 3) -1))))
+
+(sc 'Std'
+    (vec
+      (case 'Factor verification'
+        (assert (factor? 12 4)))
+      (case 'Factor verification, false'
+        (assert-false (factor? 12 5)))
+      (case 'Max comparison'
+        (eq (max 10 -2) 10))
+      (case 'Min comparison'
+        (eq (min 300 4) 4))
+      (case 'Basic range function'
+        (assert (vec::eq? (range 1 6 1) (vec 1 2 3 4 5))))
+      (case 'Range with step = 2'
+        (assert (vec::eq? (range 10 20 2) (vec 10 12 14 16 18))))
+      (case 'Range with negative start'
+        (assert (vec::eq? (range -6 6 3) (vec -6 -3 0 3))))
+      (case 'seq shorthand function'
+        (assert (vec::eq? (seq 10) (vec 0 1 2 3 4 5 6 7 8 9))))
+      (case 'Large seq function call'
+        (eq (vec::size (seq 2500)) 2500))))
+
+(: row (vec 3 14 15 92 65 35 897))
+(sc 'Vector'
+    (vec
+      (case 'vec::head'
+        (eq (vec::head row) 3))
+      (case 'vec::tail'
+        (assert (vec::eq? (vec::tail row) (vec 14 15 92 65 35 897))))
+      (case 'vec::last'
+        (eq (vec::last row) 897))
+      (case 'vec::empty?'
+        (assert (vec::empty? (vec))))
+      (case 'vec::empty? - false'
+        (assert-false (vec::empty? (seq 100))))
+      (case 'vec::eq?'
+        (assert (vec::eq? (seq 10) (range 0 10 1))))
+      (case 'vec::eq? - false'
+        (assert-false (vec::eq? (seq 5) (vec 0 1 2 4 3))))
+      (case 'vec::reverse'
+        (assert (vec::eq? (vec::reverse (seq 10))
+                          (vec 9 8 7 6 5 4 3 2 1 0))))
+      (case 'vec::cat'
+        (assert (vec::eq? (vec::cat (vec 1 2 3) (vec 'hi' 'hello' 'bye'))
+                          (vec 1 2 3 'hi' 'hello' 'bye'))))
+      (case 'vec::reduce - number sum'
+        (eq (vec::reduce (seq 11) + 3) 58))
+      (case 'vec::reduce - string concatenation'
+        (eq (vec::reduce (vec 'hello' 'world' 'foo' 'bar') + 'start_')
+            'barfooworldhellostart_'))))
+
+(sc 'String'
+    (vec))
+
+(sc 'Map'
+    (vec))

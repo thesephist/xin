@@ -3,6 +3,9 @@
 ; boolean aliases
 (: true 1)
 (: false 0)
+; want to be able to say "pass"
+; on useless if-else cases, for example
+(: pass 0)
 (: and &)
 (: or |)
 (: not !)

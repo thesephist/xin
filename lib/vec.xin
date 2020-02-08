@@ -71,6 +71,18 @@
                 acc))
            (vec)))
 
+(: (every v)
+   (reduce v
+           (: (f x acc)
+              (& acc x))
+           true))
+
+(: (some v)
+   (reduce v
+           (: (f x acc)
+              (| acc x))
+           false))
+
 ; quicksort using hoare partition
 (: (sort-by v pred)
    (do (: v-pred (map v pred))

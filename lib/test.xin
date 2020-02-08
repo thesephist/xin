@@ -1,0 +1,55 @@
+; test runner
+
+(: (scope label cases)
+   (do
+     (: all-succeeded (vec::every (vec::map cases case-succeeded?)))
+     (: count-succeeded (vec::size (vec::filter cases case-succeeded?)))
+     (log (str::join (vec (str count-succeeded)
+                          '/'
+                          (str (vec::size cases))
+                          '\t'
+                          label)
+                     ''))
+     (if all-succeeded
+       pass
+       (vec::each cases
+                  (: (f c)
+                     (if (case-failed? c)
+                       (log (str::join (vec '\t- '
+                                            (desc-of-case c)
+                                            '\n\t  '
+                                            (assertion-of-case c))
+                                       ''))
+                       pass))))))
+
+(: (case description assertion)
+   (vec description assertion))
+(: (desc-of-case c)
+   (vec::get c 0))
+(: (assertion-of-case c)
+   (vec::get c 1))
+(: (case-succeeded? c)
+   (= (assertion-of-case c) 0))
+(: (case-failed? c)
+   (! (case-succeeded? c)))
+
+; assertions
+
+(: (assert result)
+   (if (= result true)
+     0
+     (str::join (vec 'Expected true but got' (str result)) ' ')))
+
+(: (assert-false result)
+   (if (= result false)
+     0
+     (str::join (vec 'Expected false but got' (str result)) ' ')))
+
+(: (assert-eq result expected)
+   (if (= result expected)
+     0
+     (str::join (vec 'Expected'
+                     (str expected)
+                     'but got'
+                     (str result))
+                ' ')))
