@@ -42,6 +42,8 @@
 (: (sqrt x) (^ x .5))
 (: (pos? n) (> n 0))
 (: (neg? n) (< n 0))
+(: (inc n) (+ n 1))
+(: (dec n) (- n 1))
 (: (factor? big small)
    (= (% big small) 0))
 (: (max a b)

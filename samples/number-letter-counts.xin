@@ -103,5 +103,5 @@
    (str::size (write-number n)))
 
 (: (letters-count-to cap)
-   (vec::sum (vec::map (range 1 (+ 1 cap) 1) count-letters)))
+   (vec::sum (vec::map (range 1 (inc cap) 1) count-letters)))
 (log (letters-count-to 1000))

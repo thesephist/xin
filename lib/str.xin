@@ -79,6 +79,9 @@
 (: (lower? s)
    (is-in-range (str::enc s) 97 122))
 
+(: (letter? s)
+   (| (upper? s) (lower? s)))
+
 (: (upcase s)
    (map s
         (: (f c)

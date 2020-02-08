@@ -19,13 +19,13 @@
 ; more memory-efficient solution
 (: (next-i i j cap)
    (if (= j cap)
-     (+ i 1)
+     (inc i)
      i))
 
 (: (next-j i j cap)
    (if (= j cap)
-     (+ i 1)
-     (+ j 1)))
+     (inc i)
+     (inc j)))
 
 (: (effi-max-palindrome-prod-under n)
    (do (: (sub last-max i j)
