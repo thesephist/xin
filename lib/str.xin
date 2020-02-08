@@ -96,7 +96,28 @@
              (str::dec (+ (str::enc c) 32))
              c))))
 
-(: (split s delim) 0)
+(: (replace s old new)
+   (if (= (: idx (index s old)) -1)
+     s
+     (replace (+ (str::slice s 0 idx)
+                 (+ new
+                    (str::slice s
+                                (+ idx (str::size old))
+                                (str::size s))))
+              old new)))
+
+(: (split s delim)
+   (do (: (sub substr sublist)
+          (if (= (: idx (index substr delim)) -1)
+            (vec::add! sublist substr)
+            (sub (str::slice substr
+                             (+ idx (str::size delim))
+                             (str::size substr))
+                 (vec::add! sublist
+                            (str::slice substr
+                                        0
+                                        idx)))))
+     (sub s (vec))))
 
 (do (: esc (map::new))
   (map::set! esc '\n' '\\n')
