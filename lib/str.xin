@@ -19,6 +19,9 @@
           acc))
      (sub 0 acc)))
 
+; because we'll use map as a function name here,
+; alias the buitlin map function
+(: map::new map)
 (: (map s f)
    (reduce s
            (: (g c acc i)
@@ -91,3 +94,15 @@
              c))))
 
 (: (split s delim) 0)
+
+(do (: esc (map::new))
+  (map::set! esc '\n' '\\n')
+  (map::set! esc '\r' '\\r')
+  (map::set! esc '\t' '\\t')
+  (map::set! esc '\\' '\\\\')
+  (map::set! esc '\'' '\\\''))
+(: (unescape s)
+   (map s (: (f c)
+             (if (map::has esc c)
+               (map::get esc c)
+               c))))

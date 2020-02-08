@@ -76,7 +76,7 @@ func charFromEscaper(escaper byte) rune {
 	case '\'':
 		return '\''
 	default:
-		return '?'
+		return rune(escaper)
 	}
 }
 
@@ -181,6 +181,21 @@ func lex(path string, r io.Reader) (tokenStream, InterpreterError) {
 
 			content := rdr.upto("'")
 			for rdr.lookback() == "\\" {
+				// count preceding backslashes
+				// if there's an even number, like \\'
+				// or \\\\', break loop
+				backslashesBefore := 1
+				for i := 2; i < rdr.index; i++ {
+					if rdr.before(i) == "\\" {
+						backslashesBefore++
+					} else {
+						break
+					}
+				}
+				if backslashesBefore%2 == 0 {
+					break
+				}
+
 				rdr.skip()
 				content += "'"
 				content += rdr.upto("'")

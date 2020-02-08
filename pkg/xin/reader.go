@@ -54,6 +54,14 @@ func (rdr *reader) lookback() string {
 	return rdr.source[rdr.index-1 : rdr.index]
 }
 
+func (rdr *reader) before(n int) string {
+	if n > rdr.index {
+		panic("Tried to look before() start of string")
+	}
+
+	return rdr.source[rdr.index-n : rdr.index-n+1]
+}
+
 func (rdr *reader) peek() string {
 	return rdr.source[rdr.index : rdr.index+1]
 }
