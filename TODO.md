@@ -1,6 +1,8 @@
 # Todos
 
 - [ ] Add math Rand, crypto Rand, and date / time default forms. Unix to ISO 8601 should be a built-in for now. Might move to stdlib later.
+- [ ] UUID4 library (for which crypto::rand is required)
+- [ ] Xin saves data to files as Xin source that can be imported to an alias, not JSON. Make Xin source format serde library.
 - [ ] Native TCP / UCP `os::net` interfaces, on top of which an HTTP library can be written.
 - [ ] Rich runtime error traces and suggestions for corrections like Rust.
 - [ ] More robust filesystem IO APIs in general -- supporting read/write offsets, permissions

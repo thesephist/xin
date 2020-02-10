@@ -39,7 +39,7 @@ func strGetForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError
 	firstStr, fok := first.(StringValue)
 	secondInt, sok := second.(IntValue)
 	if fok && sok {
-		if int(secondInt) < len(firstStr) {
+		if int(secondInt) >= 0 && int(secondInt) < len(firstStr) {
 			return firstStr[secondInt : secondInt+1], nil
 		}
 
@@ -105,6 +105,13 @@ func strSliceForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterErr
 		max := len(firstStr)
 		inRange := func(iv IntValue) bool {
 			return int(iv) >= 0 && int(iv) <= max
+		}
+
+		if int(secondInt) < 0 {
+			secondInt = 0
+		}
+		if int(thirdInt) < 0 {
+			thirdInt = 0
 		}
 
 		if int(secondInt) > max {

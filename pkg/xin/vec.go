@@ -73,10 +73,6 @@ func vecGetForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError
 			return int(iv) >= 0 && int(iv) <= max
 		}
 
-		if int(secondInt) > max {
-			secondInt = IntValue(max)
-		}
-
 		if max > 0 && inRange(secondInt) {
 			return firstVec.underlying.items[secondInt], nil
 		}
@@ -118,10 +114,6 @@ func vecSetForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError
 		max := len(firstVec.underlying.items)
 		inRange := func(iv IntValue) bool {
 			return int(iv) >= 0 && int(iv) <= max
-		}
-
-		if int(secondInt) > max {
-			secondInt = IntValue(max)
 		}
 
 		if max > 0 && inRange(secondInt) {
@@ -220,6 +212,13 @@ func vecSliceForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterErr
 		max := len(firstVec.underlying.items)
 		inRange := func(iv IntValue) bool {
 			return int(iv) >= 0 && int(iv) <= max
+		}
+
+		if int(secondInt) < 0 {
+			secondInt = 0
+		}
+		if int(thirdInt) < 0 {
+			thirdInt = 0
 		}
 
 		if int(secondInt) > max {
