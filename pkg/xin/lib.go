@@ -15,6 +15,8 @@ func loadStandardLibrary(vm *Vm) InterpreterError {
 		fmt.Println("Standard library error:", err.Error())
 	}
 
+	// import order matters here, later libs
+	// have dependency on the preceding ones
 	libFiles := []string{
 		"std",
 		"math",

@@ -54,7 +54,7 @@
 (: (min a b)
    (if (< a b) a b))
 
-; iteration primitives: range, seq
+; iteration primitives
 (: (range start end step)
    (do (: (sub i acc)
           (if (< i end)
@@ -65,6 +65,14 @@
 
 (: (seq n)
    (range 0 n 1))
+
+(: (loop n f)
+   (do (: (sub i)
+          (if (< i n)
+            (do (f i)
+              (sub (+ i 1)))
+            0))
+     (sub 0)))
 
 ; set abstraction over map
 (: (set)
