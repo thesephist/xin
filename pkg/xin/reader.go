@@ -68,7 +68,7 @@ func (rdr *reader) peek() string {
 
 func (rdr *reader) upto(end string) string {
 	s := ""
-	for rdr.peek() != end {
+	for !rdr.done() && rdr.peek() != end {
 		s += rdr.next()
 	}
 	return s
