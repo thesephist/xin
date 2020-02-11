@@ -49,9 +49,12 @@
       (eq (vec::size (seq 2500)) 2500))))
 
 (: row (vec 3 14 15 92 65 35 897))
+(: (odd? x) (% x 2))
 (scope
   'Vector'
   (vec
+    (case 'vec::size'
+      (eq (vec::size row) 7))
     (case 'vec::head'
       (eq (vec::head row) 3))
     (case 'vec::tail'
@@ -67,16 +70,68 @@
     (case 'vec::eq? - false'
       (assert-false (vec::eq? (seq 5) (vec 0 1 2 4 3))))
     (case 'vec::reverse'
-      (assert (vec::eq? (vec::reverse (seq 10))
-                        (vec 9 8 7 6 5 4 3 2 1 0))))
+      (assert
+        (vec::eq? (vec::reverse (seq 10))
+                  (vec 9 8 7 6 5 4 3 2 1 0))))
     (case 'vec::cat'
-      (assert (vec::eq? (vec::cat (vec 1 2 3) (vec 'hi' 'hello' 'bye'))
-                        (vec 1 2 3 'hi' 'hello' 'bye'))))
+      (assert
+        (vec::eq? (vec::cat (vec 1 2 3) (vec 'hi' 'hello' 'bye'))
+                  (vec 1 2 3 'hi' 'hello' 'bye'))))
     (case 'vec::reduce - number sum'
       (eq (vec::reduce (seq 11) + 3) 58))
     (case 'vec::reduce - string concatenation'
       (eq (vec::reduce (vec 'hello' 'world' 'foo' 'bar') + 'start_')
-          'barfooworldhellostart_'))))
+          'barfooworldhellostart_'))
+    (case 'vec::reverse'
+      (assert (vec::eq? (vec::reverse row) (vec 897 35 65 92 15 14 3))))
+    (case 'vec::cat'
+      (assert
+        (vec::eq? (vec::cat row (vec 1 2 3))
+                  (vec 3 14 15 92 65 35 897 1 2 3))))
+    (case 'vec::map'
+      (assert
+        (vec::eq? (vec::map row odd?)
+                  (vec 1 0 1 0 1 1 1))))
+    (case 'vec::filter'
+      (assert
+        (vec::eq? (vec::filter row odd?)
+                  (vec 3 15 65 35 897))))
+    (case 'vec::every true'
+      (eq (vec::every (vec 1 1 1 1 1)) true))
+    (case 'vec::every false'
+      (eq (vec::every (vec 1 1 0 1 0)) false))
+    (case 'vec::some true'
+      (eq (vec::some (vec 1 1 0 1 1)) true))
+    (case 'vec::some false'
+      (eq (vec::some (vec 0 0 0 0 0)) false))
+    (case 'vec::sort'
+      (assert
+        (vec::eq? (vec::sort (vec::reverse row))
+                  (vec 3 14 15 35 65 92 897))))
+    (case 'vec::of'
+      (assert
+        (vec::eq? (vec::of 5 10)
+                  (vec 10 10 10 10 10))))
+    (case 'vec::max'
+      (eq (vec::max row) 897))
+    (case 'vec::min'
+      (eq (vec::min row) 3))
+    (case 'vec::sum'
+      (eq (vec::sum row) 1121))
+    (case 'vec::prod'
+      (eq (vec::prod (vec::slice row 0 4)) 57960))
+    (case 'vec::++'
+      (assert
+        (vec::eq? (vec::++ (vec 1 2 3) (vec 90 80 70))
+                  (vec 91 82 73))))
+    (case 'vec::v+'
+      (assert
+        (vec::eq? (vec::v+ row 100)
+                  (vec 103 114 115 192 165 135 997))))
+    (case 'vec::flat'
+      (assert
+        (vec::eq? (vec::flat (vec row row row))
+                  (vec::cat (vec::cat row row) row))))))
 
 (: hello 'Hello, World!\n')
 (scope
@@ -113,7 +168,23 @@
     (case 'str::enc'
       (eq (str::enc 'abc') 97))
     (case 'str::dec'
-      (eq (str::dec 65) 'A'))))
+      (eq (str::dec 65) 'A'))
+    (case 'str::split'
+      (assert
+        (vec::eq? (str::split ', scale, by, the,bay, 2020' ', ')
+                  (vec '' 'scale' 'by' 'the,bay' '2020'))))
+    (case 'str::replace'
+      (eq (str::replace ', scale, by, , ,the,bay, 2020' ', ' '-')
+          '-scale-by--,the,bay-2020'))
+    (case 'str::upcase'
+      (eq (str::upcase 'Scale by the Bay!')
+          'SCALE BY THE BAY!'))
+    (case 'str::downcase'
+      (eq (str::downcase 'Scale by the Bay!')
+          'scale by the bay!'))
+    (case 'str::unescape'
+      (eq (str::unescape '\n\thacker \'town\\\' \n')
+          '\\n\\thacker \\\'town\\\\\\\' \\n'))))
 
 (scope
   'Map'
