@@ -2,45 +2,41 @@
 
 (: (ser-str v)
    (+ '\'' (+ (str::unescape v)
-              ('\''))))
-
-(: (ser-vec v)
-   (if (vec::empty? v)
-     '(vec)'
-     (str::join (vec '\(vec '
-                     jj
-                     ' \)'))))
+              '\'')))
 
 (: (ser-vec v)
    (if (vec::empty? v)
      '(vec)'
      (+ '\(vec '
         (+ (str::join (vec::map v serialize) ' ')
-           (' \)')))))
+           '\)'))))
 
 (: (ser-map v)
    (if (map::empty? v)
      '(map)'
-     (+ '\(do \(: m \(map\)\)'
+     (+ '\(do \(: m \(map\)\) '
         (+ (str::join (vec::map (map::keys m)
                                 (: (f k)
                                    (str::join (vec '\(map::set! m '
                                                    (serialize k)
                                                    ' '
                                                    (serialize (map::get v k))
-                                                   ' \)')))))))))
+                                                   '\)')
+                                              '')))
+                      ' ')
+           '\)'))))
 
 (: (ser-stream v)
    '(stream)')
 
-; (do (: serializers (map))
-;   (map::set! serializers int str)
-;   (map::set! serializers frac str)
-;   (map::set! serializers str ser-str)
-;   (map::set! serializers vec ser-vec)
-;   (map::set! serializers map ser-map)
-;   (map::set! serializers stream ser-stream))
-; (: (get-serializer v)
-;    (map::get serializers (type v)))
-; (: (serialize v)
-;    ((get-serializer v) v))
+(do (: serializers (map))
+  (map::set! serializers int str)
+  (map::set! serializers frac str)
+  (map::set! serializers str ser-str)
+  (map::set! serializers vec ser-vec)
+  (map::set! serializers map ser-map)
+  (map::set! serializers stream ser-stream))
+(: (get-serializer v)
+   (map::get serializers (type v)))
+(: (serialize v)
+   ((get-serializer v) v))

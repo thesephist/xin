@@ -30,8 +30,11 @@ func (sr stackRecord) String() string {
 type Vm struct {
 	Frame *Frame
 
-	stack   *stackRecord
+	stack *stackRecord
+	// cached imports
 	imports map[string]*Frame
+	// interned native forms
+	evalers map[string]formEvaler
 
 	sync.Mutex
 	waiter sync.WaitGroup

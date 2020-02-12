@@ -6,7 +6,7 @@ package xin
 type hashableStringProxy string
 
 func (v hashableStringProxy) String() string {
-	return "(<string proxy> " + string(v) + ")"
+	return "(<string (proxy)> " + string(v) + ")"
 }
 
 func (v hashableStringProxy) Equal(ov Value) bool {
@@ -18,7 +18,7 @@ func (v hashableStringProxy) Equal(ov Value) bool {
 type hashableNativeFormProxy string
 
 func (v hashableNativeFormProxy) String() string {
-	return "(<native form proxy> " + string(v) + ")"
+	return "(<native form (proxy)> " + string(v) + ")"
 }
 
 func (v hashableNativeFormProxy) Equal(ov Value) bool {
@@ -31,6 +31,21 @@ func hashable(v Value) Value {
 		return hashableStringProxy(val)
 	case NativeFormValue:
 		return hashableNativeFormProxy(val.name)
+	default:
+		return v
+	}
+}
+
+// inverse of hashable(Value)
+func dehash(vm *Vm, v Value) Value {
+	switch val := v.(type) {
+	case hashableStringProxy:
+		return StringValue(val)
+	case hashableNativeFormProxy:
+		return NativeFormValue{
+			name:   string(val),
+			evaler: vm.evalers[string(val)],
+		}
 	default:
 		return v
 	}
@@ -242,9 +257,9 @@ func mapKeysForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterErro
 	}
 
 	if firstMap, fok := first.(MapValue); fok {
-		keys := []Value{}
+		keys := make([]Value, 0, len(*firstMap.items))
 		for k, _ := range *firstMap.items {
-			keys = append(keys, k)
+			keys = append(keys, dehash(fr.Vm, k))
 		}
 		return NewVecValue(keys), nil
 	}

@@ -193,3 +193,32 @@
 (scope
   'Set'
   (vec))
+
+(scope
+  'Data serialization'
+  (vec
+    (case 'simple int'
+      (eq (src::serialize 42) '42'))
+    (case 'simple frac'
+      ; (str <frac>) will return to 8 digits, so
+      ; src::serialize also does. This is fine for now.
+      (eq (src::serialize -3.141592) '-3.14159200'))
+    (case 'simple string'
+      (eq (src::serialize 'hello world') '\'hello world\''))
+    (case 'escaped string'
+      (eq (src::serialize 'hello\tworld\r\n')
+          '\'hello\\tworld\\r\\n\''))
+    (case 'simple vec'
+      (eq (src::serialize (vec 1 2 'three' 4 -5))
+          '(vec 1 2 \'three\' 4 -5)'))
+    (case 'nested vec'
+      (eq (src::serialize (vec 'hi' 'hello' (vec 1 2.42 3.14 'four')))
+          '(vec \'hi\' \'hello\' (vec 1 2.42000000 3.14000000 \'four\'))'))
+    (case 'simple map'
+      (eq (src::serialize (do (: m (map))
+                            (map::set! m 'hi' 2)
+                            (map::set! m 'hello' 5)
+                            (map::set! m (vec 1 2) 'is vec')))
+          '(do (: m (map)) (map::set! m \'hi\' 2) (map::set! m \'hello\' 5) (map::set! m (vec 1 2) \'is vec\'))'))
+    (case 'stream'
+      (eq (src::serialize (stream)) '(stream)'))))

@@ -60,7 +60,7 @@ func loadAllDefaultValues(vm *Vm) {
 }
 
 func loadAllNativeForms(vm *Vm) {
-	builtins := map[string]formEvaler{
+	vm.evalers = map[string]formEvaler{
 		"+": addForm,
 		"-": subtractForm,
 		"*": multiplyForm,
@@ -121,16 +121,12 @@ func loadAllNativeForms(vm *Vm) {
 	}
 
 	fr := vm.Frame
-	for name, evaler := range builtins {
-		loadNativeForm(vm, fr, name, evaler)
+	for name, evaler := range vm.evalers {
+		fr.Put(name, NativeFormValue{
+			name:   name,
+			evaler: evaler,
+		})
 	}
-}
-
-func loadNativeForm(vm *Vm, fr *Frame, name string, evaler formEvaler) {
-	fr.Put(name, NativeFormValue{
-		name:   name,
-		evaler: evaler,
-	})
 }
 
 func addForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) {
