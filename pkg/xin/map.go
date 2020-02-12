@@ -3,22 +3,37 @@ package xin
 // StringValue is of type []byte, which is unhashable
 // so we convert StringValues to hashable string type
 // before using as map keys
-type hashableStringProxyValue string
+type hashableStringProxy string
 
-func (v hashableStringProxyValue) String() string {
+func (v hashableStringProxy) String() string {
 	return "(<string proxy> " + string(v) + ")"
 }
 
-func (v hashableStringProxyValue) Equal(ov Value) bool {
-	panic("hashableStringProxyValue should not be equality-checked")
+func (v hashableStringProxy) Equal(ov Value) bool {
+	panic("hashableStringProxy should not be equality-checked")
+}
+
+// hashableDefaultFormProxy is a hashable proxy for
+// DefaultFormValue
+type hashableDefaultFormProxy string
+
+func (v hashableDefaultFormProxy) String() string {
+	return "(<default form proxy> " + string(v) + ")"
+}
+
+func (v hashableDefaultFormProxy) Equal(ov Value) bool {
+	panic("hashableDefaultFormProxy should not be equality-checked")
 }
 
 func hashable(v Value) Value {
-	if asStr, ok := v.(StringValue); ok {
-		return hashableStringProxyValue(asStr)
+	switch val := v.(type) {
+	case StringValue:
+		return hashableStringProxy(val)
+	case DefaultFormValue:
+		return hashableDefaultFormProxy(val.name)
+	default:
+		return v
 	}
-
-	return v
 }
 
 type mapItems map[Value]Value
