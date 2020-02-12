@@ -1,0 +1,4 @@
+; map standard library
+
+(: (empty? m)
+   (= (map::size m) 0))

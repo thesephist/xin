@@ -211,3 +211,31 @@ func mapSizeForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterErro
 		args: args,
 	}
 }
+
+func mapKeysForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) {
+	if len(args) < 1 {
+		return nil, IncorrectNumberOfArgsError{
+			node:     node,
+			required: 1,
+			given:    len(args),
+		}
+	}
+
+	first, err := unlazy(args[0])
+	if err != nil {
+		return nil, err
+	}
+
+	if firstMap, fok := first.(MapValue); fok {
+		keys := []Value{}
+		for k, _ := range *firstMap.items {
+			keys = append(keys, k)
+		}
+		return NewVecValue(keys), nil
+	}
+
+	return nil, MismatchedArgumentsError{
+		node: node,
+		args: args,
+	}
+}

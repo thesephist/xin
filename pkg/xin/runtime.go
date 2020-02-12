@@ -101,6 +101,7 @@ func loadAllDefaultForms(vm *Vm) {
 		"map::has":  mapHasForm,
 		"map::del!": mapDelForm,
 		"map::size": mapSizeForm,
+		"map::keys": mapKeysForm,
 
 		"stream":              streamForm,
 		"stream::set-sink!":   streamSetSink,
