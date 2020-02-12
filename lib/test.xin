@@ -53,3 +53,21 @@
                      'but got'
                      (str result))
                 ' ')))
+
+(: (assert-eq-vec result expected)
+   (if (vec::eq? result expected)
+     0
+     (str::join (vec 'Expected'
+                     (str expected)
+                     'but got'
+                     (str result))
+                ' ')))
+
+(: (assert-eq-map result expected)
+   (if (map::eq? result expected)
+     0
+     (str::join (vec 'Expected'
+                     (str expected)
+                     'but got'
+                     (str result))
+                ' ')))

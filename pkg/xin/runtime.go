@@ -98,7 +98,7 @@ func loadAllNativeForms(vm *Vm) {
 		"map":       mapForm,
 		"map::get":  mapGetForm,
 		"map::set!": mapSetForm,
-		"map::has":  mapHasForm,
+		"map::has?": mapHasForm,
 		"map::del!": mapDelForm,
 		"map::size": mapSizeForm,
 		"map::keys": mapKeysForm,

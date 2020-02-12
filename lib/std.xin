@@ -80,4 +80,6 @@
 (: (set::add! s v)
    (map::set! s v 0))
 (: set::del! map::del!)
-(: set::has map::has)
+(: set::has? map::has?)
+(: set::size map::size)
+(: set::items map::keys)

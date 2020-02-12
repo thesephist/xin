@@ -127,6 +127,6 @@
   (map::set! esc '\'' '\\\''))
 (: (unescape s)
    (map s (: (f c)
-             (if (map::has esc c)
+             (if (map::has? esc c)
                (map::get esc c)
                c))))

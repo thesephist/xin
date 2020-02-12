@@ -2,9 +2,13 @@
 
 (: scope test::scope)
 (: case test::case)
+
 (: assert test::assert)
 (: assert-false test::assert-false)
+
 (: eq test::assert-eq)
+(: eq-vec test::assert-eq-vec)
+(: eq-map test::assert-eq-map)
 
 (scope
   'Arithmetic'
@@ -38,13 +42,13 @@
     (case 'Min comparison'
       (eq (min 300 4) 4))
     (case 'Basic range function'
-      (assert (vec::eq? (range 1 6 1) (vec 1 2 3 4 5))))
+      (eq-vec (range 1 6 1) (vec 1 2 3 4 5)))
     (case 'Range with step = 2'
-      (assert (vec::eq? (range 10 20 2) (vec 10 12 14 16 18))))
+      (eq-vec (range 10 20 2) (vec 10 12 14 16 18)))
     (case 'Range with negative start'
-      (assert (vec::eq? (range -6 6 3) (vec -6 -3 0 3))))
+      (eq-vec (range -6 6 3) (vec -6 -3 0 3)))
     (case 'seq shorthand function'
-      (assert (vec::eq? (seq 10) (vec 0 1 2 3 4 5 6 7 8 9))))
+      (eq-vec (seq 10) (vec 0 1 2 3 4 5 6 7 8 9)))
     (case 'Large seq function call'
       (eq (vec::size (seq 2500)) 2500))))
 
@@ -58,7 +62,7 @@
     (case 'vec::head'
       (eq (vec::head row) 3))
     (case 'vec::tail'
-      (assert (vec::eq? (vec::tail row) (vec 14 15 92 65 35 897))))
+      (eq-vec (vec::tail row) (vec 14 15 92 65 35 897)))
     (case 'vec::last'
       (eq (vec::last row) 897))
     (case 'vec::empty?'
@@ -66,36 +70,43 @@
     (case 'vec::empty? - false'
       (assert-false (vec::empty? (seq 100))))
     (case 'vec::eq?'
-      (assert (vec::eq? (seq 10) (range 0 10 1))))
+      (eq-vec (seq 10) (range 0 10 1)))
     (case 'vec::eq? - false'
       (assert-false (vec::eq? (seq 5) (vec 0 1 2 4 3))))
+    (case 'vec::index 0'
+      (eq (vec::index row 3) 0))
+    (case 'vec::index > 0'
+      (eq (vec::index row 65) 4))
+    (case 'vec::index -1'
+      (eq (vec::index row 100) -1))
+    (case 'vec::index long vec'
+      (eq (vec::index (seq 10000) 9876) 9876))
+    (case 'vec::index long vec, -1'
+      (eq (vec::index (seq 1000) -99) -1))
+    (case 'vec::has? true'
+      (assert (vec::has? row 15)))
+    (case 'vec::has? false'
+      (assert-false (vec::has? row 1000)))
     (case 'vec::reverse'
-      (assert
-        (vec::eq? (vec::reverse (seq 10))
-                  (vec 9 8 7 6 5 4 3 2 1 0))))
+      (eq-vec (vec::reverse (seq 10))
+              (vec 9 8 7 6 5 4 3 2 1 0)))
     (case 'vec::cat'
-      (assert
-        (vec::eq? (vec::cat (vec 1 2 3) (vec 'hi' 'hello' 'bye'))
-                  (vec 1 2 3 'hi' 'hello' 'bye'))))
+      (eq-vec (vec::cat (vec 1 2 3) (vec 'hi' 'hello' 'bye'))
+              (vec 1 2 3 'hi' 'hello' 'bye')))
     (case 'vec::reduce - number sum'
       (eq (vec::reduce (seq 11) + 3) 58))
     (case 'vec::reduce - string concatenation'
       (eq (vec::reduce (vec 'hello' 'world' 'foo' 'bar') + 'start_')
           'barfooworldhellostart_'))
     (case 'vec::reverse'
-      (assert (vec::eq? (vec::reverse row) (vec 897 35 65 92 15 14 3))))
+      (eq-vec (vec::reverse row) (vec 897 35 65 92 15 14 3)))
     (case 'vec::cat'
-      (assert
-        (vec::eq? (vec::cat row (vec 1 2 3))
-                  (vec 3 14 15 92 65 35 897 1 2 3))))
+      (eq-vec (vec::cat row (vec 1 2 3))
+              (vec 3 14 15 92 65 35 897 1 2 3)))
     (case 'vec::map'
-      (assert
-        (vec::eq? (vec::map row odd?)
-                  (vec 1 0 1 0 1 1 1))))
+      (eq-vec (vec::map row odd?) (vec 1 0 1 0 1 1 1)))
     (case 'vec::filter'
-      (assert
-        (vec::eq? (vec::filter row odd?)
-                  (vec 3 15 65 35 897))))
+      (eq-vec (vec::filter row odd?) (vec 3 15 65 35 897)))
     (case 'vec::every true'
       (eq (vec::every (vec 1 1 1 1 1)) true))
     (case 'vec::every false'
@@ -105,13 +116,9 @@
     (case 'vec::some false'
       (eq (vec::some (vec 0 0 0 0 0)) false))
     (case 'vec::sort'
-      (assert
-        (vec::eq? (vec::sort (vec::reverse row))
-                  (vec 3 14 15 35 65 92 897))))
+      (eq-vec (vec::sort (vec::reverse row)) (vec 3 14 15 35 65 92 897)))
     (case 'vec::of'
-      (assert
-        (vec::eq? (vec::of 5 10)
-                  (vec 10 10 10 10 10))))
+      (eq-vec (vec::of 5 10) (vec 10 10 10 10 10)))
     (case 'vec::max'
       (eq (vec::max row) 897))
     (case 'vec::min'
@@ -121,17 +128,14 @@
     (case 'vec::prod'
       (eq (vec::prod (vec::slice row 0 4)) 57960))
     (case 'vec::++'
-      (assert
-        (vec::eq? (vec::++ (vec 1 2 3) (vec 90 80 70))
-                  (vec 91 82 73))))
+      (eq-vec (vec::++ (vec 1 2 3) (vec 90 80 70))
+              (vec 91 82 73)))
     (case 'vec::v+'
-      (assert
-        (vec::eq? (vec::v+ row 100)
-                  (vec 103 114 115 192 165 135 997))))
+      (eq-vec (vec::v+ row 100)
+              (vec 103 114 115 192 165 135 997)))
     (case 'vec::flat'
-      (assert
-        (vec::eq? (vec::flat (vec row row row))
-                  (vec::cat (vec::cat row row) row))))))
+      (eq-vec (vec::flat (vec row row row))
+              (vec::cat (vec::cat row row) row)))))
 
 (: hello 'Hello, World!\n')
 (scope
@@ -170,9 +174,8 @@
     (case 'str::dec'
       (eq (str::dec 65) 'A'))
     (case 'str::split'
-      (assert
-        (vec::eq? (str::split ', scale, by, the,bay, 2020' ', ')
-                  (vec '' 'scale' 'by' 'the,bay' '2020'))))
+      (eq-vec (str::split ', scale, by, the,bay, 2020' ', ')
+              (vec '' 'scale' 'by' 'the,bay' '2020')))
     (case 'str::replace'
       (eq (str::replace ', scale, by, , ,the,bay, 2020' ', ' '-')
           '-scale-by--,the,bay-2020'))
@@ -186,13 +189,65 @@
       (eq (str::unescape '\n\thacker \'town\\\' \n')
           '\\n\\thacker \\\'town\\\\\\\' \\n'))))
 
+(do (: simple-map (map))
+  (map::set! simple-map 1 'first')
+  (map::set! simple-map 2 'second')
+  (map::set! simple-map 3 'third'))
+(: mixed-vec-key
+   (vec 5 3 1))
+(do (: mixed-map (map))
+  (map::set! mixed-map 'words' (vec 'hi' 'bye' 'aloha'))
+  (map::set! mixed-map 'maps' simple-map)
+  (map::set! mixed-map scope 'scope func')
+  (map::set! mixed-map mixed-vec-key 'keyed by vec'))
 (scope
   'Map'
-  (vec))
+  (vec
+    (case 'map::size 0'
+      (eq (map::size (map)) 0))
+    (case 'map::size > 0'
+      (eq (map::size mixed-map) 4))
+    (case 'map::empty?'
+      (assert (map::empty? (map))))
+    (case 'map::empty? - false'
+      (assert-false (map::empty? simple-map)))
+    (case 'map::get - simple'
+      (eq (map::get simple-map 3) 'third'))
+    (case 'map::get - mixed'
+      (eq-vec (map::get mixed-map 'words') (vec 'hi' 'bye' 'aloha')))
+    (case 'map::get - vec key'
+      (eq (map::get mixed-map mixed-vec-key)
+          'keyed by vec'))
+    (case 'map::get - func key'
+      (eq (map::get mixed-map scope)
+          'scope func'))
+    (case 'map::has? - true'
+      (assert (map::has? simple-map 3)))
+    (case 'map::has? - false'
+      (assert-false (map::has? mixed-map (vec 5 3 1))))
+    (case 'map::keys - simple'
+      (assert
+        (do (: keys (map::keys mixed-map))
+          (& (= (vec::size keys) 4)
+             (vec::every (vec::map (vec 'words'
+                                        'maps'
+                                        scope
+                                        mixed-vec-key)
+                                   (: (f k)
+                                      (vec::has? keys k))))))))))
 
+(do (: simple-set (set))
+  (set::add! simple-set 'one')
+  (set::add! simple-set 'two')
+  (set::add! simple-set 'three')
+  (set::add! simple-set 'four'))
 (scope
   'Set'
-  (vec))
+  (vec
+    (case 'set::size 0'
+      (eq (set::size (set)) 0))
+    (case 'set::size > 0'
+      (eq (set::size simple-set) 4))))
 
 (scope
   'Data serialization'
@@ -215,10 +270,11 @@
       (eq (src::serialize (vec 'hi' 'hello' (vec 1 2.42 3.14 'four')))
           '(vec \'hi\' \'hello\' (vec 1 2.42000000 3.14000000 \'four\'))'))
     (case 'simple map'
-      (eq (src::serialize (do (: m (map))
-                            (map::set! m 'hi' 2)
-                            (map::set! m 'hello' 5)
-                            (map::set! m (vec 1 2) 'is vec')))
-          '(do (: m (map)) (map::set! m \'hi\' 2) (map::set! m \'hello\' 5) (map::set! m (vec 1 2) \'is vec\'))'))
+      (assert (vec::has? (vec
+                           '(do (: m (map)) (map::set! m \'hi\' 2) (map::set! m (vec 1 2) \'is vec\'))'
+                           '(do (: m (map)) (map::set! m (vec 1 2) \'is vec\') (map::set! m \'hi\' 2))')
+                         (src::serialize (do (: m (map))
+                                           (map::set! m 'hi' 2)
+                                           (map::set! m (vec 1 2) 'is vec'))))))
     (case 'stream'
       (eq (src::serialize (stream)) '(stream)'))))

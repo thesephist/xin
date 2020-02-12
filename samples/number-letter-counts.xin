@@ -40,7 +40,7 @@
 (: (get-special n)
    (map::get special n))
 (: (is-special n)
-   (map::has special n))
+   (map::has? special n))
 (add-special 11 'eleven')
 (add-special 12 'twelve')
 (add-special 13 'thirteen')

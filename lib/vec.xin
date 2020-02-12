@@ -20,6 +20,18 @@
              true)
      false))
 
+(: (index v x)
+   (do (: (rec i)
+          (if (> i (vec::size v))
+            -1
+            (if (= (vec::get v i) x)
+              i
+              (rec (+ i 1)))))
+     (rec 0)))
+
+(: (has? v x)
+   (> (index v x) -1))
+
 (: (reverse v)
    (if (empty? v)
      (vec)

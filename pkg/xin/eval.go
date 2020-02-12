@@ -52,6 +52,8 @@ func (fr *Frame) String() string {
 
 func (fr *Frame) Get(name string, pos position) (Value, InterpreterError) {
 	if val, prs := fr.Scope[name]; prs {
+		// function args are passed as lazy, so sometimes
+		// we need to un-lazy vars in scope.
 		if lzv, ok := val.(LazyValue); ok {
 			tmp, err := unlazy(lzv)
 			if err != nil {

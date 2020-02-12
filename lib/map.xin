@@ -2,3 +2,10 @@
 
 (: (empty? m)
    (= (map::size m) 0))
+
+(: (eq? m l)
+   (& (= (map::size m) (map::size l))
+      (vec::every
+        (vec::map (map::keys m)
+                  (: (cmp-val m-key)
+                     (= (map::get m m-key) (map-get l m-key)))))))
