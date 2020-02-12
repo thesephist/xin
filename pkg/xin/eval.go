@@ -140,7 +140,7 @@ func evalForm(fr *Frame, node *astNode) (Value, InterpreterError) {
 			frame: localFrame,
 			node:  form.definition,
 		}, nil
-	case DefaultFormValue:
+	case NativeFormValue:
 		args := make([]Value, len(node.leaves)-1)
 		for i, n := range node.leaves[1:] {
 			if n.isLiteral() {

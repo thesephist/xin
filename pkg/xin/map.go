@@ -13,24 +13,24 @@ func (v hashableStringProxy) Equal(ov Value) bool {
 	panic("hashableStringProxy should not be equality-checked")
 }
 
-// hashableDefaultFormProxy is a hashable proxy for
-// DefaultFormValue
-type hashableDefaultFormProxy string
+// hashableNativeFormProxy is a hashable proxy for
+// NativeFormValue
+type hashableNativeFormProxy string
 
-func (v hashableDefaultFormProxy) String() string {
-	return "(<default form proxy> " + string(v) + ")"
+func (v hashableNativeFormProxy) String() string {
+	return "(<native form proxy> " + string(v) + ")"
 }
 
-func (v hashableDefaultFormProxy) Equal(ov Value) bool {
-	panic("hashableDefaultFormProxy should not be equality-checked")
+func (v hashableNativeFormProxy) Equal(ov Value) bool {
+	panic("hashableNativeFormProxy should not be equality-checked")
 }
 
 func hashable(v Value) Value {
 	switch val := v.(type) {
 	case StringValue:
 		return hashableStringProxy(val)
-	case DefaultFormValue:
-		return hashableDefaultFormProxy(val.name)
+	case NativeFormValue:
+		return hashableNativeFormProxy(val.name)
 	default:
 		return v
 	}

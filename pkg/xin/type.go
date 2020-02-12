@@ -129,37 +129,37 @@ func typeForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) 
 
 	switch first.(type) {
 	case IntValue:
-		return DefaultFormValue{
+		return NativeFormValue{
 			name:   "int",
 			evaler: intForm,
 		}, nil
 	case FracValue:
-		return DefaultFormValue{
+		return NativeFormValue{
 			name:   "frac",
 			evaler: fracForm,
 		}, nil
 	case StringValue:
-		return DefaultFormValue{
+		return NativeFormValue{
 			name:   "str",
 			evaler: streamForm,
 		}, nil
 	case VecValue:
-		return DefaultFormValue{
+		return NativeFormValue{
 			name:   "vec",
 			evaler: vecForm,
 		}, nil
 	case MapValue:
-		return DefaultFormValue{
+		return NativeFormValue{
 			name:   "map",
 			evaler: mapForm,
 		}, nil
 	case StreamValue:
-		return DefaultFormValue{
+		return NativeFormValue{
 			name:   "stream",
 			evaler: streamForm,
 		}, nil
-	case FormValue, DefaultFormValue:
-		return DefaultFormValue{
+	case FormValue, NativeFormValue:
+		return NativeFormValue{
 			name: "form",
 			evaler: func(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) {
 				panic("form constructor as type should never be called")

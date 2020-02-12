@@ -11,21 +11,21 @@ import (
 
 type formEvaler func(*Frame, []Value, *astNode) (Value, InterpreterError)
 
-type DefaultFormValue struct {
+type NativeFormValue struct {
 	name   string
 	evaler formEvaler
 }
 
-func (v DefaultFormValue) eval(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) {
+func (v NativeFormValue) eval(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) {
 	return v.evaler(fr, args, node)
 }
 
-func (v DefaultFormValue) String() string {
-	return fmt.Sprintf("Default form %s", v.name)
+func (v NativeFormValue) String() string {
+	return fmt.Sprintf("Native form %s", v.name)
 }
 
-func (v DefaultFormValue) Equal(o Value) bool {
-	if ov, ok := o.(DefaultFormValue); ok {
+func (v NativeFormValue) Equal(o Value) bool {
+	if ov, ok := o.(NativeFormValue); ok {
 		return v.name == ov.name
 	}
 
@@ -59,7 +59,7 @@ func loadAllDefaultValues(vm *Vm) {
 	fr.Put("os::stdin", stdinStream)
 }
 
-func loadAllDefaultForms(vm *Vm) {
+func loadAllNativeForms(vm *Vm) {
 	builtins := map[string]formEvaler{
 		"+": addForm,
 		"-": subtractForm,
@@ -122,12 +122,12 @@ func loadAllDefaultForms(vm *Vm) {
 
 	fr := vm.Frame
 	for name, evaler := range builtins {
-		loadDefaultForm(vm, fr, name, evaler)
+		loadNativeForm(vm, fr, name, evaler)
 	}
 }
 
-func loadDefaultForm(vm *Vm, fr *Frame, name string, evaler formEvaler) {
-	fr.Put(name, DefaultFormValue{
+func loadNativeForm(vm *Vm, fr *Frame, name string, evaler formEvaler) {
+	fr.Put(name, NativeFormValue{
 		name:   name,
 		evaler: evaler,
 	})

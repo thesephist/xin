@@ -54,7 +54,7 @@ func NewVm() (*Vm, InterpreterError) {
 	vm.Frame.cwd = &cwd
 
 	loadAllDefaultValues(vm)
-	loadAllDefaultForms(vm)
+	loadAllNativeForms(vm)
 	err := loadStandardLibrary(vm)
 	if err != nil {
 		return nil, err
