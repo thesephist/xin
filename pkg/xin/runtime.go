@@ -5,8 +5,10 @@ import (
 	"fmt"
 	"io"
 	"math"
+	"math/rand"
 	"os"
 	"strings"
+	"time"
 )
 
 type formEvaler func(*Frame, []Value, *astNode) (Value, InterpreterError)
@@ -60,6 +62,9 @@ func loadAllDefaultValues(vm *Vm) {
 }
 
 func loadAllNativeForms(vm *Vm) {
+	// seed PRNG for math::rand
+	rand.Seed(time.Now().UTC().UnixNano())
+
 	vm.evalers = map[string]formEvaler{
 		"+": addForm,
 		"-": subtractForm,
@@ -110,6 +115,9 @@ func loadAllNativeForms(vm *Vm) {
 		"->":                  streamSourceForm,
 		"<-":                  streamSinkForm,
 		"stream::close!":      streamCloseForm,
+
+		"math::rand":   mathRandForm,
+		"crypto::rand": cryptoRandForm,
 
 		"os::wait":   osWaitForm,
 		"os::read":   osReadForm,
