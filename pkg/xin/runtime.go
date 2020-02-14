@@ -116,6 +116,10 @@ func loadAllNativeForms(vm *Vm) {
 		"<-":                  streamSinkForm,
 		"stream::close!":      streamCloseForm,
 
+		"math::sin":    mathSinForm,
+		"math::cos":    mathCosForm,
+		"math::tan":    mathTanForm,
+		"math::ln":     mathLnForm,
 		"math::rand":   mathRandForm,
 		"crypto::rand": cryptoRandForm,
 
