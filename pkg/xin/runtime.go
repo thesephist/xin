@@ -606,9 +606,27 @@ func greaterForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterErro
 		return nil, err
 	}
 
+	if firstInt, fok := first.(IntValue); fok {
+		if _, sok := second.(FracValue); sok {
+			first = FracValue(float64(firstInt))
+		}
+	} else if _, fok := first.(FracValue); fok {
+		if secondInt, sok := second.(IntValue); sok {
+			second = FracValue(float64(secondInt))
+		}
+	}
+
 	switch cleanFirst := first.(type) {
 	case IntValue:
 		if cleanSecond, ok := second.(IntValue); ok {
+			if cleanFirst > cleanSecond {
+				return IntValue(1), nil
+			} else {
+				return zeroValue, nil
+			}
+		}
+	case FracValue:
+		if cleanSecond, ok := second.(FracValue); ok {
 			if cleanFirst > cleanSecond {
 				return IntValue(1), nil
 			} else {
@@ -649,9 +667,27 @@ func lessForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) 
 		return nil, err
 	}
 
+	if firstInt, fok := first.(IntValue); fok {
+		if _, sok := second.(FracValue); sok {
+			first = FracValue(float64(firstInt))
+		}
+	} else if _, fok := first.(FracValue); fok {
+		if secondInt, sok := second.(IntValue); sok {
+			second = FracValue(float64(secondInt))
+		}
+	}
+
 	switch cleanFirst := first.(type) {
 	case IntValue:
 		if cleanSecond, ok := second.(IntValue); ok {
+			if cleanFirst < cleanSecond {
+				return IntValue(1), nil
+			} else {
+				return zeroValue, nil
+			}
+		}
+	case FracValue:
+		if cleanSecond, ok := second.(FracValue); ok {
 			if cleanFirst < cleanSecond {
 				return IntValue(1), nil
 			} else {
