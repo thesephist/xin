@@ -18,6 +18,4 @@
 
 ; least common multiple using gcd
 (: (lcm a b)
-   (do (: factor (gcd a b))
-     (* factor (* (/ a factor)
-                  (/ b factor)))))
+   (* a (/ b (gcd a b))))

@@ -267,7 +267,9 @@
     (case 'math::gcd including 1'
       (eq (math::gcd 1 12) 1))
     (case 'math::lcm'
-      (eq (math::lcm 14 49) 98))))
+      (eq (math::lcm 14 49) 98))
+    (case 'math::lcm coprime'
+      (eq (math::lcm 7 39) 273))))
 
 (scope
   'Data serialization'
