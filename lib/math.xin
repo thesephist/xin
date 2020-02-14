@@ -1,6 +1,23 @@
 ; mathematics library
 
 (: (abs n)
-   (if (< n 0) n -n))
+   (if (< n 0) (neg n) n))
 
-(: (gcd a b) 0)
+; Euclid's GCD algorithm
+(: (gcd a b)
+   ; prereq: a < b
+   (do (: (sub a b)
+          (if (= a 0)
+            b
+            (sub (% b a) a)))
+     (: a (abs a))
+     (: b (abs b))
+     (if (> a b)
+       (sub b a)
+       (sub a b))))
+
+; least common multiple using gcd
+(: (lcm a b)
+   (do (: factor (gcd a b))
+     (* factor (* (/ a factor)
+                  (/ b factor)))))

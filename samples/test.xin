@@ -250,6 +250,26 @@
       (eq (set::size simple-set) 4))))
 
 (scope
+  'Math'
+  (vec
+    (case 'math::abs positive'
+      (eq (math::abs 12) 12))
+    (case 'math::abs negative'
+      (eq (math::abs -34) 34))
+    (case 'math::abs zero'
+      (eq (math::abs 0) 0))
+    (case 'math::gcd coprime'
+      (eq (math::gcd 3 7) 1))
+    (case 'math::gcd a > b'
+      (eq (math::gcd 49 14) 7))
+    (case 'math::gcd negatives'
+      (eq (math::gcd -42 14) 14))
+    (case 'math::gcd including 1'
+      (eq (math::gcd 1 12) 1))
+    (case 'math::lcm'
+      (eq (math::lcm 14 49) 98))))
+
+(scope
   'Data serialization'
   (vec
     (case 'simple int'
