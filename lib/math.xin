@@ -19,3 +19,9 @@
 ; least common multiple using gcd
 (: (lcm a b)
    (* a (/ b (gcd a b))))
+
+(: (log base n)
+   (/ (math::ln n) (math::ln base)))
+
+(: (rand-int max)
+   (int (* (math::rand) max)))
