@@ -1,12 +1,25 @@
 ; generate a pascal's triangle
 ; of height n
 
-(: height 10)
+(: height 16)
 
-; n starts at 1
-(: (make-row n)
-   (if (= n 1)
-     (vec 1)
-     (if (= n 2)
-       (vec 1 1)
-       (vec::cat ???))))
+; n-choose-m combinatorics
+(: (choose n m)
+   (/ (vec::prod (vec::map (seq m)
+                           (: (f x)
+                              (+ (inc x) (- n m)))))
+      (vec::prod (vec::map (seq m)
+                           inc))))
+
+; n starts at 0
+(: (pascal-row y)
+   (vec::map (seq (inc y))
+             (: (f x)
+                (choose y x))))
+
+; render the triangle
+(vec::each (seq height)
+           (: (f y)
+              (log (str::join
+                     (vec::map (pascal-row y) str)
+                     ' '))))

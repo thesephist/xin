@@ -30,7 +30,9 @@
    (longest-collatz-seq (range 1 cap 1)))
 
 ; compute the longest collatz seq below given cap
-(: cap 1000)
+(: cap (if (= (vec::size (os::args)) 3)
+         1000 ; 1000 cap default, if none given
+         (int (vec::get (os::args) 3))))
 (: longest-seq
    (longest-collatz-seq-below cap))
 (log (str::join (vec 'Longest Collatz sequence length below '

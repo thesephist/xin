@@ -13,7 +13,7 @@ var runCmd = &cobra.Command{
 	Short: "Run a Xin program file",
 	Long:  "Execute a Xin program from a file specified by a path",
 	Run: func(cmd *cobra.Command, args []string) {
-		if len(args) == 1 {
+		if len(args) >= 1 {
 			run(args[0])
 			return
 		}
