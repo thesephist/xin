@@ -84,3 +84,31 @@
 (: set::has? map::has?)
 (: set::size map::size)
 (: set::items map::keys)
+
+; hex encoding/decoding
+(: to-hex-digits
+   (vec '0' '1' '2' '3' '4' '5' '6' '7' '8' '9' 'a' 'b' 'c' 'd' 'e' 'f'))
+(: (hex::enc n)
+   (if (< n 16)
+     (vec::get to-hex-digits (int n))
+     (+ (hex::enc (/ n 16))
+        (vec::get to-hex-digits (int (% n 16))))))
+
+(: to-dec-number-map
+   (do (: m (map))
+     (map::set! m 'a' 10)
+     (map::set! m 'b' 11)
+     (map::set! m 'c' 12)
+     (map::set! m 'd' 13)
+     (map::set! m 'e' 14)
+     (map::set! m 'f' 15)))
+(: (to-dec-number s)
+   (if (str::digit? s)
+     (int s)
+     (map::get to-dec-number-map s)))
+(: (hex::dec s)
+   (if (= (str::size s) 1)
+     (to-dec-number s)
+     (+ (* (hex::dec (str::slice s 0 (dec (str::size s))))
+           16)
+        (to-dec-number (str::get s (dec (str::size s)))))))

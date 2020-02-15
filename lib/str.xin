@@ -96,6 +96,20 @@
              (str::dec (+ (str::enc c) 32))
              c))))
 
+(: (pad-start s cap fill)
+   (if (< (str::size s) cap)
+     (do (: diff (- cap (str::size s)))
+       (+ (str::slice (* fill (inc (/ diff (str::size fill)))) 0 diff)
+          s))
+     s))
+
+(: (pad-end s cap fill)
+   (if (< (str::size s) cap)
+     (do (: diff (- cap (str::size s)))
+       (+ s
+          (str::slice (* fill (inc (/ diff (str::size fill)))) 0 diff)))
+     s))
+
 (: (replace s old new)
    (if (= (: idx (index s old)) -1)
      s

@@ -25,3 +25,6 @@
 
 (: (rand-int max)
    (int (* (math::rand) max)))
+
+(: (urand-int max)
+   (int (* (math::urand) max)))
