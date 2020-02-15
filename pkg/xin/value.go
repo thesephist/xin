@@ -3,7 +3,6 @@ package xin
 import (
 	"fmt"
 	"strconv"
-	"strings"
 )
 
 // Value represents a value in the Xin runtime.
@@ -58,7 +57,11 @@ type FormValue struct {
 }
 
 func (v FormValue) String() string {
-	return "(<form> " + strings.Join(*v.arguments, " ") + ") " + v.definition.String()
+	ss := ""
+	for _, a := range *v.arguments {
+		ss += " " + a
+	}
+	return "(<form>" + ss + ") " + v.definition.String()
 }
 
 func (v FormValue) Equal(o Value) bool {
