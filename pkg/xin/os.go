@@ -204,6 +204,12 @@ func osArgsForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError
 	return NewVecValue(argsVec), nil
 }
 
+func osTimeForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) {
+	return FracValue(
+		float64(time.Now().UnixNano()) / 1e9,
+	), nil
+}
+
 func debugDumpForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) {
 	return StringValue(fr.String()), nil
 }

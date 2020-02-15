@@ -20,14 +20,7 @@
                 inside-count)))) 0 0))
 
 ; run with increasing number of attempts
-(: attempts (vec 10
-                 50
-                 100
-                 1000
-                 10000
-                 100000
-                 1000000))
-; (: attempts (vec::map (seq 6) (: (f exp) (^ 10 (inc exp)))))
+(: attempts (vec::map (seq 6) (: (f exp) (^ 10 (inc exp)))))
 (vec::each attempts
            (: (f times)
               (log (str::join

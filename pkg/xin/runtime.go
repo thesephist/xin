@@ -128,6 +128,7 @@ func loadAllNativeForms(vm *Vm) {
 		"os::write":  osWriteForm,
 		"os::delete": osDeleteForm,
 		"os::args":   osArgsForm,
+		"os::time":   osTimeForm,
 
 		"debug::dump": debugDumpForm,
 	}
