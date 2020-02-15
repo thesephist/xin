@@ -12,12 +12,7 @@ func stringForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError
 		}
 	}
 
-	first, err := unlazy(args[0])
-	if err != nil {
-		return nil, err
-	}
-
-	return StringValue(first.String()), nil
+	return StringValue(args[0].String()), nil
 }
 
 func intForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) {
@@ -28,10 +23,7 @@ func intForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) {
 		}
 	}
 
-	first, err := unlazy(args[0])
-	if err != nil {
-		return nil, err
-	}
+	first := args[0]
 
 	switch val := first.(type) {
 	case IntValue:
@@ -57,10 +49,7 @@ func fracForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) 
 		}
 	}
 
-	first, err := unlazy(args[0])
-	if err != nil {
-		return nil, err
-	}
+	first := args[0]
 
 	switch val := first.(type) {
 	case IntValue:
@@ -87,14 +76,7 @@ func equalForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError)
 		}
 	}
 
-	first, err := unlazy(args[0])
-	if err != nil {
-		return nil, err
-	}
-	second, err := unlazy(args[1])
-	if err != nil {
-		return nil, err
-	}
+	first, second := args[0], args[1]
 
 	if firstInt, fok := first.(IntValue); fok {
 		if _, sok := second.(FracValue); sok {
@@ -122,10 +104,7 @@ func typeForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) 
 		}
 	}
 
-	first, err := unlazy(args[0])
-	if err != nil {
-		return nil, err
-	}
+	first := args[0]
 
 	switch first.(type) {
 	case IntValue:

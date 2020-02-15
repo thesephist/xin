@@ -18,8 +18,7 @@ func osWaitForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError
 		}
 	}
 
-	first := args[0]
-	second := args[1]
+	first, second := args[0], args[1]
 
 	var duration float64
 	if firstInt, fok := first.(IntValue); fok {
@@ -74,10 +73,7 @@ func osReadForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError
 		}
 	}
 
-	first, err := unlazy(args[0])
-	if err != nil {
-		return nil, err
-	}
+	first := args[0]
 
 	if firstStr, ok := first.(StringValue); ok {
 		file, err := os.Open(string(firstStr))
@@ -127,10 +123,7 @@ func osWriteForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterErro
 		}
 	}
 
-	first, err := unlazy(args[0])
-	if err != nil {
-		return nil, err
-	}
+	first := args[0]
 
 	if firstStr, ok := first.(StringValue); ok {
 		flag := os.O_CREATE | os.O_WRONLY
@@ -186,10 +179,7 @@ func osDeleteForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterErr
 		}
 	}
 
-	first, err := unlazy(args[0])
-	if err != nil {
-		return nil, err
-	}
+	first := args[0]
 
 	if firstStr, ok := first.(StringValue); ok {
 		err := os.RemoveAll(string(firstStr))

@@ -27,14 +27,7 @@ func strGetForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError
 		}
 	}
 
-	first, err := unlazy(args[0])
-	if err != nil {
-		return nil, err
-	}
-	second, err := unlazy(args[1])
-	if err != nil {
-		return nil, err
-	}
+	first, second := args[0], args[1]
 
 	firstStr, fok := first.(StringValue)
 	secondInt, sok := second.(IntValue)
@@ -61,10 +54,7 @@ func strSizeForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterErro
 		}
 	}
 
-	first, err := unlazy(args[0])
-	if err != nil {
-		return nil, err
-	}
+	first := args[0]
 
 	if firstString, ok := first.(StringValue); ok {
 		return IntValue(len(firstString)), nil
@@ -85,18 +75,7 @@ func strSliceForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterErr
 		}
 	}
 
-	first, err := unlazy(args[0])
-	if err != nil {
-		return nil, err
-	}
-	second, err := unlazy(args[1])
-	if err != nil {
-		return nil, err
-	}
-	third, err := unlazy(args[2])
-	if err != nil {
-		return nil, err
-	}
+	first, second, third := args[0], args[1], args[2]
 
 	firstStr, fok := first.(StringValue)
 	secondInt, sok := second.(IntValue)
@@ -146,10 +125,7 @@ func strEncForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError
 		}
 	}
 
-	first, err := unlazy(args[0])
-	if err != nil {
-		return nil, err
-	}
+	first := args[0]
 
 	if firstStr, ok := first.(StringValue); ok {
 		if len(firstStr) < 1 {
@@ -174,10 +150,7 @@ func strDecForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError
 		}
 	}
 
-	first, err := unlazy(args[0])
-	if err != nil {
-		return nil, err
-	}
+	first := args[0]
 
 	if firstInt, ok := first.(IntValue); ok {
 		if firstInt < 0 || firstInt > 255 {

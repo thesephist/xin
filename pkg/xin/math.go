@@ -18,10 +18,7 @@ func mathSinForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterErro
 		}
 	}
 
-	first, err := unlazy(args[0])
-	if err != nil {
-		return nil, err
-	}
+	first := args[0]
 
 	switch cleanFirst := first.(type) {
 	case IntValue:
@@ -45,10 +42,7 @@ func mathCosForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterErro
 		}
 	}
 
-	first, err := unlazy(args[0])
-	if err != nil {
-		return nil, err
-	}
+	first := args[0]
 
 	switch cleanFirst := first.(type) {
 	case IntValue:
@@ -72,10 +66,7 @@ func mathTanForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterErro
 		}
 	}
 
-	first, err := unlazy(args[0])
-	if err != nil {
-		return nil, err
-	}
+	first := args[0]
 
 	switch cleanFirst := first.(type) {
 	case IntValue:
@@ -99,10 +90,7 @@ func mathLnForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError
 		}
 	}
 
-	first, err := unlazy(args[0])
-	if err != nil {
-		return nil, err
-	}
+	first := args[0]
 
 	switch cleanFirst := first.(type) {
 	case IntValue:

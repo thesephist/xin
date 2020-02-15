@@ -38,11 +38,7 @@ func (v VecValue) Equal(o Value) bool {
 func vecForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) {
 	vecValues := make([]Value, len(args))
 	for i, a := range args {
-		val, err := unlazy(a)
-		if err != nil {
-			return nil, err
-		}
-		vecValues[i] = val
+		vecValues[i] = a
 	}
 	return NewVecValue(vecValues), nil
 }
@@ -56,14 +52,7 @@ func vecGetForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError
 		}
 	}
 
-	first, err := unlazy(args[0])
-	if err != nil {
-		return nil, err
-	}
-	second, err := unlazy(args[1])
-	if err != nil {
-		return nil, err
-	}
+	first, second := args[0], args[1]
 
 	firstVec, fok := first.(VecValue)
 	secondInt, sok := second.(IntValue)
@@ -95,18 +84,7 @@ func vecSetForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError
 		}
 	}
 
-	first, err := unlazy(args[0])
-	if err != nil {
-		return nil, err
-	}
-	second, err := unlazy(args[1])
-	if err != nil {
-		return nil, err
-	}
-	third, err := unlazy(args[2])
-	if err != nil {
-		return nil, err
-	}
+	first, second, third := args[0], args[1], args[2]
 
 	firstVec, fok := first.(VecValue)
 	secondInt, sok := second.(IntValue)
@@ -139,14 +117,7 @@ func vecAddForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError
 		}
 	}
 
-	first, err := unlazy(args[0])
-	if err != nil {
-		return nil, err
-	}
-	second, err := unlazy(args[1])
-	if err != nil {
-		return nil, err
-	}
+	first, second := args[0], args[1]
 
 	if firstVec, fok := first.(VecValue); fok {
 		firstVec.underlying.items = append(firstVec.underlying.items, second)
@@ -168,10 +139,7 @@ func vecSizeForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterErro
 		}
 	}
 
-	first, err := unlazy(args[0])
-	if err != nil {
-		return nil, err
-	}
+	first := args[0]
 
 	if firstVec, fok := first.(VecValue); fok {
 		return IntValue(len(firstVec.underlying.items)), nil
@@ -192,18 +160,7 @@ func vecSliceForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterErr
 		}
 	}
 
-	first, err := unlazy(args[0])
-	if err != nil {
-		return nil, err
-	}
-	second, err := unlazy(args[1])
-	if err != nil {
-		return nil, err
-	}
-	third, err := unlazy(args[2])
-	if err != nil {
-		return nil, err
-	}
+	first, second, third := args[0], args[1], args[2]
 
 	firstVec, fok := first.(VecValue)
 	secondInt, sok := second.(IntValue)

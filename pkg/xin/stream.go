@@ -77,14 +77,7 @@ func streamSetSink(fr *Frame, args []Value, node *astNode) (Value, InterpreterEr
 		}
 	}
 
-	first, err := unlazy(args[0])
-	if err != nil {
-		return nil, err
-	}
-	second, err := unlazy(args[1])
-	if err != nil {
-		return nil, err
-	}
+	first, second := args[0], args[1]
 
 	if firstStream, ok := first.(StreamValue); ok {
 		if secondForm, ok := second.(FormValue); ok {
@@ -121,14 +114,7 @@ func streamSetSource(fr *Frame, args []Value, node *astNode) (Value, Interpreter
 		}
 	}
 
-	first, err := unlazy(args[0])
-	if err != nil {
-		return nil, err
-	}
-	second, err := unlazy(args[1])
-	if err != nil {
-		return nil, err
-	}
+	first, second := args[0], args[1]
 
 	if firstStream, ok := first.(StreamValue); ok {
 		if secondForm, ok := second.(FormValue); ok {
@@ -162,14 +148,7 @@ func streamSetClose(fr *Frame, args []Value, node *astNode) (Value, InterpreterE
 		}
 	}
 
-	first, err := unlazy(args[0])
-	if err != nil {
-		return nil, err
-	}
-	second, err := unlazy(args[1])
-	if err != nil {
-		return nil, err
-	}
+	first, second := args[0], args[1]
 
 	if firstStream, ok := first.(StreamValue); ok {
 		if secondForm, ok := second.(FormValue); ok {
@@ -204,10 +183,7 @@ func streamSourceForm(fr *Frame, args []Value, node *astNode) (Value, Interprete
 		}
 	}
 
-	first, err := unlazy(args[0])
-	if err != nil {
-		return nil, err
-	}
+	first := args[0]
 
 	if firstStream, ok := first.(StreamValue); ok {
 		if !firstStream.isSource() {
@@ -234,14 +210,7 @@ func streamSinkForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterE
 		}
 	}
 
-	first, err := unlazy(args[0])
-	if err != nil {
-		return nil, err
-	}
-	second, err := unlazy(args[1])
-	if err != nil {
-		return nil, err
-	}
+	first, second := args[0], args[1]
 
 	if firstStream, ok := first.(StreamValue); ok {
 		if !firstStream.isSink() {
@@ -272,10 +241,7 @@ func streamCloseForm(fr *Frame, args []Value, node *astNode) (Value, Interpreter
 		}
 	}
 
-	first, err := unlazy(args[0])
-	if err != nil {
-		return nil, err
-	}
+	first := args[0]
 
 	if firstStream, ok := first.(StreamValue); ok {
 		if !firstStream.isClose() {

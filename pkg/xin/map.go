@@ -94,14 +94,7 @@ func mapGetForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError
 		}
 	}
 
-	first, err := unlazy(args[0])
-	if err != nil {
-		return nil, err
-	}
-	second, err := unlazy(args[1])
-	if err != nil {
-		return nil, err
-	}
+	first, second := args[0], args[1]
 
 	if firstMap, ok := first.(MapValue); ok {
 		val, prs := (*firstMap.items)[hashable(second)]
@@ -127,18 +120,7 @@ func mapSetForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError
 		}
 	}
 
-	first, err := unlazy(args[0])
-	if err != nil {
-		return nil, err
-	}
-	second, err := unlazy(args[1])
-	if err != nil {
-		return nil, err
-	}
-	third, err := unlazy(args[2])
-	if err != nil {
-		return nil, err
-	}
+	first, second, third := args[0], args[1], args[2]
 
 	if firstMap, ok := first.(MapValue); ok {
 		(*firstMap.items)[hashable(second)] = third
@@ -160,14 +142,7 @@ func mapHasForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError
 		}
 	}
 
-	first, err := unlazy(args[0])
-	if err != nil {
-		return nil, err
-	}
-	second, err := unlazy(args[1])
-	if err != nil {
-		return nil, err
-	}
+	first, second := args[0], args[1]
 
 	if firstMap, ok := first.(MapValue); ok {
 		_, prs := (*firstMap.items)[hashable(second)]
@@ -193,14 +168,7 @@ func mapDelForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError
 		}
 	}
 
-	first, err := unlazy(args[0])
-	if err != nil {
-		return nil, err
-	}
-	second, err := unlazy(args[1])
-	if err != nil {
-		return nil, err
-	}
+	first, second := args[0], args[1]
 
 	if firstMap, ok := first.(MapValue); ok {
 		_, prs := (*firstMap.items)[hashable(second)]
@@ -227,10 +195,7 @@ func mapSizeForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterErro
 		}
 	}
 
-	first, err := unlazy(args[0])
-	if err != nil {
-		return nil, err
-	}
+	first := args[0]
 
 	if firstMap, fok := first.(MapValue); fok {
 		return IntValue(len(*firstMap.items)), nil
@@ -251,10 +216,7 @@ func mapKeysForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterErro
 		}
 	}
 
-	first, err := unlazy(args[0])
-	if err != nil {
-		return nil, err
-	}
+	first := args[0]
 
 	if firstMap, fok := first.(MapValue); fok {
 		keys := make([]Value, 0, len(*firstMap.items))

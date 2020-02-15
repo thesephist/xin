@@ -150,14 +150,7 @@ func addForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) {
 		}
 	}
 
-	first, err := unlazy(args[0])
-	if err != nil {
-		return nil, err
-	}
-	second, err := unlazy(args[1])
-	if err != nil {
-		return nil, err
-	}
+	first, second := args[0], args[1]
 
 	if firstInt, fok := first.(IntValue); fok {
 		if _, sok := second.(FracValue); sok {
@@ -208,14 +201,7 @@ func subtractForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterErr
 		}
 	}
 
-	first, err := unlazy(args[0])
-	if err != nil {
-		return nil, err
-	}
-	second, err := unlazy(args[1])
-	if err != nil {
-		return nil, err
-	}
+	first, second := args[0], args[1]
 
 	if firstInt, fok := first.(IntValue); fok {
 		if _, sok := second.(FracValue); sok {
@@ -253,14 +239,7 @@ func multiplyForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterErr
 		}
 	}
 
-	first, err := unlazy(args[0])
-	if err != nil {
-		return nil, err
-	}
-	second, err := unlazy(args[1])
-	if err != nil {
-		return nil, err
-	}
+	first, second := args[0], args[1]
 
 	if firstInt, fok := first.(IntValue); fok {
 		if _, sok := second.(FracValue); sok {
@@ -317,14 +296,7 @@ func divideForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError
 		}
 	}
 
-	first, err := unlazy(args[0])
-	if err != nil {
-		return nil, err
-	}
-	second, err := unlazy(args[1])
-	if err != nil {
-		return nil, err
-	}
+	first, second := args[0], args[1]
 
 	if firstInt, fok := first.(IntValue); fok {
 		if _, sok := second.(FracValue); sok {
@@ -370,14 +342,7 @@ func modForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) {
 		}
 	}
 
-	first, err := unlazy(args[0])
-	if err != nil {
-		return nil, err
-	}
-	second, err := unlazy(args[1])
-	if err != nil {
-		return nil, err
-	}
+	first, second := args[0], args[1]
 
 	if firstInt, fok := first.(IntValue); fok {
 		if _, sok := second.(FracValue); sok {
@@ -427,14 +392,7 @@ func powForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) {
 		}
 	}
 
-	first, err := unlazy(args[0])
-	if err != nil {
-		return nil, err
-	}
-	second, err := unlazy(args[1])
-	if err != nil {
-		return nil, err
-	}
+	first, second := args[0], args[1]
 
 	if firstInt, fok := first.(IntValue); fok {
 		if _, sok := second.(FracValue); sok {
@@ -476,10 +434,7 @@ func notForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) {
 		}
 	}
 
-	first, err := unlazy(args[0])
-	if err != nil {
-		return nil, err
-	}
+	first := args[0]
 
 	if firstInt, ok := first.(IntValue); ok {
 		if firstInt.Equal(zeroValue) {
@@ -504,14 +459,7 @@ func andForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) {
 		}
 	}
 
-	first, err := unlazy(args[0])
-	if err != nil {
-		return nil, err
-	}
-	second, err := unlazy(args[1])
-	if err != nil {
-		return nil, err
-	}
+	first, second := args[0], args[1]
 
 	switch cleanFirst := first.(type) {
 	case IntValue:
@@ -535,14 +483,7 @@ func orForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) {
 		}
 	}
 
-	first, err := unlazy(args[0])
-	if err != nil {
-		return nil, err
-	}
-	second, err := unlazy(args[1])
-	if err != nil {
-		return nil, err
-	}
+	first, second := args[0], args[1]
 
 	switch cleanFirst := first.(type) {
 	case IntValue:
@@ -566,14 +507,7 @@ func xorForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) {
 		}
 	}
 
-	first, err := unlazy(args[0])
-	if err != nil {
-		return nil, err
-	}
-	second, err := unlazy(args[1])
-	if err != nil {
-		return nil, err
-	}
+	first, second := args[0], args[1]
 
 	switch cleanFirst := first.(type) {
 	case IntValue:
@@ -597,14 +531,7 @@ func greaterForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterErro
 		}
 	}
 
-	first, err := unlazy(args[0])
-	if err != nil {
-		return nil, err
-	}
-	second, err := unlazy(args[1])
-	if err != nil {
-		return nil, err
-	}
+	first, second := args[0], args[1]
 
 	if firstInt, fok := first.(IntValue); fok {
 		if _, sok := second.(FracValue); sok {
@@ -658,14 +585,7 @@ func lessForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) 
 		}
 	}
 
-	first, err := unlazy(args[0])
-	if err != nil {
-		return nil, err
-	}
-	second, err := unlazy(args[1])
-	if err != nil {
-		return nil, err
-	}
+	first, second := args[0], args[1]
 
 	if firstInt, fok := first.(IntValue); fok {
 		if _, sok := second.(FracValue); sok {
