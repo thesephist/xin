@@ -84,6 +84,11 @@ func (v LazyValue) Equal(o Value) bool {
 }
 
 func unlazy(v Value) (Value, InterpreterError) {
+	// hot path, a shortcut for frequent case
+	if _, isLazy := v.(LazyValue); !isLazy {
+		return v, nil
+	}
+
 	var err InterpreterError
 	for lzv, isLazy := v.(LazyValue); isLazy; lzv, isLazy = v.(LazyValue) {
 		v, err = eval(lzv.frame, lzv.node)

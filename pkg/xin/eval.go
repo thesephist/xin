@@ -52,18 +52,6 @@ func (fr *Frame) String() string {
 
 func (fr *Frame) Get(name string, pos position) (Value, InterpreterError) {
 	if val, prs := fr.Scope[name]; prs {
-		// function args are passed as lazy, so sometimes
-		// we need to un-lazy vars in scope.
-		if lzv, ok := val.(LazyValue); ok {
-			tmp, err := unlazy(lzv)
-			if err != nil {
-				return nil, err
-			}
-
-			fr.Scope[name] = tmp
-			return tmp, nil
-		}
-
 		return val, nil
 	} else if fr.Parent != nil {
 		return fr.Parent.Get(name, pos)
@@ -114,6 +102,10 @@ func evalForm(fr *Frame, node *astNode) (Value, InterpreterError) {
 		return nil, err
 	}
 
+	return evalFormValue(fr, node, maybeForm)
+}
+
+func evalFormValue(fr *Frame, node *astNode, maybeForm Value) (Value, InterpreterError) {
 	switch form := maybeForm.(type) {
 	case FormValue:
 		localFrame := newFrame(form.frame)
@@ -123,19 +115,12 @@ func evalForm(fr *Frame, node *astNode) (Value, InterpreterError) {
 			nargs = len(node.leaves) - 1
 		}
 		for i, n := range node.leaves[1 : nargs+1] {
-			if n.isLiteral() {
-				val, err := evalAtom(fr, n)
-				if err != nil {
-					return nil, err
-				}
-
-				localFrame.Put((*form.arguments)[i], val)
-			} else {
-				localFrame.Put((*form.arguments)[i], LazyValue{
-					frame: fr,
-					node:  n,
-				})
+			val, err := unlazyEval(fr, n)
+			if err != nil {
+				return nil, err
 			}
+
+			localFrame.Put((*form.arguments)[i], val)
 		}
 
 		return LazyValue{
@@ -145,19 +130,12 @@ func evalForm(fr *Frame, node *astNode) (Value, InterpreterError) {
 	case NativeFormValue:
 		args := make([]Value, len(node.leaves)-1)
 		for i, n := range node.leaves[1:] {
-			if n.isLiteral() {
-				val, err := evalAtom(fr, n)
-				if err != nil {
-					return nil, err
-				}
-
-				args[i] = val
-			} else {
-				args[i] = LazyValue{
-					frame: fr,
-					node:  n,
-				}
+			val, err := unlazyEval(fr, n)
+			if err != nil {
+				return nil, err
 			}
+
+			args[i] = val
 		}
 
 		return form.eval(fr, args, node)

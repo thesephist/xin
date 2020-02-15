@@ -18,10 +18,8 @@ func osWaitForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError
 		}
 	}
 
-	first, err := unlazy(args[0])
-	if err != nil {
-		return nil, err
-	}
+	first := args[0]
+	second := args[1]
 
 	var duration float64
 	if firstInt, fok := first.(IntValue); fok {
@@ -48,9 +46,9 @@ func osWaitForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError
 		vm.Lock()
 		defer vm.Unlock()
 
-		_, err := unlazy(args[1])
+		_, err := evalFormValue(fr, node, second)
 		if err != nil {
-			fmt.Println("Eval error:", FormatError(err))
+			fmt.Println("Eval error in os::wait:", FormatError(err))
 			return
 		}
 	}()
