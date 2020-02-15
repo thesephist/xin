@@ -3,12 +3,9 @@
 (: (add a b c)
    (+ a (+ b c)))
 
-(: (unless cond x y)
-   (if cond y x))
-
 (: result
-   (unless 1
-     (* (vec 1 2 3) 3)
-     (add 4 limit 5)))
+   (if 1
+     (add 4 limit 5)
+     (* (vec 1 2 3) 3)))
 
 (log result)

@@ -79,7 +79,7 @@ While Xin is meant to be a practical general-purpose programming language, as a 
 
 ### Lazy evaluation
 
-In Xin, the evaluation of every expression is deferred until it's absolutely necessary. We call this lazy evaluation. Values are kept in "lazy" states until some outside action or special form coerces a lazy value to resolve to a real value.
+In Xin, the evaluation of every expression is deferred until usage. We call this lazy evaluation. Values are kept in "lazy" states until some outside action or special form coerces a lazy value to resolve to a real value.
 
 ### Code as data structure
 
@@ -93,4 +93,4 @@ Xin expresses all I/O operations as operations to streams.
 
 ### Syntax minimalism and extensibility
 
-Xin is unusual among even toy programming languages in that there are only four special forms defined in the language spec: `:` (called "bind"), `if`, `do`, and `import`. All other language constructs, like loops, switch cases, and `unless` are defined in the standard library as Xin forms, not in the runtime as special cases.
+Xin is unusual among even toy programming languages in that there are only four special forms defined in the language spec: `:` (called "bind"), `if`, `do`, and `import`. All other language constructs, like loops, switch cases, booleans, and iteration primitives are defined in the standard library as Xin forms, not in the runtime as special cases.
