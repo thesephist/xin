@@ -101,9 +101,10 @@ func unlazy(v Value) (Value, InterpreterError) {
 }
 
 func unlazyEval(fr *Frame, node *astNode) (Value, InterpreterError) {
-	asLazy, err := eval(fr, node)
+	val, err := eval(fr, node)
 	if err != nil {
 		return nil, err
 	}
-	return unlazy(asLazy)
+
+	return unlazy(val)
 }

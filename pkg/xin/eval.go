@@ -146,6 +146,17 @@ func evalFormValue(fr *Frame, node *astNode, maybeForm Value) (Value, Interprete
 	}
 }
 
+// unlazyEvalFormValue is used to evaluate-and-coerce a Xin form invocation,
+// usually for use when calling callbacks from builtin native forms.
+func unlazyEvalFormValue(fr *Frame, node *astNode, maybeForm Value) (Value, InterpreterError) {
+	val, err := evalFormValue(fr, node, maybeForm)
+	if err != nil {
+		return nil, err
+	}
+
+	return unlazy(val)
+}
+
 func evalAtom(fr *Frame, node *astNode) (Value, InterpreterError) {
 	tok := node.token
 	switch tok.kind {

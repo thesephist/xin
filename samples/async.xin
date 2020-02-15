@@ -1,5 +1,5 @@
 (: (say-with-pause secs saying)
-   (os::wait secs (log saying)))
+   (os::wait secs (: (f) (log saying))))
 
 (do
   (say-with-pause 2 'after two -- should be last')

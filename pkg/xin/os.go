@@ -46,7 +46,16 @@ func osWaitForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError
 		vm.Lock()
 		defer vm.Unlock()
 
-		_, err := evalFormValue(fr, node, second)
+		_, err := unlazyEvalFormValue(fr, &astNode{
+			// dummy function invocation astNode
+			// to help generate proper error messages
+			isForm: true,
+			leaves: []*astNode{
+				&astNode{
+					isForm: false,
+				},
+			},
+		}, second)
 		if err != nil {
 			fmt.Println("Eval error in os::wait:", FormatError(err))
 			return

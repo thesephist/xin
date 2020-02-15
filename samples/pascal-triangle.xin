@@ -1,0 +1,12 @@
+; generate a pascal's triangle
+; of height n
+
+(: height 10)
+
+; n starts at 1
+(: (make-row n)
+   (if (= n 1)
+     (vec 1)
+     (if (= n 2)
+       (vec 1 1)
+       (vec::cat ???))))

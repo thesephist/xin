@@ -1,0 +1,29 @@
+; testing proper tail call support
+
+; without TCO, calling this func
+; more than 10M times should overflow
+; the interpreter (Go) stack.
+(: (hyper i max)
+   (do (: next (inc i))
+     (if (> i max)
+       i
+       (do (if (factor? i 1000000)
+             (log i)
+             0)
+         (hyper next max)))))
+
+(hyper 0 10000000)
+
+; regression test case for when a lazy
+; variable lookup in scope cascades up
+; and overflows Go stack
+(: (sub i j)
+   (if (= i 1000000)
+     j
+     (sub (+ i 1)
+          (+ j 1))))
+
+(log (sub 0 0))
+
+; if not crashed by here, interp has TCO
+(log 'Verified proper TCO support.')
