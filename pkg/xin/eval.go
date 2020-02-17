@@ -138,7 +138,7 @@ func evalFormValue(fr *Frame, node *astNode, maybeForm Value) (Value, Interprete
 			args[i] = val
 		}
 
-		return form.eval(fr, args, node)
+		return form.evaler(fr, args, node)
 	}
 
 	return nil, InvalidFormError{
@@ -253,19 +253,19 @@ func evalIfForm(fr *Frame, args []*astNode) (Value, InterpreterError) {
 	}
 }
 
-func evalDoForm(fr *Frame, args []*astNode) (Value, InterpreterError) {
-	if len(args) == 0 {
+func evalDoForm(fr *Frame, exprs []*astNode) (Value, InterpreterError) {
+	if len(exprs) == 0 {
 		return zeroValue, nil
 	}
 
-	lastIndex := len(args) - 1
+	lastIndex := len(exprs) - 1
 
-	for _, node := range args[:lastIndex] {
+	for _, node := range exprs[:lastIndex] {
 		_, err := unlazyEval(fr, node)
 		if err != nil {
 			return nil, err
 		}
 	}
 
-	return eval(fr, args[lastIndex])
+	return eval(fr, exprs[lastIndex])
 }

@@ -83,7 +83,7 @@ In Xin, the evaluation of every expression is deferred until usage. We call this
 
 ### Code as data structure
 
-Like all Lisps, the power and flexibility of Xin comes from its syntax, and the fact that it's trivial to express Xin programs as simple nested list data structures. Xin is not a "real" Lisp, because Xin does not use linked lists internally to represent its own syntax. But the idea of runtime syntax introspection with list data structures is alive in Xin, and it's much of what makes the language so extensible.
+Like all Lisps, the power and flexibility of Xin comes from its syntax, and the fact that it's trivial to express Xin programs as simple nested list data structures. Xin is not a "real" Lisp, because Xin does not use linked lists internally to represent its own syntax. But the idea of runtime syntax introspection with list data structures through macros is alive in Xin, and it's much of what makes the language so extensible.
 
 Expressing all syntax as lists (auto-resizing vectors, internally) allows functions to modify or introspect their syntax at runtime, and this allows Xin programmers to build language constructs like switch cases, variadic functions, and lambdas in the userspace, as a library function, rather than having to add them to the language core, which remains tiny.
 

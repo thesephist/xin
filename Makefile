@@ -28,6 +28,10 @@ test: gen
 	rm ./xin
 
 
+run-test: gen
+	${XIN} run ./samples/test.xin
+
+
 # start interactive repl
 repl: gen
 	${XIN} repl

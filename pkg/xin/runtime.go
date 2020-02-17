@@ -18,10 +18,6 @@ type NativeFormValue struct {
 	evaler formEvaler
 }
 
-func (v NativeFormValue) eval(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) {
-	return v.evaler(fr, args, node)
-}
-
 func (v NativeFormValue) String() string {
 	return fmt.Sprintf("Native form %s", v.name)
 }
@@ -178,12 +174,14 @@ func addForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) {
 			// strings should produce a completely new string whose modifications
 			// won't be observable by the original strings.
 			base := make([]byte, 0, len(cleanFirst)+len(cleanSecond))
-			base = append(base, cleanFirst...)
+			copy(base, cleanFirst)
 			return StringValue(append(base, cleanSecond...)), nil
 		}
 	case VecValue:
 		if cleanSecond, ok := second.(VecValue); ok {
-			return NewVecValue(append(cleanFirst.underlying.items, cleanSecond.underlying.items...)), nil
+			base := make([]Value, 0, len(cleanFirst.underlying.items))
+			copy(base, cleanFirst.underlying.items)
+			return NewVecValue(append(base, cleanSecond.underlying.items...)), nil
 		}
 	}
 
