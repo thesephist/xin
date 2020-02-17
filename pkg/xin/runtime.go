@@ -174,14 +174,12 @@ func addForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) {
 			// strings should produce a completely new string whose modifications
 			// won't be observable by the original strings.
 			base := make([]byte, 0, len(cleanFirst)+len(cleanSecond))
-			copy(base, cleanFirst)
-			return StringValue(append(base, cleanSecond...)), nil
+			return StringValue(append(append(base, cleanFirst...), cleanSecond...)), nil
 		}
 	case VecValue:
 		if cleanSecond, ok := second.(VecValue); ok {
-			base := make([]Value, 0, len(cleanFirst.underlying.items))
-			copy(base, cleanFirst.underlying.items)
-			return NewVecValue(append(base, cleanSecond.underlying.items...)), nil
+			base := make([]Value, 0, len(cleanFirst.underlying.items)+len(cleanSecond.underlying.items))
+			return NewVecValue(append(append(base, cleanFirst.underlying.items...), cleanSecond.underlying.items...)), nil
 		}
 	}
 

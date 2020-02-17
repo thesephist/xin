@@ -74,6 +74,9 @@
   (vec
     (case 'vec::size'
       (eq (vec::size row) 7))
+    (case 'vec addition'
+      (eq-vec (+ (vec 1 2 3) (vec 'hi' 'hello' 'bye'))
+              (vec 1 2 3 'hi' 'hello' 'bye')))
     (case 'vec::head'
       (eq (vec::head row) 3))
     (case 'vec::tail'
@@ -105,9 +108,6 @@
     (case 'vec::reverse'
       (eq-vec (vec::reverse (seq 10))
               (vec 9 8 7 6 5 4 3 2 1 0)))
-    (case 'vec::cat'
-      (eq-vec (vec::cat (vec 1 2 3) (vec 'hi' 'hello' 'bye'))
-              (vec 1 2 3 'hi' 'hello' 'bye')))
     (case 'vec::reduce - number sum'
       (eq (vec::reduce (seq 11) + 3) 58))
     (case 'vec::reduce - string concatenation'
@@ -115,9 +115,6 @@
           'barfooworldhellostart_'))
     (case 'vec::reverse'
       (eq-vec (vec::reverse row) (vec 897 35 65 92 15 14 3)))
-    (case 'vec::cat'
-      (eq-vec (vec::cat row (vec 1 2 3))
-              (vec 3 14 15 92 65 35 897 1 2 3)))
     (case 'vec::map'
       (eq-vec (vec::map row odd?) (vec 1 0 1 0 1 1 1)))
     (case 'vec::filter'
@@ -150,7 +147,7 @@
               (vec 103 114 115 192 165 135 997)))
     (case 'vec::flat'
       (eq-vec (vec::flat (vec row row row))
-              (vec::cat (vec::cat row row) row)))))
+              (+ (+ row row) row)))))
 
 (: hello 'Hello, World!\n')
 (scope

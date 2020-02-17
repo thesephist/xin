@@ -37,13 +37,6 @@
      (vec)
      (vec::add! (reverse (tail v)) (head v))))
 
-(: (cat v w)
-   (do (: (sub v w)
-          (if (empty? w)
-            v
-            (sub (vec::add! v (head w)) (tail w))))
-     (sub (clone v) w)))
-
 (: (reduce v f acc)
    (do
      (: max (vec::size v))
@@ -184,7 +177,7 @@
 
 ; dot and cross products, other combinators
 (: (flat v)
-   (reduce v (: (f w acc) (cat acc w)) (vec)))
+   (reduce v (: (f w acc) (+ acc w)) (vec)))
 (: (dot v w)
    (sum (** v w)))
 (: (combine v w op)
