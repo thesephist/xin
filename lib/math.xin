@@ -6,6 +6,9 @@
 (: pi
    (* 2 (math::asin 1)))
 
+(: (sqrt n)
+   (^ n .5))
+
 ; Euclid's GCD algorithm
 (: (gcd a b)
    ; prereq: a < b
@@ -25,6 +28,13 @@
 
 (: (log base n)
    (/ (math::ln n) (math::ln base)))
+
+; alias for (floor n) -- just (int n),
+; which truncates the given decimal
+(: floor int)
+
+(: (round n)
+   (int (+ n .5)))
 
 (: (rand-int max)
    (int (* (math::rand) max)))

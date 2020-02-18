@@ -288,6 +288,9 @@
       (eq (math::abs -34) 34))
     (case 'math::abs zero'
       (eq (math::abs 0) 0))
+    (case 'math::round'
+      (eq-vec (vec::map (vec 2.01 2.2 2.45 2.49 2.5 2.51 2.8 2.99 3.1) math::round)
+              (vec 2 2 2 2 3 3 3 3 3)))
     (case 'math::gcd coprime'
       (eq (math::gcd 3 7) 1))
     (case 'math::gcd a > b'
