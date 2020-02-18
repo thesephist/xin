@@ -3,6 +3,9 @@
 (: (abs n)
    (if (< n 0) (neg n) n))
 
+(: pi
+   (* 2 (math::asin 1)))
+
 ; Euclid's GCD algorithm
 (: (gcd a b)
    ; prereq: a < b
