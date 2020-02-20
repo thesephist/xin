@@ -2,7 +2,6 @@ package xin
 
 import (
 	"fmt"
-	"strconv"
 	"strings"
 )
 
@@ -162,15 +161,10 @@ func evalAtom(fr *Frame, node *astNode) (Value, InterpreterError) {
 	switch tok.kind {
 	case tkName:
 		return fr.Get(tok.value, node.position)
-	case tkNumberLiteralInt:
-		iv, _ := strconv.ParseInt(tok.value, 10, 64)
-		return IntValue(iv), nil
+	case tkNumberLiteralInt, tkNumberLiteralHex:
+		return tok.intv, nil
 	case tkNumberLiteralDecimal:
-		fv, _ := strconv.ParseFloat(tok.value, 64)
-		return FracValue(fv), nil
-	case tkNumberLiteralHex:
-		iv, _ := strconv.ParseInt(tok.value, 16, 64)
-		return IntValue(iv), nil
+		return tok.fracv, nil
 	case tkStringLiteral:
 		return StringValue(tok.value), nil
 	default:

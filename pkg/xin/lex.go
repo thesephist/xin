@@ -26,6 +26,11 @@ type token struct {
 	kind  tokenKind
 	value string
 	position
+
+	// we compute the integer and float values of
+	// number literals at parse time for runtime efficiency
+	intv  IntValue
+	fracv FracValue
 }
 
 func (tk token) String() string {
@@ -120,10 +125,12 @@ func bufToToken(s string, pos position) token {
 	if strings.HasPrefix(s, "0x") || strings.HasPrefix(s, "0X") {
 		hexPart := s[2:]
 		if _, err := strconv.ParseInt(hexPart, 16, 64); err == nil {
+			v, _ := strconv.ParseInt(hexPart, 16, 64)
 			return token{
 				kind:     tkNumberLiteralHex,
 				value:    hexPart,
 				position: pos,
+				intv:     IntValue(v),
 			}
 		} else {
 			return token{
@@ -131,19 +138,24 @@ func bufToToken(s string, pos position) token {
 				// TODO: make this throw a parse err
 				value:    "0",
 				position: pos,
+				intv:     IntValue(0),
 			}
 		}
 	} else if _, err := strconv.ParseInt(s, 10, 64); err == nil {
+		v, _ := strconv.ParseInt(s, 10, 64)
 		return token{
 			kind:     tkNumberLiteralInt,
 			value:    s,
 			position: pos,
+			intv:     IntValue(v),
 		}
 	} else if _, err := strconv.ParseFloat(s, 64); err == nil {
+		v, _ := strconv.ParseFloat(s, 64)
 		return token{
 			kind:     tkNumberLiteralDecimal,
 			value:    s,
 			position: pos,
+			fracv:    FracValue(v),
 		}
 	} else {
 		return token{
