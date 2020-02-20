@@ -32,8 +32,7 @@ func parse(toks tokenStream) (astNode, InterpreterError) {
 	root.leaves = append(root.leaves, &astNode{
 		isForm: false,
 		token: token{
-			kind:  tkName,
-			value: "do",
+			kind: tkDoForm,
 		},
 	})
 

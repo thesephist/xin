@@ -76,32 +76,30 @@ func eval(fr *Frame, node *astNode) (Value, InterpreterError) {
 func evalForm(fr *Frame, node *astNode) (Value, InterpreterError) {
 	formNode := node.leaves[0]
 
-	var maybeForm Value
-	var err InterpreterError
-	if formNode.token.kind == tkName {
-		// Evaluate special forms
-		switch formNode.token.value {
-		case ":":
-			return evalBindForm(fr, node.leaves[1:])
-		case "if":
-			return evalIfForm(fr, node.leaves[1:])
-		case "do":
-			return evalDoForm(fr, node.leaves[1:])
-		case "import":
-			return evalImportForm(fr, node.leaves[1:])
+	switch formNode.token.kind {
+	case tkBindForm:
+		return evalBindForm(fr, node.leaves[1:])
+	case tkIfForm:
+		return evalIfForm(fr, node.leaves[1:])
+	case tkDoForm:
+		return evalDoForm(fr, node.leaves[1:])
+	case tkImportForm:
+		return evalImportForm(fr, node.leaves[1:])
+	case tkName:
+		maybeForm, err := fr.Get(formNode.token.value, formNode.position)
+		if err != nil {
+			return nil, err
 		}
 
-		// In the common case that the form head is a named reference,
-		// take this shortcut (Get) in this hot path.
-		maybeForm, err = fr.Get(formNode.token.value, formNode.position)
-	} else {
-		maybeForm, err = unlazyEval(fr, formNode)
-	}
-	if err != nil {
-		return nil, err
-	}
+		return evalFormValue(fr, node, maybeForm)
+	default:
+		maybeForm, err := unlazyEval(fr, formNode)
+		if err != nil {
+			return nil, err
+		}
 
-	return evalFormValue(fr, node, maybeForm)
+		return evalFormValue(fr, node, maybeForm)
+	}
 }
 
 func evalFormValue(fr *Frame, node *astNode, maybeForm Value) (Value, InterpreterError) {

@@ -13,6 +13,11 @@ const (
 	tkOpenParen = iota
 	tkCloseParen
 
+	tkBindForm
+	tkIfForm
+	tkDoForm
+	tkImportForm
+
 	tkName
 	tkNumberLiteralInt
 	tkNumberLiteralDecimal
@@ -39,6 +44,14 @@ func (tk token) String() string {
 		return "("
 	case tkCloseParen:
 		return ")"
+	case tkBindForm:
+		return ":"
+	case tkIfForm:
+		return "if"
+	case tkDoForm:
+		return "do"
+	case tkImportForm:
+		return "import"
 	case tkName, tkNumberLiteralInt, tkNumberLiteralDecimal, tkNumberLiteralHex:
 		return tk.value
 	case tkStringLiteral:
@@ -158,10 +171,33 @@ func bufToToken(s string, pos position) token {
 			fracv:    FracValue(v),
 		}
 	} else {
-		return token{
-			kind:     tkName,
-			value:    s,
-			position: pos,
+		switch s {
+		case ":":
+			return token{
+				kind:     tkBindForm,
+				position: pos,
+			}
+		case "if":
+			return token{
+				kind:     tkIfForm,
+				position: pos,
+			}
+		case "do":
+			return token{
+				kind:     tkDoForm,
+				position: pos,
+			}
+		case "import":
+			return token{
+				kind:     tkImportForm,
+				position: pos,
+			}
+		default:
+			return token{
+				kind:     tkName,
+				value:    s,
+				position: pos,
+			}
 		}
 	}
 }
