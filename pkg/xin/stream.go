@@ -56,6 +56,10 @@ func (v StreamValue) String() string {
 	return fmt.Sprintf("(%s<stream %d>)", streamType, v.id)
 }
 
+func (v StreamValue) Repr() string {
+	return v.String()
+}
+
 func (v StreamValue) Equal(o Value) bool {
 	if ov, ok := o.(StreamValue); ok {
 		return v.id == ov.id

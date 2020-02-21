@@ -9,6 +9,10 @@ func (v hashableStringProxy) String() string {
 	return "(<string (proxy)> " + string(v) + ")"
 }
 
+func (v hashableStringProxy) Repr() string {
+	return v.String()
+}
+
 func (v hashableStringProxy) Equal(ov Value) bool {
 	panic("hashableStringProxy should not be equality-checked")
 }
@@ -19,6 +23,10 @@ type hashableNativeFormProxy string
 
 func (v hashableNativeFormProxy) String() string {
 	return "(<native form (proxy)> " + string(v) + ")"
+}
+
+func (v hashableNativeFormProxy) Repr() string {
+	return v.String()
 }
 
 func (v hashableNativeFormProxy) Equal(ov Value) bool {
@@ -65,6 +73,10 @@ func (v MapValue) String() string {
 		ss += " " + k.String() + "->" + val.String()
 	}
 	return "(<map>" + ss + ")"
+}
+
+func (v MapValue) Repr() string {
+	return v.String()
 }
 
 func (v MapValue) Equal(o Value) bool {

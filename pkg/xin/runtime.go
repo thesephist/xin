@@ -19,7 +19,11 @@ type NativeFormValue struct {
 }
 
 func (v NativeFormValue) String() string {
-	return fmt.Sprintf("Native form %s", v.name)
+	return fmt.Sprintf("(<native form> %s)", v.name)
+}
+
+func (v NativeFormValue) Repr() string {
+	return v.String()
 }
 
 func (v NativeFormValue) Equal(o Value) bool {

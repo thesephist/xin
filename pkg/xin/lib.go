@@ -24,6 +24,7 @@ func loadStandardLibrary(vm *Vm) InterpreterError {
 		"map",
 		"str",
 		"src",
+		"stat",
 		"test",
 	}
 

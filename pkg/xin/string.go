@@ -2,12 +2,17 @@ package xin
 
 import (
 	"bytes"
+	"strings"
 )
 
 type StringValue []byte
 
 func (v StringValue) String() string {
 	return string(v)
+}
+
+func (v StringValue) Repr() string {
+	return "'" + strings.ReplaceAll(string(v), "'", "\\'") + "'"
 }
 
 func (v StringValue) Equal(o Value) bool {

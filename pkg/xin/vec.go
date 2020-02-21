@@ -27,6 +27,10 @@ func (v VecValue) String() string {
 	return "(<vec>" + ss + ")"
 }
 
+func (v VecValue) Repr() string {
+	return v.String()
+}
+
 func (v VecValue) Equal(o Value) bool {
 	if ov, ok := o.(VecValue); ok {
 		return v.underlying == ov.underlying

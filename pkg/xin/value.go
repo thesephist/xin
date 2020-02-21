@@ -15,12 +15,17 @@ import (
 // 	which is hashable.
 type Value interface {
 	String() string
+	Repr() string
 	Equal(Value) bool
 }
 
 type IntValue int64
 
 func (v IntValue) String() string {
+	return strconv.FormatInt(int64(v), 10)
+}
+
+func (v IntValue) Repr() string {
 	return strconv.FormatInt(int64(v), 10)
 }
 
@@ -35,6 +40,10 @@ func (v IntValue) Equal(o Value) bool {
 type FracValue float64
 
 func (v FracValue) String() string {
+	return fmt.Sprintf("%.8f", float64(v))
+}
+
+func (v FracValue) Repr() string {
 	return fmt.Sprintf("%.8f", float64(v))
 }
 
@@ -64,6 +73,15 @@ func (v FormValue) String() string {
 	return "(<form>" + ss + ") " + v.definition.String()
 }
 
+func (v FormValue) Repr() string {
+	// same impl as FormValue.String()
+	ss := ""
+	for _, a := range *v.arguments {
+		ss += " " + a
+	}
+	return "(<form>" + ss + ") " + v.definition.String()
+}
+
 func (v FormValue) Equal(o Value) bool {
 	if ov, ok := o.(FormValue); ok {
 		return v.definition == ov.definition
@@ -78,6 +96,11 @@ type LazyValue struct {
 }
 
 func (v LazyValue) String() string {
+	return "(<lazy> " + v.node.String() + ")"
+}
+
+func (v LazyValue) Repr() string {
+	// same impl as LazyValue.String()
 	return "(<lazy> " + v.node.String() + ")"
 }
 

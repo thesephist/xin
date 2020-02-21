@@ -58,7 +58,7 @@ func repl() {
 			fmt.Sprintf("_%d", replCount),
 			result,
 		)
-		color.Yellow("%d ) %s\n\n", replCount, result)
+		color.Yellow("%d ) %s\n\n", replCount, result.Repr())
 
 		replCount++
 	}
