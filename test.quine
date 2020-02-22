@@ -1,1 +1,0 @@
-((: (q) (<- os::stdout (+ '((: ' (+ (str::replace (str q) (+ '<fo' 'rm>') 'q') '))')))))
