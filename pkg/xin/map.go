@@ -159,7 +159,7 @@ func mapHasForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError
 	if firstMap, ok := first.(MapValue); ok {
 		_, prs := (*firstMap.items)[hashable(second)]
 		if prs {
-			return IntValue(1), nil
+			return trueValue, nil
 		}
 
 		return zeroValue, nil

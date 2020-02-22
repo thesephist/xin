@@ -5,7 +5,10 @@ import (
 	"strings"
 )
 
+// these values are interned
 const zeroValue = IntValue(0)
+const trueValue = IntValue(1)
+const falseValue = zeroValue
 
 type Frame struct {
 	Vm     *Vm
@@ -236,9 +239,9 @@ func evalIfForm(fr *Frame, args []*astNode) (Value, InterpreterError) {
 	}
 
 	switch cond {
-	case IntValue(1):
+	case trueValue:
 		return eval(fr, ifTrueNode)
-	case zeroValue:
+	case falseValue:
 		return eval(fr, ifFalseNode)
 	default:
 		return nil, InvalidIfConditionError{cond: cond}

@@ -61,7 +61,7 @@ func osWaitForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError
 		}
 	}()
 
-	return IntValue(1), nil
+	return trueValue, nil
 }
 
 func osReadForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) {
@@ -184,10 +184,10 @@ func osDeleteForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterErr
 	if firstStr, ok := first.(StringValue); ok {
 		err := os.RemoveAll(string(firstStr))
 		if err != nil {
-			return zeroValue, nil
+			return falseValue, nil
 		}
 
-		return IntValue(1), nil
+		return trueValue, nil
 	}
 
 	return nil, MismatchedArgumentsError{

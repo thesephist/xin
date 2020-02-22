@@ -315,7 +315,7 @@ func divideForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError
 	switch cleanFirst := first.(type) {
 	case IntValue:
 		if cleanSecond, ok := second.(IntValue); ok {
-			if cleanSecond == IntValue(0) {
+			if cleanSecond == zeroValue {
 				return zeroValue, nil
 			}
 
@@ -361,7 +361,7 @@ func modForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) {
 	switch cleanFirst := first.(type) {
 	case IntValue:
 		if cleanSecond, ok := second.(IntValue); ok {
-			if cleanSecond == IntValue(0) {
+			if cleanSecond == zeroValue {
 				return zeroValue, nil
 			}
 
@@ -442,9 +442,9 @@ func notForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) {
 
 	if firstInt, ok := first.(IntValue); ok {
 		if firstInt.Equal(zeroValue) {
-			return IntValue(1), nil
+			return trueValue, nil
 		} else {
-			return zeroValue, nil
+			return falseValue, nil
 		}
 	}
 
@@ -551,26 +551,26 @@ func greaterForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterErro
 	case IntValue:
 		if cleanSecond, ok := second.(IntValue); ok {
 			if cleanFirst > cleanSecond {
-				return IntValue(1), nil
+				return trueValue, nil
 			} else {
-				return zeroValue, nil
+				return falseValue, nil
 			}
 		}
 	case FracValue:
 		if cleanSecond, ok := second.(FracValue); ok {
 			if cleanFirst > cleanSecond {
-				return IntValue(1), nil
+				return trueValue, nil
 			} else {
-				return zeroValue, nil
+				return falseValue, nil
 			}
 		}
 	case StringValue:
 		if cleanSecond, ok := second.(StringValue); ok {
 			cmp := strings.Compare(string(cleanFirst), string(cleanSecond))
 			if cmp == 1 {
-				return IntValue(1), nil
+				return trueValue, nil
 			} else {
-				return zeroValue, nil
+				return falseValue, nil
 			}
 		}
 	}
@@ -605,26 +605,26 @@ func lessForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) 
 	case IntValue:
 		if cleanSecond, ok := second.(IntValue); ok {
 			if cleanFirst < cleanSecond {
-				return IntValue(1), nil
+				return trueValue, nil
 			} else {
-				return zeroValue, nil
+				return falseValue, nil
 			}
 		}
 	case FracValue:
 		if cleanSecond, ok := second.(FracValue); ok {
 			if cleanFirst < cleanSecond {
-				return IntValue(1), nil
+				return trueValue, nil
 			} else {
-				return zeroValue, nil
+				return falseValue, nil
 			}
 		}
 	case StringValue:
 		if cleanSecond, ok := second.(StringValue); ok {
 			cmp := strings.Compare(string(cleanFirst), string(cleanSecond))
 			if cmp == -1 {
-				return IntValue(1), nil
+				return trueValue, nil
 			} else {
-				return zeroValue, nil
+				return falseValue, nil
 			}
 		}
 	}

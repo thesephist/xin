@@ -89,9 +89,9 @@ func equalForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError)
 	}
 
 	if first.Equal(second) {
-		return IntValue(1), nil
+		return trueValue, nil
 	} else {
-		return zeroValue, nil
+		return falseValue, nil
 	}
 }
 
