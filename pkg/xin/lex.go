@@ -277,5 +277,8 @@ func lex(path string, r io.Reader) (tokenStream, InterpreterError) {
 		}
 	}
 
+	// clear out remaining items in the buffer
+	clear()
+
 	return toks, nil
 }
