@@ -69,6 +69,9 @@
 (: (seq n)
    (range 0 n 1))
 
+(: (nat n)
+   (range 1 (inc n) 1))
+
 (: (loop n f)
    (do (: (sub i)
           (if (< i n)
