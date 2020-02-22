@@ -37,26 +37,36 @@
 
 (: (assert result)
    (if (= result true)
-     0
+     pass
      (str::join (vec 'Expected true but got' (str result)) ' ')))
 
 (: (assert-false result)
    (if (= result false)
-     0
+     pass
      (str::join (vec 'Expected false but got' (str result)) ' ')))
 
 (: (assert-eq result expected)
    (if (= result expected)
-     0
+     pass
      (str::join (vec 'Expected'
                      (str expected)
                      'but got'
                      (str result))
                 ' ')))
 
+(: (assert-eq-approx result expected)
+   (if (< (math::abs (- result expected)) 0.000001)
+     pass
+     (str::join (vec 'Expected'
+                     (str expected)
+                     'but got'
+                     (str result)
+                     '(approx comparison)')
+                ' ')))
+
 (: (assert-eq-vec result expected)
    (if (vec::eq? result expected)
-     0
+     pass
      (str::join (vec 'Expected'
                      (str expected)
                      'but got'
@@ -65,7 +75,7 @@
 
 (: (assert-eq-map result expected)
    (if (map::eq? result expected)
-     0
+     pass
      (str::join (vec 'Expected'
                      (str expected)
                      'but got'

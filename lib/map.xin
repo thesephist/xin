@@ -9,3 +9,15 @@
         (vec::map (map::keys m)
                   (: (cmp-val m-key)
                      (= (map::get m m-key) (map-get l m-key)))))))
+
+(: (values m)
+   (vec::map (map::keys m)
+             (: (f k)
+                (map::get m k))
+             (vec)))
+
+(: (entries m)
+   (vec::map (map::keys m)
+             (: (f k)
+                (vec k (map::get m k)))
+             (vec)))

@@ -1,0 +1,34 @@
+; statistics library
+
+; arithmetic mean
+(: (mean xs)
+   (/ (vec::sum xs) (frac (vec::size xs))))
+
+; geometric mean
+(: (geomean xs)
+   (^ (vec::prod xs) (/ 1.0 (vec::size xs))))
+
+(: (median xs)
+   (if (even? (vec::size xs))
+     (do (: half (/ (vec::size xs) 2))
+       (mean (vec::slice (vec::sort xs)
+                         (dec half)
+                         (inc half))))
+     (vec::get (vec::sort xs)
+               (/ (vec::size xs) 2) 1)))
+
+; non-deterministic mode
+(: (mode xs)
+   (do
+     (: counts
+        (vec::reduce xs
+                     (: (push x acc)
+                        (if (map::has? acc x)
+                          (map::set! acc x (inc (map::get acc x)))
+                          (map::set! acc x 1)))
+                     (map)))
+     (: (get-neg-count pair)
+        (neg (vec::get pair 1)))
+     (vec::head (vec::head
+                  (vec::sort-by (map::entries counts)
+                                get-neg-count)))))

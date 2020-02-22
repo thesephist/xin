@@ -7,6 +7,7 @@
 (: assert-false test::assert-false)
 
 (: eq test::assert-eq)
+(: eq-approx test::assert-eq-approx)
 (: eq-vec test::assert-eq-vec)
 (: eq-map test::assert-eq-map)
 
@@ -28,7 +29,19 @@
     (case 'Modulus'
       (eq (% 100 17) 15))
     (case 'Negative modulus'
-      (eq (% -10 3) -1))))
+      (eq (% -10 3) -1))
+    (case 'factor? true'
+      (assert (factor? 144 12)))
+    (case 'factor? false'
+      (assert-false (factor? 144 10)))
+    (case 'even? true'
+      (assert (even? 12)))
+    (case 'even? false'
+      (assert-false (even? 13)))
+    (case 'odd? true'
+      (assert (odd? 13)))
+    (case 'odd? false'
+      (assert-false (odd? 14)))))
 
 (scope
   'Std'
@@ -255,7 +268,7 @@
       (assert (map::has? simple-map 3)))
     (case 'map::has? - false'
       (assert-false (map::has? mixed-map (vec 5 3 1))))
-    (case 'map::keys - simple'
+    (case 'map::keys'
       (assert
         (do (: keys (map::keys mixed-map))
           (& (= (vec::size keys) 4)
@@ -264,7 +277,24 @@
                                         scope
                                         mixed-vec-key)
                                    (: (f k)
-                                      (vec::has? keys k))))))))))
+                                      (vec::has? keys k))))))))
+    (case 'map::values'
+      (assert
+        (do (: vals (map::values simple-map))
+          (& (= (vec::size vals) 3)
+             (vec::every (vec::map (vec 'first'
+                                        'second'
+                                        'third')
+                                   (: (f k)
+                                      (vec::has? vals k))))))))
+    (case 'map::entries'
+      (assert
+        (do (: ents (map::entries simple-map))
+          (& (= (vec::size ents) 3)
+             (vec::every (vec::map ents
+                                   (: (f pair)
+                                      (= (map::get simple-map (vec::head pair))
+                                         (vec::get pair 1)))))))))))
 
 (do (: simple-set (set))
   (set::add! simple-set 'one')
@@ -333,3 +363,18 @@
                                            (map::set! m (vec 1 2) 'is vec'))))))
     (case 'stream'
       (eq (src::serialize (stream)) '(stream)'))))
+
+(: stat-test-list (vec 1 3 24 0 4 2 2 2 2 4 3 1 2 442 235 3 23 315))
+(scope
+  'Statistics'
+  (vec
+    (case 'mean'
+      (eq (stat::mean (vec 0 3 1 5 639 24)) 112))
+    (case 'geomean'
+      (eq-approx (stat::geomean (vec 3 1 3 3 9 1 1 27)) 3))
+    (case 'median of odd list'
+      (eq (stat::median (vec 13 254 2 24 0 0 3 1 2)) 2))
+    (case 'median of even list'
+      (eq (stat::median (vec 1 2 3 4 5 6)) 3.5))
+    (case 'mode'
+      (eq (stat::mode stat-test-list) 2))))
