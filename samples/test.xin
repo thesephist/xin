@@ -251,7 +251,11 @@
     (case 'str::fmt - nested & escaped placeholders'
       (eq (str::fmt '{{}} {\\} [{]} {{} end'
                     (vec 1 2 3 4 5))
-          '{1} {\\} [{]} {2 end'))))
+          '{1} {\\} [{]} {2 end'))
+    (case 'str::fmt - no recursive replacement'
+      (eq (str::fmt 'a: {}, b: {}'
+                    (vec '{} {}' 42))
+          'a: {} {}, b: 42'))))
 
 (do (: simple-map (map))
   (map::set! simple-map 1 'first')

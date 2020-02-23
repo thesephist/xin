@@ -136,22 +136,26 @@
                                      idx)))))
     s (vec)))
 
-; rudimentary string formatting
-; placeholders with just '{}'
+; rudimentary string formatting placeholders with just '{}'
+; optimized and tail-recursive with minimal copying,
+; takes after str::replace
 ;
 ; ex) (fmt 'start {} {},{} end'
 ;          (vec 1 2 3))
 ; ->  'start 1 2,3 end'
 (: (fmt s items)
-   (if (| (= (: idx (index s '{}')) -1)
-          (vec::empty? items))
-     s
-     (fmt (+ (str::slice s 0 idx)
-             (+ (str (vec::head items))
-                (str::slice s
-                            (+ idx 2)
-                            (str::size s))))
-          (vec::tail items))))
+   ((: (sub pref suff items)
+       (if (| (= (: idx (index suff '{}')) -1)
+              (vec::empty? items))
+         (+ pref suff)
+         (sub (+ pref
+                 (+ (str::slice suff 0 idx)
+                    (str (vec::head items))))
+              (str::slice suff
+                          (+ idx 2)
+                          (str::size suff))
+              (vec::tail items))))
+    '' s items))
 
 (do (: esc (map::new))
   (map::set! esc '\n' '\\n')
