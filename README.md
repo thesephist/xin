@@ -57,10 +57,10 @@ go build ./xin.go -o ./xin
 
 to build Xin as a standalone binary, or run `make install` to install Xin alongside the vim syntax highlighting / definition file.
 
-Xin can currently run as a repl, or execute from a file. To run the repl, simply run
+Xin can currently run as a repl, or execute from a file or standard input. To run the repl, simply run from the command line:
 
 ```
-xin repl
+xin
 ```
 
 And a prompt will appear. Each input and output line in the prompt is numbered, and you can access previous results from the repl with the corresponding number. For example, take this repl session:
@@ -75,10 +75,17 @@ And a prompt will appear. Each input and output line in the prompt is numbered, 
 
 We can access `3`, the result from line 0, as the variable `_0`. Likewise, `_1` will reference the vector from line 1.
 
-To run Xin programs from files, use `xin run`. For example, to run `samples/list.xin`
+To run Xin programs from files, pass file paths to the interpreter. For example, to run `samples/list.xin`
 
 ```
-xin run samples/list.xin
+xin samples/list.xin
+```
+
+You can also pass input as stdin piped into the CLI:
+
+```
+$ echo '(log (vec::sum (nat 10))) | xin'
+55      # -> output
 ```
 
 ## Key ideas explored
