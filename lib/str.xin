@@ -123,18 +123,27 @@
                           (str::size suff)))))
     '' s))
 
+; in the special case of (split s '')
+; we instead split at every byte character
+(: (split-into-chars s)
+   (reduce s
+           (: (f c acc)
+              (vec::add! acc c))
+           (vec)))
 (: (split s delim)
-   ((: (sub substr sublist)
-       (if (= (: idx (index substr delim)) -1)
-         (vec::add! sublist substr)
-         (sub (str::slice substr
-                          (+ idx (str::size delim))
-                          (str::size substr))
-              (vec::add! sublist
-                         (str::slice substr
-                                     0
-                                     idx)))))
-    s (vec)))
+   (if (blank? delim)
+     (split-into-chars s)
+     ((: (sub substr sublist)
+         (if (= (: idx (index substr delim)) -1)
+           (vec::add! sublist substr)
+           (sub (str::slice substr
+                            (+ idx (str::size delim))
+                            (str::size substr))
+                (vec::add! sublist
+                           (str::slice substr
+                                       0
+                                       idx)))))
+      s (vec))))
 
 ; rudimentary string formatting placeholders with just '{}'
 ; optimized and tail-recursive with minimal copying,
