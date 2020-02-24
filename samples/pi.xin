@@ -23,9 +23,5 @@
 (: attempts (vec::map (seq 6) (: (f exp) (^ 10 (inc exp)))))
 (vec::each attempts
            (: (f times)
-              (log (str::join
-                     (vec 'Estimate of Pi with '
-                          (str times)
-                          ' MC runs: \t'
-                          (str (run-monte-carlo times)))
-                     ''))))
+              (logf 'Estimate of Pi with {} MC runs: \t{}'
+                    (vec times (run-monte-carlo times)))))
