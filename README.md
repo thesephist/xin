@@ -11,26 +11,34 @@ Here's the fibonacci sequence, written naively in Xin.
 
 ```
 (: (fib n)
-   (if (| (= n 0) (= n 1))
+   (if (< n 2)
      1
      (+ (fib (- n 1))
         (fib (- n 2)))))
 
-(log (fib 20))
+; 30th fibonacci number
+(fib 30)
 ```
 
 Xin supports proper tail calls, so we can write this in a faster (`O(n)`) tail-recursive form.
 
 ```
-(: (fibh n a b)
-   (if (| (= n 0) (= n 1))
-     b
-     (fibh (- n 1) b (+ a b))))
-(: (fib n)
-   (fibh n 1 1))
+(: (fast-fib n)
+   ((: (f n a b)
+       (if (< n 2)
+         b
+         (f (- n 1) b (+ a b))))
+    n 1 1))
 
-(log (fib 20))
+; 50th fibonacci number
+(fib 50)
 ```
+
+You can find more example and real-world Xin code in the sample programs in the repository:
+
+- [the standard library](lib/std.xin)
+- [quicksort, and other iterator algorithms](lib/vec.xin)
+- [counting word frequently in a file](samples/freq.xin)
 
 ## Goals
 

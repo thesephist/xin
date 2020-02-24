@@ -1,1 +1,140 @@
-; most frequently used words in a file
+#!/usr/bin/env xin
+
+; counting the top N most frequently used words in a file
+;
+; usage: xin freq.xin <file> [count]
+; (count is optional, defaults to 20)
+
+; a char is significant for our counting if
+; it's a letter or _ or - or # or ' '.
+; In xin, or (|) doesn't short circuit, so we
+; use if forms.
+(: (significant-char? c)
+   (if (str::lower? c)
+     true
+     (if (str::digit? c)
+       true
+       (if (= c ' ')
+         true
+         (vec::has? (vec '-' '_' '#') c)))))
+
+; normalize string to have only spaces for whitespaces
+; and be all-lowercase, for easy parsing into words
+(: (normalize s)
+   (str::filter
+     (str::downcase
+       ; we normalize all common whitespace to ' '
+       (vec::reduce (vec '\t' '\n')
+                    (: (f ws acc)
+                       (str::replace acc ws ' '))
+                    s))
+     significant-char?))
+
+; to-word-vec takes a file's contents and splits it into
+; a vector of normalized words
+(: (to-word-vec file)
+   (vec::filter (str::split (normalize file) ' ')
+                (: (not-blank? s)
+                   (! (str::blank? s)))))
+
+; produce a map of {word -> count} mappings from a vec of words
+(: (freq-map word-vec)
+   (vec::reduce word-vec
+                (: (incr-count word counter)
+                   (if (map::has? counter word)
+                     (map::set! counter word
+                                (inc (map::get counter word)))
+                     (map::set! counter word 1)))
+                (map)))
+
+; converts the freq-map into a sorted list of (word, count) pairs
+(: (freq-sorted word-vec)
+   (vec::sort-by (map::entries (freq-map word-vec))
+                 (: (get-neg-count pair)
+                    (neg (vec::get pair 1)))))
+
+; given a word-vec and the number of top N words to show (row-count),
+; generate and pretty-print a textual table view of frequencies
+(: (display-freq-table word-vec row-count)
+   (do
+     (: freqs (vec::slice (freq-sorted word-vec) 0 row-count))
+     (: frac-size (frac (vec::size word-vec)))
+
+     ; shortcuts to get count / % freq from a (word, count) pair
+     (: (get-count pair)
+        (vec::get pair 1))
+     (: (get-percent pair)
+        (* 100 (/ (get-count pair) frac-size)))
+
+     ; get max widths of words / counts to be displayed, to render
+     ; table column widths accordingly
+     (: max-word-size (max 4
+                           (vec::max (vec::map
+                                       (vec::map freqs vec::head)
+                                       str::size))))
+     (: max-count-size (max 5
+                            (vec::max (vec::map
+                                        freqs
+                                        (: (f w)
+                                           (str::size (str (get-count w))))))))
+
+     ; header row
+     (logf '{} | {} | {}'
+           (vec (str::pad-start 'WORD' max-word-size ' ')
+                (str::pad-start 'COUNT' max-count-size ' ')
+                'FREQ %'))
+     ; divider row
+     (log (* '=' (vec::sum (vec max-word-size
+                                3 ; divider
+                                max-count-size
+                                3 ; divider
+                                6))))
+     ; value rows
+     (vec::each freqs
+                (: (log-row pair)
+                   (logf '{} | {} | {}'
+                         (vec (str::pad-start (vec::head pair)
+                                              max-word-size
+                                              ' ')
+                              (str::pad-start (str (get-count pair))
+                                              max-count-size
+                                              ' ')
+                              (+ (str::slice (str (get-percent pair))
+                                             0 5)
+                                 '%')))))))
+
+; read CLI args
+(: filepath (vec::get (os::args) 2))
+(: row-count
+   (if (< (vec::size (os::args)) 4)
+     ; default top 10 words
+     20
+     (int (vec::get (os::args) 3))))
+
+; main proc
+(if (zero? (: file
+              (os::read filepath)))
+  (logf 'Error: could not open "{}" for reading.'
+        (vec filepath))
+  (if (zero? row-count)
+    (logf 'Error: could not parse row count "{}".'
+          (vec (vec::get (os::args) 3)))
+    (do
+      (logf 'Analyzing {}:\n'
+            (vec filepath))
+
+      (: content (os::read-all file))
+      (stream::close! file)
+      (: word-vec (to-word-vec content))
+
+      (display-freq-table
+        word-vec
+        row-count)
+
+      (log '')
+      (logf 'Size:\t{} bytes'
+            (vec (str::size content)))
+      (logf 'Total:\t{} words'
+            (vec (vec::size word-vec)))
+      (logf 'Uniq:\t{} words'
+            (vec (vec::size (map::keys (freq-map word-vec))))))))
