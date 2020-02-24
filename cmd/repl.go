@@ -8,22 +8,8 @@ import (
 	"strings"
 
 	"github.com/fatih/color"
-	"github.com/spf13/cobra"
 	"github.com/thesephist/xin/pkg/xin"
 )
-
-var replCmd = &cobra.Command{
-	Use:   "repl",
-	Short: "Run a Xin repl",
-	Long:  "Start an interactive Xin language interpreter session",
-	Run: func(cmd *cobra.Command, args []string) {
-		repl()
-	},
-}
-
-func init() {
-	rootCmd.AddCommand(replCmd)
-}
 
 func repl() {
 	vm, err := xin.NewVm()

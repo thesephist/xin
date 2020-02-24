@@ -10,31 +10,31 @@ init:
 
 test: gen
 	go build -race -o ./xin
-	./xin run ./samples/first.xin
-	./xin run ./samples/hello.xin
-	./xin run ./samples/fact.xin
-	./xin run ./samples/fib.xin
-	./xin run ./samples/prime.xin
-	./xin run ./samples/collatz.xin
-	./xin run ./samples/map.xin
-	./xin run ./samples/list.xin
-	./xin run ./samples/async.xin
-	./xin run ./samples/stream.xin
-	./xin run ./samples/file.xin
-	./xin run ./samples/nest-import.xin
+	./xin ./samples/first.xin
+	./xin ./samples/hello.xin
+	./xin ./samples/fact.xin
+	./xin ./samples/fib.xin
+	./xin ./samples/prime.xin
+	./xin ./samples/collatz.xin
+	./xin ./samples/map.xin
+	./xin ./samples/list.xin
+	./xin ./samples/async.xin
+	./xin ./samples/stream.xin
+	./xin ./samples/file.xin
+	./xin ./samples/nest-import.xin
 	# we echo in some input for prompt.xin testing stdin
-	echo "Linus" | ./xin run ./samples/prompt.xin
-	./xin run ./samples/test.xin
+	echo "Linus" | ./xin ./samples/prompt.xin
+	./xin ./samples/test.xin
 	rm ./xin
 
 
 run-test: gen
-	${XIN} run ./samples/test.xin
+	${XIN} ./samples/test.xin
 
 
 # start interactive repl
 repl: gen
-	${XIN} repl
+	${XIN}
 
 
 # re-generate static files
