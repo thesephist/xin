@@ -1,0 +1,10 @@
+; os interface wrappers
+
+(: (read-all flie)
+   (if (zero? file)
+     0
+     ((: (sub acc)
+         (if (zero? (: buf (-> file)))
+           ; if zero, we reached EOF
+           acc
+           (sub (+ acc buf)))) '')))

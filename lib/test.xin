@@ -4,22 +4,18 @@
    (do
      (: all-succeeded (vec::every (vec::map cases case-succeeded?)))
      (: count-succeeded (vec::size (vec::filter cases case-succeeded?)))
-     (log (str::join (vec (str count-succeeded)
-                          '/'
-                          (str (vec::size cases))
-                          '\t'
-                          label)
-                     ''))
+     (logf '{}/{}\t{}'
+           (vec count-succeeded
+                (vec::size cases)
+                label))
      (if all-succeeded
        pass
        (vec::each cases
                   (: (f c)
                      (if (case-failed? c)
-                       (log (str::join (vec '\t- '
-                                            (desc-of-case c)
-                                            '\n\t  '
-                                            (assertion-of-case c))
-                                       ''))
+                       (logf '\t- {}\n\t  {}'
+                             (vec (desc-of-case c)
+                                  (assertion-of-case c)))
                        pass))))))
 
 (: (case description assertion)
@@ -38,46 +34,38 @@
 (: (assert result)
    (if (= result true)
      pass
-     (str::join (vec 'Expected true but got' (str result)) ' ')))
+     (str::fmt 'Expected true but got {}'
+               (vec result))))
 
 (: (assert-false result)
    (if (= result false)
      pass
-     (str::join (vec 'Expected false but got' (str result)) ' ')))
+     (str::fmt 'Expected false but got {}'
+               (vec result))))
 
 (: (assert-eq result expected)
    (if (= result expected)
      pass
-     (str::join (vec 'Expected'
-                     (str expected)
-                     'but got'
-                     (str result))
-                ' ')))
+     (str::fmt 'Expected {} but got {}'
+               (vec expected result))))
 
+(: approx-cap 0.000001)
 (: (assert-eq-approx result expected)
-   (if (< (math::abs (- result expected)) 0.000001)
+   (if (< (math::abs (- result expected)) approx-cap)
      pass
-     (str::join (vec 'Expected'
-                     (str expected)
-                     'but got'
-                     (str result)
-                     '(approx comparison)')
-                ' ')))
+     (str::fmt 'Expected approx. {} but got {}, off by >{}'
+               (vec expected
+                    result
+                    approx-cap))))
 
 (: (assert-eq-vec result expected)
    (if (vec::eq? result expected)
      pass
-     (str::join (vec 'Expected'
-                     (str expected)
-                     'but got'
-                     (str result))
-                ' ')))
+     (str::fmt 'Expected vec {} but got {}'
+               (vec expected result))))
 
 (: (assert-eq-map result expected)
    (if (map::eq? result expected)
      pass
-     (str::join (vec 'Expected'
-                     (str expected)
-                     'but got'
-                     (str result))
-                ' ')))
+     (str::fmt 'Expected map {} but got {}'
+               (vec expected result))))

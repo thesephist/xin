@@ -38,6 +38,10 @@
 (: (scan)
    (-> os::stdin))
 
+; formatted logging shorthand
+(: (logf s items)
+   (log (str::fmt s items)))
+
 ; basic math
 (: (!= a b) (! (= a b)))
 (: (>= a b) (! (< a b)))
@@ -46,6 +50,7 @@
 (: (neg n) (- 0 n))
 (: (pos? n) (> n 0))
 (: (neg? n) (< n 0))
+(: (zero? x) (= x 0))
 (: (inc n) (+ n 1))
 (: (dec n) (- n 1))
 (: (factor? big small)

@@ -45,13 +45,13 @@
                   (vec::head v))))
 
 (: (index s sub)
-   (do (: (rec i)
-          (if (> i (str::size s))
-            -1
-            (if (= (str::slice s i (+ i (str::size sub))) sub)
-              i
-              (rec (+ i 1)))))
-     (rec 0)))
+   ((: (rec i)
+       (if (> i (str::size s))
+         -1
+         (if (= (str::slice s i (+ i (str::size sub))) sub)
+           i
+           (rec (+ i 1)))))
+    0))
 
 (: (has? s sub)
    (> (index s sub) -1))
@@ -110,28 +110,31 @@
           (str::slice (* fill (inc (/ diff (str::size fill)))) 0 diff)))
      s))
 
+; optimized str::replace with minimal copying / O(n) searching
 (: (replace s old new)
-   (if (= (: idx (index s old)) -1)
-     s
-     (replace (+ (str::slice s 0 idx)
-                 (+ new
-                    (str::slice s
-                                (+ idx (str::size old))
-                                (str::size s))))
-              old new)))
+   ((: (sub pref suff)
+       (if (= (: idx (index suff old)) -1)
+         (+ pref suff)
+         (sub (+ pref
+                 (+ (str::slice suff 0 idx)
+                    new))
+              (str::slice suff
+                          (+ idx (str::size old))
+                          (str::size suff)))))
+    '' s))
 
 (: (split s delim)
-   (do (: (sub substr sublist)
-          (if (= (: idx (index substr delim)) -1)
-            (vec::add! sublist substr)
-            (sub (str::slice substr
-                             (+ idx (str::size delim))
-                             (str::size substr))
-                 (vec::add! sublist
-                            (str::slice substr
-                                        0
-                                        idx)))))
-     (sub s (vec))))
+   ((: (sub substr sublist)
+       (if (= (: idx (index substr delim)) -1)
+         (vec::add! sublist substr)
+         (sub (str::slice substr
+                          (+ idx (str::size delim))
+                          (str::size substr))
+              (vec::add! sublist
+                         (str::slice substr
+                                     0
+                                     idx)))))
+    s (vec)))
 
 ; rudimentary string formatting
 ; placeholders with just '{}'

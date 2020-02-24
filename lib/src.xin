@@ -7,24 +7,23 @@
 (: (ser-vec v)
    (if (vec::empty? v)
      '(vec)'
-     (+ '\(vec '
-        (+ (str::join (vec::map v serialize) ' ')
-           '\)'))))
+     (str::fmt
+       '(vec {})'
+       (vec
+         (str::join (vec::map v serialize) ' ')))))
 
 (: (ser-map v)
    (if (map::empty? v)
      '(map)'
-     (+ '\(do \(: m \(map\)\) '
-        (+ (str::join (vec::map (map::keys m)
-                                (: (f k)
-                                   (str::join (vec '\(map::set! m '
-                                                   (serialize k)
-                                                   ' '
-                                                   (serialize (map::get v k))
-                                                   '\)')
-                                              '')))
-                      ' ')
-           '\)'))))
+     (str::fmt
+       '(do (: m (map)) {})'
+       (vec
+         (str::join (vec::map (map::keys m)
+                              (: (f k)
+                                 (str::fmt '(map::set! m {} {})'
+                                           (vec (serialize k)
+                                                (serialize (map::get v k))))))
+                    ' ')))))
 
 (: (ser-stream v)
    '(stream)')
