@@ -14,8 +14,15 @@ import (
 // 	exception to this case, where a proxy Value type is used instead
 // 	which is hashable.
 type Value interface {
+	// String is stable, string representation of a Xin value
+	// that can be used to back the to-string type conversion of values
 	String() string
+
+	// Repr is an unstable, human-readable representation of Xin values used for
+	// debugging and the repl, should not be considered a stable API
+	// to be used in the language internally.
 	Repr() string
+
 	Equal(Value) bool
 }
 

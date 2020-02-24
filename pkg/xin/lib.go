@@ -25,6 +25,7 @@ func loadStandardLibrary(vm *Vm) InterpreterError {
 		"str",
 		"src",
 		"stat",
+		"os",
 		"test",
 	}
 

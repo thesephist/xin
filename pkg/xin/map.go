@@ -1,16 +1,20 @@
 package xin
 
+import (
+	"strings"
+)
+
 // StringValue is of type []byte, which is unhashable
 // so we convert StringValues to hashable string type
 // before using as map keys
 type hashableStringProxy string
 
 func (v hashableStringProxy) String() string {
-	return "(<string (proxy)> " + string(v) + ")"
+	return string(v)
 }
 
 func (v hashableStringProxy) Repr() string {
-	return v.String()
+	return "'" + strings.ReplaceAll(string(v), "'", "\\'") + "'"
 }
 
 func (v hashableStringProxy) Equal(ov Value) bool {
@@ -22,7 +26,7 @@ func (v hashableStringProxy) Equal(ov Value) bool {
 type hashableNativeFormProxy string
 
 func (v hashableNativeFormProxy) String() string {
-	return "(<native form (proxy)> " + string(v) + ")"
+	return "(<native form> " + string(v) + ")"
 }
 
 func (v hashableNativeFormProxy) Repr() string {
@@ -76,7 +80,11 @@ func (v MapValue) String() string {
 }
 
 func (v MapValue) Repr() string {
-	return v.String()
+	ss := ""
+	for k, val := range *v.items {
+		ss += " " + k.Repr() + "->" + val.Repr()
+	}
+	return "(<map>" + ss + ")"
 }
 
 func (v MapValue) Equal(o Value) bool {

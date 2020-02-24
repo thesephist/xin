@@ -3,6 +3,7 @@ package xin
 import (
 	"io"
 	"io/ioutil"
+	"strings"
 )
 
 type reader struct {
@@ -25,6 +26,13 @@ func newReader(path string, r io.Reader) (*reader, error) {
 		max:    len(asString),
 	}
 	rdr.position.path = path
+
+	// read shebang line if present
+	if strings.HasPrefix(asString, "#!") {
+		rdr.upto("\n")
+		rdr.skip()
+	}
+
 	return &rdr, nil
 }
 func (rdr *reader) done() bool {

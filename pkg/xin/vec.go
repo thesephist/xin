@@ -28,7 +28,11 @@ func (v VecValue) String() string {
 }
 
 func (v VecValue) Repr() string {
-	return v.String()
+	ss := ""
+	for _, item := range v.underlying.items {
+		ss += " " + item.Repr()
+	}
+	return "(<vec>" + ss + ")"
 }
 
 func (v VecValue) Equal(o Value) bool {

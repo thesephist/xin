@@ -2,7 +2,6 @@ package xin
 
 import (
 	"bufio"
-	"fmt"
 	"io"
 	"math"
 	"math/rand"
@@ -19,7 +18,7 @@ type NativeFormValue struct {
 }
 
 func (v NativeFormValue) String() string {
-	return fmt.Sprintf("(<native form> %s)", v.name)
+	return "(<native form> " + v.name + ")"
 }
 
 func (v NativeFormValue) Repr() string {
@@ -39,7 +38,7 @@ func loadAllDefaultValues(vm *Vm) {
 
 	stdoutStream := NewStream()
 	stdoutStream.callbacks.sink = func(v Value) InterpreterError {
-		fmt.Printf(v.String())
+		os.Stdout.Write([]byte(v.String()))
 		return nil
 	}
 	fr.Put("os::stdout", stdoutStream)
