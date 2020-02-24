@@ -232,7 +232,21 @@
           'this is a long sentence'))
     (case 'str::unescape'
       (eq (str::unescape '\n\thacker \'town\\\' \n')
-          '\\n\\thacker \\\'town\\\\\\\' \\n'))))
+          '\\n\\thacker \\\'town\\\\\\\' \\n'))
+    (case 'str::fmt - basic'
+      (eq (str::fmt 'a {}{} b {} 3 {}'
+                    (vec 1 'test' 3.141592 (vec 1 2)))
+          'a 1test b 3.14159200 3 (<vec> 1 2)'))
+    (case 'str::fmt - items vec too long'
+      (eq (str::fmt '{}, {}' (vec 12 13 14 15 16))
+          '12, 13'))
+    (case 'str::fmt - items vec too short'
+      (eq (str::fmt '{}, {}, {}' (vec -3 -2))
+          '-3, -2, {}'))
+    (case 'str::fmt - nested & escaped placeholders'
+      (eq (str::fmt '{{}} {\\} [{]} {{} end'
+                    (vec 1 2 3 4 5))
+          '{1} {\\} [{]} {2 end'))))
 
 (do (: simple-map (map))
   (map::set! simple-map 1 'first')
