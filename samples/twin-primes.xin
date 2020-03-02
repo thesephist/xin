@@ -1,0 +1,34 @@
+; find twin primes under cap
+
+(: (twin? a b)
+   (= (+ a 2) b))
+
+(: (primes-under cap)
+   (vec::filter (nat cap) math::prime?))
+
+; shorthand for getting 1st/2nd items from vec
+(: (first v) (vec::head v))
+(: (second v) (vec::get v 1))
+
+(: (twin-primes-under cap)
+   ((: (sub acc rest)
+       (if (< (vec::size rest) 2)
+         acc
+         (if (twin? (first rest) (second rest))
+           (sub (vec::add! acc (vec (first rest) (second rest)))
+                (vec::tail rest))
+           (sub acc
+                (vec::tail rest)))))
+    (vec) (primes-under cap)))
+
+; main proc
+(: cap
+   (if (< (vec::size (os::args)) 3)
+     100
+     (int (vec::get (os::args) 2))))
+(: twp (twin-primes-under cap))
+(logf 'Found {} twin primes under {}:'
+      (vec (vec::size twp) cap))
+(vec::each twp
+           (: (log-pair pair)
+              (logf '{} + 2 = {}' pair)))
