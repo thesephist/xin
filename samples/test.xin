@@ -146,6 +146,18 @@
       (eq (vec::some (vec 0 0 0 0 0)) false))
     (case 'vec::sort'
       (eq-vec (vec::sort (vec::reverse row)) (vec 3 14 15 35 65 92 897)))
+    (case 'vec::uniq - already unique'
+      (eq-vec (vec::uniq (nat 10))
+              (nat 10)))
+    (case 'vec::uniq - all the same'
+      (eq-vec (vec::uniq (vec 'hi' 'hi' 'hi'))
+              (vec 'hi')))
+    (case 'vec::uniq - sorted'
+      (eq-vec (vec::uniq (vec 1 1 1 2 2 3 4 5 5 5 6 6 7 7 7 8 9))
+              (nat 9)))
+    (case 'vec::uniq - unsorted'
+      (eq-vec (vec::sort! (vec::uniq (vec 1 5 9 2 7 2 4 2 5 8 4 6 3 4 2 5 1)))
+              (nat 9)))
     (case 'vec::of'
       (eq-vec (vec::of 5 10) (vec 10 10 10 10 10)))
     (case 'vec::max'
@@ -357,7 +369,16 @@
     (case 'math::lcm'
       (eq (math::lcm 14 49) 98))
     (case 'math::lcm coprime'
-      (eq (math::lcm 7 39) 273))))
+      (eq (math::lcm 7 39) 273))
+    (case 'math::{prime? prime-factors factors}'
+      ; validate that all primes in factors is prime factors
+      (assert
+        (vec::every
+          (vec::map (nat 500)
+                    (: (f n)
+                       (vec::eq? (vec::uniq (math::prime-factors n))
+                                 (vec::filter (math::factors n)
+                                              math::prime?)))))))))
 
 (scope
   'Data serialization'

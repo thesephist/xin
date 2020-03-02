@@ -21,13 +21,13 @@
      false))
 
 (: (index v x)
-   (do (: (rec i)
-          (if (> i (vec::size v))
-            -1
-            (if (= (vec::get v i) x)
-              i
-              (rec (+ i 1)))))
-     (rec 0)))
+   ((: (rec i)
+       (if (> i (vec::size v))
+         -1
+         (if (= (vec::get v i) x)
+           i
+           (rec (+ i 1)))))
+    0))
 
 (: (has? v x)
    (> (index v x) -1))
@@ -130,6 +130,16 @@
    (sort-by v identity))
 (: (sort v)
    (sort! (clone v)))
+
+; naive uniq of a list
+; that does not assume sortability
+(: (uniq v)
+   (reduce v
+           (: (add-if-uniq x acc)
+              (if (has? acc x)
+                acc
+                (vec::add! acc x)))
+           (vec)))
 
 ; building blocks to allow us to compose vector ops
 (: (compose op)

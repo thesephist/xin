@@ -6,9 +6,6 @@
 (: pi
    (* 2 (math::asin 1)))
 
-(: (sqrt n)
-   (^ n .5))
-
 ; Euclid's GCD algorithm
 (: (gcd a b)
    ; prereq: a < b
@@ -25,6 +22,50 @@
 ; least common multiple using gcd
 (: (lcm a b)
    (* a (/ b (gcd a b))))
+
+(: (prime? n)
+   (if (< n 2)
+     false
+     (do (: max (inc (int (sqrt n))))
+       ((: (sub i)
+           (if (= i max)
+             true
+             (if (factor? n i)
+               false
+               (sub (inc i))))) 2))))
+
+; prime factorize natural number
+(: (prime-factors n)
+   ((: (sub pfs m pf)
+       (if (= m 1)
+         pfs
+         (if (factor? m pf)
+           (sub (vec::add! pfs pf)
+                (/ m pf)
+                pf)
+           (sub pfs
+                m
+                (inc pf)))))
+    (vec) n 2))
+
+; factorize natural number
+; for large n, may be more efficient to first
+; prime-factorize and produce combinations of prime factors
+(: (factors n)
+   ((: (sub lower upper r)
+       (if (>= (* r r) n)
+         (if (= (* r r) n)
+           (+ (vec::add! lower r)
+              (vec::reverse upper))
+           (+ lower (vec::reverse upper)))
+         (if (factor? n r)
+           (sub (vec::add! lower r)
+                (vec::add! upper (/ n r))
+                (inc r))
+           (sub lower
+                upper
+                (inc r)))))
+    (vec) (vec) 1))
 
 (: (log base n)
    (/ (math::ln n) (math::ln base)))

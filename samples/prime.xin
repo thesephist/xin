@@ -1,22 +1,7 @@
 ; find first N primes
 
-(: (int-sqrt n)
-   (+ 1 (int (sqrt n))))
-
-(: (is-prime n)
-   (if (< n 2)
-     false
-     (do (: max (int-sqrt n))
-       (: (sub i)
-          (if (= i max)
-            true
-            (if (factor? n i)
-              false
-              (sub (+ i 1)))))
-       (sub 2))))
-
 (: (primes-in-range ns)
-   (vec::filter ns is-prime))
+   (vec::filter ns math::prime?))
 
 (: (count-primes-in-range ns)
    (vec::size (primes-in-range ns)))

@@ -64,12 +64,12 @@
 
 ; iteration primitives
 (: (range start end step)
-   (do (: (sub i acc)
-          (if (< i end)
-            (do (vec::add! acc i)
-              (sub (+ i step) acc))
-            acc))
-     (sub start (vec))))
+   ((: (sub i acc)
+       (if (< i end)
+         (sub (+ i step)
+              (vec::add! acc i))
+         acc))
+    start (vec)))
 
 (: (seq n)
    (range 0 n 1))
@@ -78,12 +78,12 @@
    (range 1 (inc n) 1))
 
 (: (loop n f)
-   (do (: (sub i)
-          (if (< i n)
-            (do (f i)
-              (sub (+ i 1)))
-            0))
-     (sub 0)))
+   ((: (sub i)
+       (if (< i n)
+         (do (f i)
+           (sub (+ i 1)))
+         0))
+    0))
 
 ; set abstraction over map
 (: (set)
