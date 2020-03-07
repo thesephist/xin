@@ -94,6 +94,12 @@
     (case 'vec addition'
       (eq-vec (+ (vec 1 2 3) (vec 'hi' 'hello' 'bye'))
               (vec 1 2 3 'hi' 'hello' 'bye')))
+    (case 'take from vec'
+      (eq-vec (take row 3)
+              (vec 3 14 15)))
+    (case 'take from vec more than vec size'
+      (eq-vec (take row 20)
+              row))
     (case 'vec::head'
       (eq (vec::head row) 3))
     (case 'vec::tail'

@@ -77,6 +77,9 @@
 (: (nat n)
    (range 1 (inc n) 1))
 
+(: (take v n)
+   (vec::slice v 0 n))
+
 (: (loop n f)
    ((: (sub i)
        (if (< i n)
