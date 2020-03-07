@@ -1,5 +1,10 @@
 ; vec standard library
 
+; we use std::{min max} in this lib,
+; so stash them away behind the std namespace
+(: std::min min)
+(: std::max max)
+
 (: (head v)
    (vec::get v 0))
 
@@ -88,6 +93,19 @@
               (| acc x))
            false))
 
+(: (zip op v w)
+   (do
+     (: min-size (std::min (vec::size v) (vec::size w)))
+     (: v (take v min-size))
+     (: w (take w min-size))
+     (: (sub i acc)
+        (if (= i min-size)
+          acc
+          (sub (inc i)
+               (vec::add! acc (op (vec::get v i)
+                                  (vec::get w i))))))
+     (sub 0 (vec))))
+
 ; quicksort using hoare partition
 (: (sort-by v pred)
    (do (: v-pred (map v pred))
@@ -154,12 +172,10 @@
    (map (seq n) (: (f) x)))
 
 ; accumulator functions
-(: std::max max)
 (: (max v)
    (if (empty? v)
      0
      (reduce v std::max (head v))))
-(: std::min min)
 (: (min v)
    (if (empty? v)
      0

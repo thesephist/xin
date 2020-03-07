@@ -150,6 +150,16 @@
       (eq (vec::some (vec 1 1 0 1 1)) true))
     (case 'vec::some false'
       (eq (vec::some (vec 0 0 0 0 0)) false))
+    (case 'vec::zip equal length vecs'
+      (eq-vec (vec::zip + (nat 10) (range -5 30 1))
+              (range -4 16 2)))
+    (case 'vec::zip with custom func'
+      (eq (str (vec::zip vec
+                         (vec 'a' 'b' 'c' 'd')
+                         (vec 1 2 3)))
+          (str (vec (vec 'a' 1)
+                    (vec 'b' 2)
+                    (vec 'c' 3)))))
     (case 'vec::sort'
       (eq-vec (vec::sort (vec::reverse row)) (vec 3 14 15 35 65 92 897)))
     (case 'vec::uniq - already unique'
