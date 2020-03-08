@@ -1,0 +1,78 @@
+#!/usr/bin/env xin
+
+; show hex printout of the bytes in a given file
+;
+; usage: xin xxd.xin <file>
+
+(: bytes-per-row 16)
+
+; when we show source data in the output, we want to hide
+; non-standard ascii characters. This defines which chars are
+; "standard" for this purpose.
+(: (show-if-alphanumeric c)
+   (if (vec::some (vec (str::letter? c)
+                       (str::digit? c)
+                       (str::has? '.,:;?!@#$%^&*(){}[]-_+=~\'\"/\\| '
+                                  c)))
+     c
+     '\xb7')) ; center dot
+
+; given a vec, chunk it up into a list of smaller vecs
+; of max chunk-size each
+(: (chunk v chunk-size)
+   (do
+     (: (sub i acc rest)
+        (if (<= (vec::size rest) chunk-size)
+          (vec::add! acc rest)
+          (sub (inc i)
+               (vec::add! acc (take rest chunk-size))
+               (vec::slice rest chunk-size (vec::size rest)))))
+     (sub 0 (vec) v)))
+
+; take binary file data, return vec of hexadecimal octet notations
+; chunked into chunks of length max n
+(: (octet-rows-of-length n data)
+   ; takes data as string
+   (chunk
+     (vec::map (vec::map (str::split data '') str::enc)
+               (: (f octet)
+                  (str::pad-start (hex::enc octet)
+                                  2
+                                  '0')))
+     n))
+
+; read CLI args
+(: filepath (vec::get (os::args) 2))
+
+; main proc
+(if (zero? (: file
+              (os::read filepath)))
+  (logf 'Error: could not open "{}" for reading.'
+        (vec filepath))
+  (do
+    (: content (os::read-all file))
+    (stream::close! file)
+
+    (: max-count-width
+       (str::size (hex::enc (str::size content))))
+
+    (logf 'Reading {} bytes from {}:'
+          (vec (str::size content)
+               filepath))
+
+    (vec::each
+      (octet-rows-of-length bytes-per-row
+                            content)
+      (: (f row i)
+         (logf '{}: {}  {}'
+               (vec (str::pad-start (hex::enc (* i bytes-per-row))
+                                    max-count-width
+                                    '0')
+                    (str::pad-end (str::join row ' ')
+                                  (dec (* 3 bytes-per-row))
+                                  ' ')
+                    (str::map (str::slice content 
+                                          (* i bytes-per-row)
+                                          (+ (* i bytes-per-row)
+                                             bytes-per-row))
+                              show-if-alphanumeric)))))))
