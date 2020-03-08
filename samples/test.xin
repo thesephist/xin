@@ -260,8 +260,8 @@
     (case 'str::pad-end too long'
       (eq (str::pad-start 'this is a long sentence' 10 ' ')
           'this is a long sentence'))
-    (case 'str::unescape'
-      (eq (str::unescape '\n\thacker \'town\\\' \n')
+    (case 'str::escape'
+      (eq (str::escape '\n\thacker \'town\\\' \n')
           '\\n\\thacker \\\'town\\\\\\\' \\n'))
     (case 'str::fmt - basic'
       (eq (str::fmt 'a {}{} b {} 3 {}'

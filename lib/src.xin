@@ -1,7 +1,7 @@
 ; serialization/deserialization library
 
 (: (ser-str v)
-   (+ '\'' (+ (str::unescape v)
+   (+ '\'' (+ (str::escape v)
               '\'')))
 
 (: (ser-vec v)
