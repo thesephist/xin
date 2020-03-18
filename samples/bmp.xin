@@ -1,0 +1,91 @@
+; bitmap image format
+
+; port of the Ink version:
+; https://github.com/thesephist/ink:samples/bmp.ink
+
+(: (hexsplit n)
+   ((: (sub p i acc)
+       (if (| (< p 256)
+              (> i 3))
+         (decode (vec::set! acc i p))
+         (sub (math::floor (/ p 256))
+              (inc i)
+              (vec::set! acc i (% p 256)))))
+    n 0 (vec 0 0 0 0)))
+
+(: (decode v)
+   (str::join (vec::map v str::dec) ''))
+
+(: (bmp width height pixels)
+   (do
+     ; file buffer in which we build the image data
+     (: buf '')
+     ; append byte values to buf
+     (: (add part)
+        (str::add! buf part))
+     ; bmp requires that we pad out each pixel row to 4-byte chunks
+     (: padding
+        (decode (vec::get (vec (vec)
+                               (vec 0 0 0)
+                               (vec 0 0)
+                               (vec 0))
+                          (% (* 3 width) 4))))
+     ; write the nth row of pixels to buf
+     (: (wrow y)
+        ((: (sub x)
+            (if (= x width)
+              (add padding)
+              (do
+                (add (decode (vec::get pixels (+ (* y width) x))))
+                (sub (inc x))))
+            ) 0))
+
+     ; -- bmp header: BITMAPINFOHEADER format
+
+     ; bmp format identifier magic number
+     (add 'BM')
+     ; file size: 54 is the header bytes, plus 3 bytes per px + row-padding bytes
+     (add (hexsplit (+ 54
+                       (* (+ (* 3 width)
+                             (str::size padding))
+                          height))))
+     ; unused 4 bytes in this format
+     (add (decode (vec 0 0 0 0)))
+     ; pixel array data offset: always 54 if following this format
+     (add (decode (vec 54 0 0 0)))
+
+     ; -- DIB header
+
+     ; num of bytes in the DIB header from here
+     (add (decode (vec 40 0 0 0)))
+     ; bitmap width in pixels
+     (add (hexsplit width))
+     ; bitmap height in pixels, bottom to top
+     (add (hexsplit height))
+     ; number of color planes used: 1
+     (add (decode (vec 1 0)))
+     ; number of bits per pixel: 24 (8-bit rgb)
+     (add (decode (vec 24 0)))
+     ; pixel array compression format: none used
+     (add (decode (vec 0 0 0 0)))
+     ; size of raw bitmap data: 16 bits
+     (add (decode (vec 16 0 0 0)))
+     ; horizontal print resolution of the image: 72 dpi = 2835 pixels/m
+     (add (hexsplit 2835))
+     ; vertical print resolution of the image: 72 dpi = 2835 pixels/m
+     (add (hexsplit 2835))
+     ; number of colors in palette: 0
+     (add (decode (vec 0 0 0 0)))
+     ; number of "important" colors: 0
+     (add (decode (vec 0 0 0 0)))
+
+     ; write the whole pixel array to buf
+     ((: (sub y)
+         (if (= y height)
+           0
+           (do
+             (wrow y)
+             (sub (inc y))))) 0)
+
+     ; return image file buffer
+     buf))
