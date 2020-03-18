@@ -42,6 +42,13 @@
      (vec)
      (vec::add! (reverse (tail v)) (head v))))
 
+; join mutates v
+(: (join! v w)
+   (reduce w
+           (: (f x acc)
+              (vec::add! acc x))
+           v))
+
 (: (reduce v f acc)
    (do
      (: max (vec::size v))

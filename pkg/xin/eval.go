@@ -68,6 +68,19 @@ func (fr *Frame) Put(name string, val Value) {
 	fr.Scope[name] = val
 }
 
+func (fr *Frame) Up(name string, val Value, pos position) InterpreterError {
+	if _, prs := fr.Scope[name]; prs {
+		fr.Put(name, val)
+		return nil
+	} else if fr.Parent != nil {
+		return fr.Parent.Up(name, val, pos)
+	}
+	return UndefinedNameError{
+		name:     name,
+		position: pos,
+	}
+}
+
 func eval(fr *Frame, node *astNode) (Value, InterpreterError) {
 	if node.isForm {
 		return evalForm(fr, node)

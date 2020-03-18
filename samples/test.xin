@@ -131,6 +131,9 @@
     (case 'vec::reverse'
       (eq-vec (vec::reverse (seq 10))
               (vec 9 8 7 6 5 4 3 2 1 0)))
+    (case 'vec::join!'
+      (eq-vec (vec::join! (nat 4) (nat 5))
+              (vec 1 2 3 4 1 2 3 4 5)))
     (case 'vec::reduce - number sum'
       (eq (vec::reduce (seq 11) + 3) 58))
     (case 'vec::reduce - string concatenation'
@@ -222,6 +225,37 @@
       (eq (str::get hello 100) false))
     (case 'str::get length'
       (eq (str::get hello (str::size hello)) false))
+    (case 'str::set! blank'
+      (do
+        (: s 'hello')
+        (str::set! s 2 '')
+        (eq s 'hello')))
+    (case 'str::set! one char'
+      (do
+        (: s 'hello')
+        (str::set! s 2 'i')
+        (eq s 'heilo')))
+    (case 'str::set! multi char'
+      (do
+        (: s 'hello')
+        (str::set! s 2 'xi')
+        (eq s 'hexio')))
+    (case 'str::set! overflow'
+      (do
+        (: s 'hello')
+        (str::set! s 4 'xxx')
+        (eq s 'hellxxx')))
+    (case 'str::set! operates on literals'
+      (do
+        (eq (str::set! 'hello' 2 'xi')
+            'hexio')))
+    (case 'str::add!'
+      (do
+        (: s 'hello')
+        (str::add! s (str::add! ' '
+                                ; check: operates on literals
+                                'world'))
+        (eq s 'hello world')))
     (case 'str::blank? on non-blank'
       (eq (str::blank? hello) false))
     (case 'str::blank? on blank'
@@ -230,6 +264,15 @@
       (eq (str::enc 'abc') 97))
     (case 'str::dec'
       (eq (str::dec 65) 'A'))
+    (case 'str::map'
+      (eq (str::map 'TeST sTrINg' (: (f c)
+                                     (if (str::upper? c)
+                                       (str::downcase c)
+                                       '0')))
+          't0st00t0in0'))
+    (case 'str::filter'
+      (eq (str::filter 'TeST sTrINg' str::upper?)
+          'TSTTIN'))
     (case 'str::split'
       (eq-vec (str::split ', scale, by, the,bay, 2020' ', ')
               (vec '' 'scale' 'by' 'the,bay' '2020')))

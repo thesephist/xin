@@ -87,6 +87,8 @@ func loadAllNativeForms(vm *Vm) {
 		"type": typeForm,
 
 		"str::get":   strGetForm,
+		"str::set!":  strSetForm,
+		"str::add!":  strAddForm,
 		"str::size":  strSizeForm,
 		"str::slice": strSliceForm,
 		"str::enc":   strEncForm,

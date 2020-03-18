@@ -50,6 +50,84 @@ func strGetForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError
 	}
 }
 
+func strSetForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) {
+	if len(args) < 3 {
+		return nil, IncorrectNumberOfArgsError{
+			node:     node,
+			required: 3,
+			given:    len(args),
+		}
+	}
+
+	first, second, third := args[0], args[1], args[2]
+
+	firstStr, fok := first.(StringValue)
+	secondInt, sok := second.(IntValue)
+	thirdStr, tok := third.(StringValue)
+	if fok && sok && tok {
+		si := int(secondInt)
+		if si >= 0 && si < len(firstStr) {
+			for i, r := range thirdStr {
+				if si+i < len(firstStr) {
+					firstStr[si+i] = r
+				} else {
+					firstStr = append(firstStr, r)
+				}
+			}
+
+			randTok := node.leaves[1].token
+			if randTok.kind == tkName {
+				err := fr.Up(randTok.value, firstStr, node.position)
+				if err != nil {
+					return nil, err
+				}
+			}
+
+			return firstStr, nil
+		}
+
+		return zeroValue, nil
+	}
+
+	return nil, MismatchedArgumentsError{
+		node: node,
+		args: args,
+	}
+}
+
+func strAddForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) {
+	if len(args) < 2 {
+		return nil, IncorrectNumberOfArgsError{
+			node:     node,
+			required: 2,
+			given:    len(args),
+		}
+	}
+
+	first, second := args[0], args[1]
+
+	firstStr, fok := first.(StringValue)
+	secondStr, sok := second.(StringValue)
+	if fok && sok {
+		firstStr = append(firstStr, secondStr...)
+
+		randTok := node.leaves[1].token
+		if randTok.kind == tkName {
+			err := fr.Up(randTok.value, firstStr, node.position)
+			if err != nil {
+				return nil, err
+			}
+		}
+
+		return firstStr, nil
+	}
+
+	return nil, MismatchedArgumentsError{
+		node: node,
+		args: args,
+	}
+}
+
 func strSizeForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) {
 	if len(args) < 1 {
 		return nil, IncorrectNumberOfArgsError{

@@ -25,14 +25,14 @@
 (: (map s f)
    (reduce s
            (: (g c acc i)
-              (+ acc (f c i)))
+              (str::add! acc (f c i)))
            ''))
 
 (: (filter s f)
    (reduce s
            (: (g c acc i)
               (if (f c i)
-                (+ acc c)
+                (str::add! acc c)
                 acc))
            ''))
 
