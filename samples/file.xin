@@ -1,13 +1,13 @@
 ; file io examples
 
 (: readme-file
-   (os::read 'README.md'))
+   (os::open 'README.md'))
 
 (: new-file-name
    'new.md')
 
 (: new-file
-   (os::write new-file-name))
+   (os::open new-file-name))
 
 (: (hint s)
    (log (+ '-> ' s)))
@@ -21,7 +21,7 @@
 (stream::close! new-file)
 
 (hint (+ 'Now reading from ' new-file-name))
-(: new-file-read (os::read new-file-name))
+(: new-file-read (os::open new-file-name))
 (log (str::slice (-> new-file-read) 0 100))
 
 (hint 'Now deleting new.md')

@@ -1,6 +1,8 @@
 # Todos
 
-- [ ] Rich runtime error traces and suggestions for corrections like Rust.
+- [ ] BMP library -- for creating lisp art.
+    - Generating generative art postcards with Xin
+- [ ] Runtime stack traces for errors
 - [ ] Well thought-out macro system. Define with `::` pass AST as `vec`s.
     - `MacroFormValue`
     - We need two utility functions, one to convert from `[]*astNode` to `VecValue`, and another to go the other way.
@@ -12,9 +14,5 @@
         - Statically determine places where lazy evaluation has no benefit, and don't lazy-evaluate (remove indirection)
         - Inline small functions ("small" here is probably the number of nodes in the AST)
         - Statically determine object / value lifetimes and maybe deterministically allocate memory for those slots
-- [ ] Add date / time native forms. Unix to ISO 8601 should be a built-in for now. Might move to stdlib later.
-- [ ] Native TCP / UCP `os::net` interfaces, on top of which an HTTP library can be written.
-- [ ] More robust filesystem IO APIs in general -- supporting read/write offsets, permissions
-    - Consider making filesystem I/O asynchronous. In particular, stream sink/source on files, and `os::delete`
-    - Update os::open to allow file to be truncated / appended at an offset and to read from offsets.
-    - Reading reads 4K bytes though the buffer size can also be modified as a side effect.
+- [ ] Native TCP / UCP `net` interfaces, on top of which an HTTP library can be written.
+    - `(os::open <socket>)` like `(os::open '127.0.0.1' 8080)` will open a TCP/UDP connection stream. The stream will emit streams which correspond to individual connections (reader & writer streams).

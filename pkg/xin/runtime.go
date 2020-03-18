@@ -126,8 +126,7 @@ func loadAllNativeForms(vm *Vm) {
 		"crypto::rand": cryptoRandForm,
 
 		"os::wait":   osWaitForm,
-		"os::read":   osReadForm,
-		"os::write":  osWriteForm,
+		"os::open":   osOpenForm,
 		"os::delete": osDeleteForm,
 		"os::args":   osArgsForm,
 		"os::time":   osTimeForm,

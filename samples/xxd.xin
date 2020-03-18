@@ -46,7 +46,7 @@
 
 ; main proc
 (if (zero? (: file
-              (os::read filepath)))
+              (os::open filepath)))
   (logf 'Error: could not open "{}" for reading.'
         (vec filepath))
   (do

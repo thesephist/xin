@@ -64,7 +64,7 @@ func osWaitForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError
 	return trueValue, nil
 }
 
-func osReadForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) {
+func osOpenForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) {
 	if len(args) < 1 {
 		return nil, IncorrectNumberOfArgsError{
 			node:     node,
@@ -76,7 +76,8 @@ func osReadForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError
 	first := args[0]
 
 	if firstStr, ok := first.(StringValue); ok {
-		file, err := os.Open(string(firstStr))
+		flag := os.O_CREATE | os.O_RDWR
+		file, err := os.OpenFile(string(firstStr), flag, 0644)
 		if err != nil {
 			return zeroValue, nil
 		}
@@ -85,6 +86,7 @@ func osReadForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError
 		reader := bufio.NewReader(file)
 		closed := false
 
+		// read
 		fileStream.callbacks.source = func() (Value, InterpreterError) {
 			if closed {
 				return zeroValue, nil
@@ -98,46 +100,9 @@ func osReadForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError
 
 			return StringValue(buffer[:readBytes]), nil
 		}
-		fileStream.callbacks.closer = func() InterpreterError {
-			if !closed {
-				closed = true
-				file.Close()
-			}
-			return nil
-		}
-		return fileStream, nil
-	}
-
-	return nil, MismatchedArgumentsError{
-		node: node,
-		args: args,
-	}
-}
-
-func osWriteForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) {
-	if len(args) < 1 {
-		return nil, IncorrectNumberOfArgsError{
-			node:     node,
-			required: 1,
-			given:    len(args),
-		}
-	}
-
-	first := args[0]
-
-	if firstStr, ok := first.(StringValue); ok {
-		flag := os.O_CREATE | os.O_WRONLY
-		file, err := os.OpenFile(string(firstStr), flag, 0644)
-		if err != nil {
-			return zeroValue, nil
-		}
-
-		fileStream := NewStream()
-		closed := false
-
+		// write
 		fileStream.callbacks.sink = func(v Value) InterpreterError {
 			if closed {
-				// TODO: maybe we should throw on write after close?
 				return nil
 			}
 
@@ -154,6 +119,7 @@ func osWriteForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterErro
 				args: []Value{v},
 			}
 		}
+		// release handle
 		fileStream.callbacks.closer = func() InterpreterError {
 			if !closed {
 				closed = true
