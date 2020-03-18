@@ -25,6 +25,8 @@ test: gen
 	./xin ./samples/nest-import.xin
 	# we echo in some input for prompt.xin testing stdin
 	echo "Linus" | ./xin ./samples/prompt.xin
+	./samples/xxd.xin ./xin.go
+	./samples/freq.xin ./SPEC.md
 	./xin ./samples/test.xin
 	rm ./xin
 
@@ -41,7 +43,7 @@ repl: gen
 # re-generate static files
 # that are bundled into the executable (standard library)
 gen:
-	statik -src=./lib
+	statik -src=./lib -f
 
 
 # build for specific OS target

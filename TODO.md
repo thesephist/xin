@@ -1,7 +1,6 @@
 # Todos
 
-- [ ] BMP library -- for creating lisp art.
-    - Generating generative art postcards with Xin
+- [ ] Generating generative art postcards with Xin with bmp.xin
 - [ ] Runtime stack traces for errors
 - [ ] Well thought-out macro system. Define with `::` pass AST as `vec`s.
     - `MacroFormValue`
