@@ -130,6 +130,8 @@ func loadAllNativeForms(vm *Vm) {
 		"os::wait":   osWaitForm,
 		"os::open":   osOpenForm,
 		"os::delete": osDeleteForm,
+		"os::dial":   osDialForm,
+		"os::listen": osListenForm,
 		"os::args":   osArgsForm,
 		"os::time":   osTimeForm,
 

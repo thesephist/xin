@@ -3,6 +3,7 @@ package xin
 import (
 	"bufio"
 	"fmt"
+	"net"
 	"os"
 	"time"
 )
@@ -160,6 +161,97 @@ func osDeleteForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterErr
 		node: node,
 		args: args,
 	}
+}
+
+func validateNetworkArgs(args []Value, node *astNode) (string, string, InterpreterError) {
+	if len(args) < 2 {
+		return "", "", IncorrectNumberOfArgsError{
+			node:     node,
+			required: 2,
+			given:    len(args),
+		}
+	}
+
+	first, second := args[0], args[1]
+
+	firstStr, fok := first.(StringValue)
+	secondStr, sok := second.(StringValue)
+
+	if !fok || !sok {
+		return "", "", MismatchedArgumentsError{
+			node: node,
+			args: args,
+		}
+	}
+
+	network := string(firstStr)
+	addr := string(secondStr)
+
+	if (network) != "tcp" && (network) != "udp" {
+		return "", "", MismatchedArgumentsError{
+			// TODO: make this a more descriptive error
+			node: node,
+			args: args,
+		}
+	}
+
+	return network, addr, nil
+}
+
+func osDialForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) {
+	network, addr, err := validateNetworkArgs(args, node)
+	if err != nil {
+		return nil, err
+	}
+
+	conn, netErr := net.Dial(network, addr)
+	if netErr != nil {
+		// TODO: make this a more descriptive error
+		return nil, RuntimeError{}
+	}
+	connStream := NewStream()
+	_ = conn
+
+	// TODO: fill these out
+	connStream.callbacks.source = func() (Value, InterpreterError) {
+		return StringValue(""), nil
+	}
+	connStream.callbacks.sink = func(v Value) InterpreterError {
+		return nil
+	}
+	connStream.callbacks.closer = func() InterpreterError {
+		return nil
+	}
+
+	return connStream, nil
+}
+
+func osListenForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) {
+	network, addr, err := validateNetworkArgs(args, node)
+	if err != nil {
+		return nil, err
+	}
+
+	listener, netErr := net.Listen(network, addr)
+	if netErr != nil {
+		// TODO: make this a more descriptive error
+		return nil, RuntimeError{}
+	}
+	connStream := NewStream()
+	_ = listener
+
+	// TODO: fill these out
+	connStream.callbacks.source = func() (Value, InterpreterError) {
+		return StringValue(""), nil
+	}
+	connStream.callbacks.sink = func(v Value) InterpreterError {
+		return nil
+	}
+	connStream.callbacks.closer = func() InterpreterError {
+		return nil
+	}
+
+	return connStream, nil
 }
 
 func osArgsForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) {
