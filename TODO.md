@@ -13,5 +13,10 @@
         - Statically determine places where lazy evaluation has no benefit, and don't lazy-evaluate (remove indirection)
         - Inline small functions ("small" here is probably the number of nodes in the AST)
         - Statically determine object / value lifetimes and maybe deterministically allocate memory for those slots
-- [ ] Native TCP / UCP `net` interfaces, on top of which an HTTP library can be written.
-    - `(os::open <socket>)` like `(os::open '127.0.0.1' 8080)` will open a TCP/UDP connection stream. The stream will emit streams which correspond to individual connections (reader & writer streams).
+
+## Network interfaces
+
+- [ ] Native TCP / UCP networking interfaces
+    - `(os::dial 'tcp' 'localhost:80')`, `(os::dial 'udp' '127.0.0.1:2020')` to initiate connections as a client
+    - `(os::listen 'tcp' 'localhost:80')`, `(os::listen 'udp' '127.0.0.1:3030')` to listen for connections as a server. `os::listen` returns a stream of connection streams. A connection stream in turn is a stream of bytes.
+    - Connection streams are streams that source 4k bytes of data at a time, like file data streams.
