@@ -303,6 +303,18 @@
     (case 'str::pad-end too long'
       (eq (str::pad-start 'this is a long sentence' 10 ' ')
           'this is a long sentence'))
+    (case 'str::trim-start'
+      (eq (str::trim-start '    test   ' ' ')
+          'test   '))
+    (case 'str::trim-end'
+      (eq (str::trim-end '    test   ' ' ')
+          '    test'))
+    (case 'str::trim'
+      (eq (str::trim '    test   ' ' ')
+          'test'))
+    (case 'str::trim - does not hang on blank part'
+      (eq (str::trim '    test   ' '')
+          '    test   '))
     (case 'str::escape'
       (eq (str::escape '\n\thacker \'town\\\' \n')
           '\\n\\thacker \\\'town\\\\\\\' \\n'))

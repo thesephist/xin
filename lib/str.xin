@@ -123,6 +123,29 @@
                           (str::size suff)))))
     '' s))
 
+(: (trim-start s part)
+   (if (blank? part)
+     s
+     ((: (sub r)
+         (if (prefix? r part)
+           (sub (str::slice r
+                            (str::size part)
+                            (str::size r)))
+           r)) s)))
+
+(: (trim-end s part)
+   (if (blank? part)
+     s
+     ((: (sub r)
+         (if (suffix? r part)
+           (sub (str::slice r
+                            0
+                            (- (str::size r) (str::size part))))
+           r)) s)))
+
+(: (trim s part)
+   (trim-end (trim-start s part) part))
+
 ; in the special case of (split s '')
 ; we instead split at every byte character
 (: (split-into-chars s)

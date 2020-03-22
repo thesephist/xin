@@ -2,14 +2,13 @@
 
 ; connection handler
 (: (handle conn)
-   (do
-     (<- conn 'Welcome to xin'
-         (: (f)
-            (-> conn
-                (: (f data)
-                   (do
-                     (log data)
-                     (stream::close! conn))))))))
+   (<- conn 'Welcome to xin'
+       (: (f)
+          (-> conn
+              (: (f data)
+                 (do
+                   (log data)
+                   (stream::close! conn)))))))
 
 ; start a tcp server
 (log 'Starting tcp server at port 9090')
