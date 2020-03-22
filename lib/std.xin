@@ -121,3 +121,14 @@
      (+ (* (hex::dec (str::slice s 0 (dec (str::size s))))
            16)
         (to-dec-number (str::get s (dec (str::size s)))))))
+
+; drain a source stream
+(: (->> file cb)
+   (if (zero? file)
+     0
+     ((: (sub acc)
+         (-> file (: (f buf)
+                     (if (zero? buf)
+                       (cb acc)
+                       (sub (str::add! acc buf))))))
+      '')))

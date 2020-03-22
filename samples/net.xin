@@ -1,9 +1,18 @@
 ; network interfaces
 
+; connection handler
+(: (handle conn)
+   (-> conn
+       (: (f data)
+          (do
+            (log data)
+            (stream::close! conn)))))
+
 ; start a tcp server
+(log 'Starting tcp server at port 9090')
 (: srv
    (os::listen 'tcp'
-               '127.0.0.1:9090'))
+               '127.0.0.1:9090'
+               handle))
 
-(: (handle conn)
-   (stream::close! conn))
+(log 'Started server...')

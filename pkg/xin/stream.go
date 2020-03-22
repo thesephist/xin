@@ -4,7 +4,7 @@ import "fmt"
 
 var streamId int64 = 0
 
-type sinkCallback func(Value) InterpreterError
+type sinkCallback func(Value, *astNode) InterpreterError
 
 type sourceCallback func() (Value, InterpreterError)
 
@@ -97,7 +97,7 @@ func streamSetSink(fr *Frame, args []Value, node *astNode) (Value, InterpreterEr
 	}
 
 	if fok && sok {
-		firstStream.callbacks.sink = func(v Value) InterpreterError {
+		firstStream.callbacks.sink = func(v Value, node *astNode) InterpreterError {
 			fr.Vm.Lock()
 			defer fr.Vm.Unlock()
 
@@ -284,7 +284,7 @@ func streamSinkForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterE
 		go func() {
 			defer vm.waiter.Done()
 
-			err := firstStream.callbacks.sink(second)
+			err := firstStream.callbacks.sink(second, node)
 			if err != nil {
 				fmt.Println(err.Error())
 				return

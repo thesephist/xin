@@ -37,7 +37,7 @@ func loadAllDefaultValues(vm *Vm) {
 	fr := vm.Frame
 
 	stdoutStream := NewStream()
-	stdoutStream.callbacks.sink = func(v Value) InterpreterError {
+	stdoutStream.callbacks.sink = func(v Value, node *astNode) InterpreterError {
 		os.Stdout.Write([]byte(v.String()))
 		return nil
 	}
