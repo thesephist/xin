@@ -1,0 +1,46 @@
+; tcp chat server
+
+; a chat room is a set of clients (tcp connection streams)
+(: room (set))
+
+; represents a single client
+(: (handle conn)
+   (do
+     (set::add! room conn)
+     (<- conn 'connected.\nname? '
+         ; prompt for name
+         (: (f)
+            (-> conn
+                (: (f name)
+                   ; start sending messages
+                   (exchange-messages name conn)))))))
+
+(: (exchange-messages name conn)
+   (-> conn
+       (: (f data)
+          (if (zero? data)
+            ; data is EOF, exited chat
+            (do
+              (logf '{} exited.'
+                    (vec (str::trim-end name '\r\n'))))
+            (do
+              (: msg
+                 (str::fmt '{}: {}'
+                           (vec (str::trim-end name '\r\n')
+                                (str::trim-end data '\r\n'))))
+              ; log message on server
+              (log msg)
+              ; send msg to everyone except myself
+              (vec::each (set::items room)
+                         (: (send client)
+                            (if (= client conn)
+                              0
+                              ; messages from others are tabbed out
+                              (<- client (str::fmt '\t{}\n'
+                                                   (vec msg))))))
+              (exchange-messages name conn))))))
+
+; start server
+(os::listen 'tcp' '127.0.0.1:9000'
+            handle)
+(log 'Started chat server.')
