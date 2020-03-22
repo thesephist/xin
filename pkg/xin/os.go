@@ -172,33 +172,11 @@ func osDeleteForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterErr
 				rv = trueValue
 			}
 
-			switch form := secondForm.(type) {
-			case FormValue:
-				localFrame := newFrame(form.frame)
+			vm.Lock()
+			defer vm.Unlock()
 
-				if len(*form.arguments) > 0 {
-					localFrame.Put((*form.arguments)[0], rv)
-				}
-
-				lv := LazyValue{
-					frame: localFrame,
-					node:  form.definition,
-				}
-				_, err := unlazy(lv)
-				if err != nil {
-					fmt.Println(err.Error())
-					return
-				}
-			case NativeFormValue:
-				_, err := form.evaler(fr, []Value{rv}, node)
-				if err != nil {
-					fmt.Println(err.Error())
-					return
-				}
-			default:
-				err := InvalidFormError{
-					position: node.position,
-				}
+			_, err = unlazyEvalFormWithArgs(fr, secondForm, []Value{rv}, node)
+			if err != nil {
 				fmt.Println(err.Error())
 			}
 		}()
