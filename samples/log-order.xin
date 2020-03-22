@@ -1,0 +1,13 @@
+; guaranteed write order
+(loop 20
+      (: (f)
+         (do
+           (log 'hi')
+           (log 'hello'))))
+
+; async write order
+(loop 20
+      (: (f)
+         (do
+           (<- os::stdout 'hi\n')
+           (<- os::stdout 'hello\n'))))

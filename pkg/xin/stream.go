@@ -81,29 +81,31 @@ func streamSetSink(fr *Frame, args []Value, node *astNode) (Value, InterpreterEr
 		}
 	}
 
-	first, second := args[0], args[1]
+	first := args[0]
+	var second Value
+	if len(args) >= 2 {
+		second = args[1]
+	} else {
+		second = Noop
+	}
 
-	if firstStream, ok := first.(StreamValue); ok {
-		if secondForm, ok := second.(FormValue); ok {
-			if len(*secondForm.arguments) != 1 {
-				return nil, InvalidStreamCallbackError{
-					reason: "Mismatched argument count in callback",
-				}
-			}
+	var secondForm Value
+	firstStream, fok := first.(StreamValue)
+	secondForm, sok := second.(FormValue)
+	if !sok {
+		secondForm, sok = second.(NativeFormValue)
+	}
 
-			firstStream.callbacks.sink = func(v Value) InterpreterError {
-				fr.Vm.Lock()
-				defer fr.Vm.Unlock()
+	if fok && sok {
+		firstStream.callbacks.sink = func(v Value) InterpreterError {
+			fr.Vm.Lock()
+			defer fr.Vm.Unlock()
 
-				localFrame := newFrame(fr)
-				localFrame.Put((*secondForm.arguments)[0], v)
-
-				_, err := unlazyEval(localFrame, secondForm.definition)
-				return err
-			}
-
-			return secondForm, nil
+			_, err := unlazyEvalFormWithArgs(fr, secondForm, []Value{v}, node)
+			return err
 		}
+
+		return secondForm, nil
 	}
 
 	return nil, MismatchedArgumentsError{
@@ -135,8 +137,7 @@ func streamSetSource(fr *Frame, args []Value, node *astNode) (Value, Interpreter
 				fr.Vm.Lock()
 				defer fr.Vm.Unlock()
 
-				localFrame := newFrame(fr)
-				return eval(localFrame, secondForm.definition)
+				return unlazyEvalFormWithArgs(fr, secondForm, []Value{}, node)
 			}
 
 			return secondForm, nil
@@ -232,33 +233,8 @@ func streamSourceForm(fr *Frame, args []Value, node *astNode) (Value, Interprete
 			vm.Lock()
 			defer vm.Unlock()
 
-			switch form := secondForm.(type) {
-			case FormValue:
-				localFrame := newFrame(form.frame)
-
-				if len(*form.arguments) > 0 {
-					localFrame.Put((*form.arguments)[0], rv)
-				}
-
-				lv := LazyValue{
-					frame: localFrame,
-					node:  form.definition,
-				}
-				_, err := unlazy(lv)
-				if err != nil {
-					fmt.Println(err.Error())
-					return
-				}
-			case NativeFormValue:
-				_, err := form.evaler(fr, []Value{rv}, node)
-				if err != nil {
-					fmt.Println(err.Error())
-					return
-				}
-			default:
-				err := InvalidFormError{
-					position: node.position,
-				}
+			_, err = unlazyEvalFormWithArgs(fr, secondForm, []Value{rv}, node)
+			if err != nil {
 				fmt.Println(err.Error())
 			}
 		}()
@@ -317,27 +293,8 @@ func streamSinkForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterE
 			vm.Lock()
 			defer vm.Unlock()
 
-			switch form := thirdForm.(type) {
-			case FormValue:
-				lv := LazyValue{
-					frame: form.frame,
-					node:  form.definition,
-				}
-				_, err := unlazy(lv)
-				if err != nil {
-					fmt.Println(err.Error())
-					return
-				}
-			case NativeFormValue:
-				_, err := form.evaler(fr, []Value{}, node)
-				if err != nil {
-					fmt.Println(err.Error())
-					return
-				}
-			default:
-				err := InvalidFormError{
-					position: node.position,
-				}
+			_, err = unlazyEvalFormWithArgs(fr, thirdForm, []Value{}, node)
+			if err != nil {
 				fmt.Println(err.Error())
 			}
 		}()

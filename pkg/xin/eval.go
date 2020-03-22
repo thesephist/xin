@@ -119,21 +119,31 @@ func evalForm(fr *Frame, node *astNode) (Value, InterpreterError) {
 }
 
 func evalFormValue(fr *Frame, node *astNode, maybeForm Value) (Value, InterpreterError) {
+	args := make([]Value, len(node.leaves)-1)
+
+	for i, n := range node.leaves[1:] {
+		val, err := unlazyEval(fr, n)
+		if err != nil {
+			return nil, err
+		}
+
+		args[i] = val
+	}
+
+	return evalFormWithArgs(fr, maybeForm, args, node)
+}
+
+func evalFormWithArgs(fr *Frame, maybeForm Value, args []Value, node *astNode) (Value, InterpreterError) {
 	switch form := maybeForm.(type) {
 	case FormValue:
 		localFrame := newFrame(form.frame)
 
 		nargs := len(*form.arguments)
-		if len(node.leaves)-1 < nargs {
-			nargs = len(node.leaves) - 1
+		if len(args) < nargs {
+			nargs = len(args)
 		}
-		for i, n := range node.leaves[1 : nargs+1] {
-			val, err := unlazyEval(fr, n)
-			if err != nil {
-				return nil, err
-			}
-
-			localFrame.Put((*form.arguments)[i], val)
+		for i, v := range args[:nargs] {
+			localFrame.Put((*form.arguments)[i], v)
 		}
 
 		return LazyValue{
@@ -141,16 +151,6 @@ func evalFormValue(fr *Frame, node *astNode, maybeForm Value) (Value, Interprete
 			node:  form.definition,
 		}, nil
 	case NativeFormValue:
-		args := make([]Value, len(node.leaves)-1)
-		for i, n := range node.leaves[1:] {
-			val, err := unlazyEval(fr, n)
-			if err != nil {
-				return nil, err
-			}
-
-			args[i] = val
-		}
-
 		return form.evaler(fr, args, node)
 	}
 
@@ -163,6 +163,15 @@ func evalFormValue(fr *Frame, node *astNode, maybeForm Value) (Value, Interprete
 // usually for use when calling callbacks from builtin native forms.
 func unlazyEvalFormValue(fr *Frame, node *astNode, maybeForm Value) (Value, InterpreterError) {
 	val, err := evalFormValue(fr, node, maybeForm)
+	if err != nil {
+		return nil, err
+	}
+
+	return unlazy(val)
+}
+
+func unlazyEvalFormWithArgs(fr *Frame, maybeForm Value, args []Value, node *astNode) (Value, InterpreterError) {
+	val, err := evalFormWithArgs(fr, maybeForm, args, node)
 	if err != nil {
 		return nil, err
 	}

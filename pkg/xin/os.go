@@ -306,6 +306,21 @@ func osListenForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterErr
 	return connStream, nil
 }
 
+func osLogForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) {
+	if len(args) < 1 {
+		return nil, IncorrectNumberOfArgsError{
+			node:     node,
+			required: 1,
+			given:    len(args),
+		}
+	}
+
+	first := args[0]
+	fmt.Println(first.String())
+
+	return first, nil
+}
+
 func osArgsForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) {
 	argsVec := make([]Value, len(os.Args))
 	for i, a := range os.Args {

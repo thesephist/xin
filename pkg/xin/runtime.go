@@ -132,6 +132,7 @@ func loadAllNativeForms(vm *Vm) {
 		"os::delete": osDeleteForm,
 		"os::dial":   osDialForm,
 		"os::listen": osListenForm,
+		"os::log":    osLogForm,
 		"os::args":   osArgsForm,
 		"os::time":   osTimeForm,
 
