@@ -261,6 +261,7 @@ func osListenForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterErr
 	}
 
 	handler := args[2]
+	signal := make(chan bool, 1)
 
 	listener, netErr := net.Listen(network, addr)
 	if netErr != nil {
@@ -278,19 +279,30 @@ func osListenForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterErr
 		for {
 			conn, err := l.Accept()
 			if err != nil {
-				fmt.Println(err.Error())
+				select {
+				case <-signal:
+					return
+				default:
+					fmt.Println(err.Error())
+				}
 			}
 
-			_, intErr := unlazyEvalFormWithArgs(fr, handler, []Value{newRWStream(conn)}, node)
-			if intErr != nil {
-				fmt.Println(intErr.Error())
-			}
+			go func(c net.Conn) {
+				vm.Lock()
+				defer vm.Unlock()
+
+				_, err := unlazyEvalFormWithArgs(fr, handler, []Value{newRWStream(c)}, node)
+				if err != nil {
+					fmt.Println(err.Error())
+				}
+			}(conn)
 		}
 	}(listener)
 
 	return NativeFormValue{
 		name: "os::listen::close",
 		evaler: func(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) {
+			signal <- true
 			listener.Close()
 			return trueValue, nil
 		},

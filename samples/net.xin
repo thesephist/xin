@@ -2,17 +2,46 @@
 
 ; connection handler
 (: (handle conn)
-   (-> conn
-       (: (f data)
-          (do
-            (log data)
-            (stream::close! conn)))))
+   (do
+     (<- conn 'Welcome to xin'
+         (: (f)
+            (-> conn
+                (: (f data)
+                   (do
+                     (log data)
+                     (stream::close! conn))))))))
 
 ; start a tcp server
 (log 'Starting tcp server at port 9090')
-(: srv
+(: close-server
    (os::listen 'tcp'
                '127.0.0.1:9090'
                handle))
-
 (log 'Started server...')
+
+; start a tcp request
+(log 'Starting client request...')
+(: (request n)
+   (do
+     (: conn (os::dial 'tcp' ':9090'))
+     (<- conn 
+         (str::fmt 'This client message #{}'
+                   (vec n))
+         (: (f)
+            (->> conn
+                 (: (f data)
+                    (if (str::blank? data)
+                      (log 'Empty response.')
+                      (logf 'Response for {}: {}'
+                            (vec n data)))))))))
+
+; send 5 immediate, 5 staggered requests
+(loop 5 request)
+(loop 5
+      (: (f n)
+         (os::wait (/ n 4.0) (: (f)
+                                (request n)))))
+(os::wait 1.5 (: (f)
+                 (do
+                   (close-server)
+                   (log 'Server closed gracefully.'))))
