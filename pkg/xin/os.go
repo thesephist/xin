@@ -217,9 +217,9 @@ func osDeleteForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterErr
 			vm.Lock()
 			defer vm.Unlock()
 
-			_, err = unlazyEvalFormWithArgs(fr, secondForm, []Value{rv}, node)
-			if err != nil {
-				fmt.Println(err.Error())
+			_, intErr := unlazyEvalFormWithArgs(fr, secondForm, []Value{rv}, node)
+			if intErr != nil {
+				fmt.Println(FormatError(intErr))
 			}
 		}()
 
@@ -330,7 +330,7 @@ func osListenForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterErr
 
 				_, err := unlazyEvalFormWithArgs(fr, handler, []Value{newRWStream(c)}, node)
 				if err != nil {
-					fmt.Println(err.Error())
+					fmt.Println(FormatError(err))
 				}
 			}(conn)
 		}

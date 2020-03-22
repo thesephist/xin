@@ -226,7 +226,7 @@ func streamSourceForm(fr *Frame, args []Value, node *astNode) (Value, Interprete
 
 			rv, err := firstStream.callbacks.source()
 			if err != nil {
-				fmt.Println(err.Error())
+				fmt.Println(FormatError(err))
 				return
 			}
 
@@ -235,7 +235,7 @@ func streamSourceForm(fr *Frame, args []Value, node *astNode) (Value, Interprete
 
 			_, err = unlazyEvalFormWithArgs(fr, secondForm, []Value{rv}, node)
 			if err != nil {
-				fmt.Println(err.Error())
+				fmt.Println(FormatError(err))
 			}
 		}()
 
@@ -286,7 +286,7 @@ func streamSinkForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterE
 
 			err := firstStream.callbacks.sink(second, node)
 			if err != nil {
-				fmt.Println(err.Error())
+				fmt.Println(FormatError(err))
 				return
 			}
 
@@ -295,7 +295,7 @@ func streamSinkForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterE
 
 			_, err = unlazyEvalFormWithArgs(fr, thirdForm, []Value{}, node)
 			if err != nil {
-				fmt.Println(err.Error())
+				fmt.Println(FormatError(err))
 			}
 		}()
 
