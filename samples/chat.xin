@@ -42,5 +42,6 @@
 
 ; start server
 (os::listen 'tcp' '127.0.0.1:9000'
+            ; send msg to everyone except myself
             handle)
 (log 'Started chat server.')

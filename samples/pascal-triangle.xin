@@ -1,7 +1,7 @@
 ; generate a pascal's triangle
 ; of height n
 
-(: height 16)
+(: height 18)
 
 ; n-choose-m combinatorics
 (: (choose n m)

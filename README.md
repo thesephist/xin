@@ -38,13 +38,15 @@ You can find more example and real-world Xin code in the sample programs in the 
 
 - [the standard library](lib/std.xin)
 - [quicksort, and other iterator algorithms](lib/vec.xin)
+- [pascal's triangle generator](samples/pascal-triangle.xin)
+- [clone of UNIX utility xxd](samples/xxd.xin)
 - [counting word frequently in a file](samples/freq.xin)
+- [basic TCP/IP chat server](samples/chat.xin)
 
 ## Goals
 
-- Expressive, extensible syntax that's natural to read and suitable for defining DSLs
-- Programs that lend themselves to sophisticated data structures and dumb algorithms, rather than vice versa
-- Ease of learning
+- Expressive, readable, extensible syntax that's natural to read and suitable for defining DSLs
+- Programs that lend themselves to smart data structures and dumb algorithms, rather than vice versa
 - Great interactive Repl
 
 ## Installation and usage
