@@ -123,18 +123,21 @@
       (logf 'Analyzing {}:\n'
             (vec filepath))
 
-      (: content (os::read-all file))
-      (stream::close! file)
-      (: word-vec (to-word-vec content))
+      (os::read-all
+        file
+        (: (f content)
+           (do
+             (stream::close! file)
+             (: word-vec (to-word-vec content))
 
-      (display-freq-table
-        word-vec
-        row-count)
+             (display-freq-table
+               word-vec
+               row-count)
 
-      (log '')
-      (logf 'Size:\t{} bytes'
-            (vec (str::size content)))
-      (logf 'Total:\t{} words'
-            (vec (vec::size word-vec)))
-      (logf 'Uniq:\t{} words'
-            (vec (vec::size (map::keys (freq-map word-vec))))))))
+             (log '')
+             (logf 'Size:\t{} bytes'
+                   (vec (str::size content)))
+             (logf 'Total:\t{} words'
+                   (vec (vec::size word-vec)))
+             (logf 'Uniq:\t{} words'
+                   (vec (vec::size (map::keys (freq-map word-vec)))))))))))

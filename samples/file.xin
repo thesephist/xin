@@ -12,17 +12,29 @@
 (: (hint s)
    (log (+ '-> ' s)))
 
-(hint 'First 100 bytes of README.md:')
-(log (str::slice (-> readme-file) 0 100))
-(stream::close! readme-file)
+; do I/O
 
-(hint (+ 'Now writing to ' new-file-name))
-(<- new-file 'new file contents.')
-(stream::close! new-file)
+(-> readme-file (: (f data)
+                   (do
+                     (hint 'First 100 bytes of README.md:')
+                     (log (str::slice data 0 100))
+                     (stream::close! readme-file))))
 
-(hint (+ 'Now reading from ' new-file-name))
-(: new-file-read (os::open new-file-name))
-(log (str::slice (-> new-file-read) 0 100))
+(<- new-file 'new file contents.'
+    (: (f)
+       (do
+         (hint (+ 'Written to ' new-file-name))
+         (stream::close! new-file)
 
-(hint 'Now deleting new.md')
-(os::delete new-file-name)
+         (hint (+ 'Now reading from ' new-file-name))
+         (: new-file-read (os::open new-file-name))
+         (-> new-file-read
+             (: (f data)
+                (do
+                  (log (str::slice data 0 100))
+                  (stream::close! new-file-read)
+
+                  (hint 'Now deleting new.md')
+                  (os::delete new-file-name
+                              (: (f)
+                                 (hint 'deleted new.md')))))))))

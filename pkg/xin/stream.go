@@ -92,6 +92,9 @@ func streamSetSink(fr *Frame, args []Value, node *astNode) (Value, InterpreterEr
 			}
 
 			firstStream.callbacks.sink = func(v Value) InterpreterError {
+				fr.Vm.Lock()
+				defer fr.Vm.Unlock()
+
 				localFrame := newFrame(fr)
 				localFrame.Put((*secondForm.arguments)[0], v)
 
@@ -129,6 +132,9 @@ func streamSetSource(fr *Frame, args []Value, node *astNode) (Value, Interpreter
 			}
 
 			firstStream.callbacks.source = func() (Value, InterpreterError) {
+				fr.Vm.Lock()
+				defer fr.Vm.Unlock()
+
 				localFrame := newFrame(fr)
 				return eval(localFrame, secondForm.definition)
 			}
@@ -163,6 +169,9 @@ func streamSetClose(fr *Frame, args []Value, node *astNode) (Value, InterpreterE
 			}
 
 			firstStream.callbacks.closer = func() InterpreterError {
+				fr.Vm.Lock()
+				defer fr.Vm.Unlock()
+
 				localFrame := newFrame(fr)
 				eval(localFrame, secondForm.definition)
 				return nil
@@ -188,15 +197,73 @@ func streamSourceForm(fr *Frame, args []Value, node *astNode) (Value, Interprete
 	}
 
 	first := args[0]
+	var second Value
+	if len(args) >= 2 {
+		second = args[1]
+	} else {
+		second = Noop
+	}
 
-	if firstStream, ok := first.(StreamValue); ok {
+	var secondForm Value
+	firstStream, fok := first.(StreamValue)
+	secondForm, sok := second.(FormValue)
+	if !sok {
+		secondForm, sok = second.(NativeFormValue)
+	}
+
+	if fok && sok {
 		if !firstStream.isSource() {
 			return nil, InvalidStreamCallbackError{
 				reason: "Cannot try to source from a non-source stream",
 			}
 		}
 
-		return firstStream.callbacks.source()
+		vm := fr.Vm
+		vm.waiter.Add(1)
+		go func() {
+			defer vm.waiter.Done()
+
+			rv, err := firstStream.callbacks.source()
+			if err != nil {
+				fmt.Println(err.Error())
+				return
+			}
+
+			vm.Lock()
+			defer vm.Unlock()
+
+			switch form := secondForm.(type) {
+			case FormValue:
+				localFrame := newFrame(form.frame)
+
+				if len(*form.arguments) > 0 {
+					localFrame.Put((*form.arguments)[0], rv)
+				}
+
+				lv := LazyValue{
+					frame: localFrame,
+					node:  form.definition,
+				}
+				_, err := unlazy(lv)
+				if err != nil {
+					fmt.Println(err.Error())
+					return
+				}
+			case NativeFormValue:
+				_, err := form.evaler(fr, []Value{rv}, node)
+				if err != nil {
+					fmt.Println(err.Error())
+					return
+				}
+			default:
+				err := InvalidFormError{
+					position: node.position,
+				}
+				fmt.Println(err.Error())
+			}
+		}()
+
+		return zeroValue, nil
 	}
 
 	return nil, MismatchedArgumentsError{
@@ -215,19 +282,67 @@ func streamSinkForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterE
 	}
 
 	first, second := args[0], args[1]
+	var third Value
+	if len(args) >= 3 {
+		third = args[2]
+	} else {
+		third = Noop
+	}
 
-	if firstStream, ok := first.(StreamValue); ok {
+	var thirdForm Value
+	firstStream, fok := first.(StreamValue)
+	thirdForm, tok := third.(FormValue)
+	if !tok {
+		thirdForm, tok = third.(NativeFormValue)
+	}
+
+	if fok && tok {
 		if !firstStream.isSink() {
 			return nil, InvalidStreamCallbackError{
 				reason: "Cannot try to sink to a non-sink stream",
 			}
 		}
 
-		err := firstStream.callbacks.sink(second)
-		if err != nil {
-			return nil, err
-		}
-		return second, nil
+		vm := fr.Vm
+		vm.waiter.Add(1)
+		go func() {
+			defer vm.waiter.Done()
+
+			err := firstStream.callbacks.sink(second)
+			if err != nil {
+				fmt.Println(err.Error())
+				return
+			}
+
+			vm.Lock()
+			defer vm.Unlock()
+
+			switch form := thirdForm.(type) {
+			case FormValue:
+				lv := LazyValue{
+					frame: form.frame,
+					node:  form.definition,
+				}
+				_, err := unlazy(lv)
+				if err != nil {
+					fmt.Println(err.Error())
+					return
+				}
+			case NativeFormValue:
+				_, err := form.evaler(fr, []Value{}, node)
+				if err != nil {
+					fmt.Println(err.Error())
+					return
+				}
+			default:
+				err := InvalidFormError{
+					position: node.position,
+				}
+				fmt.Println(err.Error())
+			}
+		}()
+
+		return zeroValue, nil
 	}
 
 	return nil, MismatchedArgumentsError{

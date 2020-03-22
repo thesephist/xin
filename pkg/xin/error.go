@@ -198,3 +198,16 @@ func (e InvalidStreamCallbackError) Error() string {
 func (e InvalidStreamCallbackError) pos() position {
 	return e.position
 }
+
+type NetworkError struct {
+	reason   string
+	position position
+}
+
+func (e NetworkError) Error() string {
+	return "Network error: " + e.reason
+}
+
+func (e NetworkError) pos() position {
+	return e.position
+}

@@ -49,30 +49,32 @@
               (os::open filepath)))
   (logf 'Error: could not open "{}" for reading.'
         (vec filepath))
-  (do
-    (: content (os::read-all file))
-    (stream::close! file)
+  (os::read-all
+    file
+    (: (f content)
+       (do
+         (stream::close! file)
 
-    (: max-count-width
-       (str::size (hex::enc (str::size content))))
+         (: max-count-width
+            (str::size (hex::enc (str::size content))))
 
-    (logf 'Reading {} bytes from {}:'
-          (vec (str::size content)
-               filepath))
+         (logf 'Reading {} bytes from {}:'
+               (vec (str::size content)
+                    filepath))
 
-    (vec::each
-      (octet-rows-of-length bytes-per-row
-                            content)
-      (: (f row i)
-         (logf '{}: {}  {}'
-               (vec (str::pad-start (hex::enc (* i bytes-per-row))
-                                    max-count-width
-                                    '0')
-                    (str::pad-end (str::join row ' ')
-                                  (dec (* 3 bytes-per-row))
-                                  ' ')
-                    (str::map (str::slice content 
-                                          (* i bytes-per-row)
-                                          (+ (* i bytes-per-row)
-                                             bytes-per-row))
-                              show-if-alphanumeric)))))))
+         (vec::each
+           (octet-rows-of-length bytes-per-row
+                                 content)
+           (: (f row i)
+              (logf '{}: {}  {}'
+                    (vec (str::pad-start (hex::enc (* i bytes-per-row))
+                                         max-count-width
+                                         '0')
+                         (str::pad-end (str::join row ' ')
+                                       (dec (* 3 bytes-per-row))
+                                       ' ')
+                         (str::map (str::slice content
+                                               (* i bytes-per-row)
+                                               (+ (* i bytes-per-row)
+                                                  bytes-per-row))
+                                   show-if-alphanumeric)))))))))

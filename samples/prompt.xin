@@ -3,7 +3,5 @@
 ; print your name
 (puts 'What is your name?')
 
-(: user-name
-   (-> os::stdin))
-
-(puts (+ 'Hello, ' user-name))
+(scan (: (f user-name)
+         (puts (+ 'Hello, ' user-name))))

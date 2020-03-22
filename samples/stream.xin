@@ -2,14 +2,13 @@
 (: sm (stream))
 
 (stream::set-sink!
-  sm
-  (: (f x) (log x)))
+  sm log)
 
 (stream::set-source!
   sm
   (: (f) 42))
 
 (log 'should print 42')
-(log (-> sm))
+(-> sm log)
 (log 'should print 39')
 (<- sm 39)

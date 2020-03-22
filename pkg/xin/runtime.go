@@ -147,6 +147,15 @@ func loadAllNativeForms(vm *Vm) {
 	}
 }
 
+var Noop = NativeFormValue{
+	name:   "noop",
+	evaler: noopForm,
+}
+
+func noopForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) {
+	return zeroValue, nil
+}
+
 func addForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) {
 	if len(args) < 2 {
 		return nil, IncorrectNumberOfArgsError{

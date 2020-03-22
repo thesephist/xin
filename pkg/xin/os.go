@@ -34,7 +34,6 @@ func osWaitForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError
 	}
 
 	vm := fr.Vm
-
 	vm.waiter.Add(1)
 	go func() {
 		defer vm.waiter.Done()
@@ -147,14 +146,64 @@ func osDeleteForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterErr
 	}
 
 	first := args[0]
+	var second Value
+	if len(args) >= 2 {
+		second = args[1]
+	} else {
+		second = Noop
+	}
 
-	if firstStr, ok := first.(StringValue); ok {
-		err := os.RemoveAll(string(firstStr))
-		if err != nil {
-			return falseValue, nil
-		}
+	var secondForm Value
+	firstStr, fok := first.(StringValue)
+	secondForm, sok := second.(FormValue)
+	if !sok {
+		secondForm, sok = second.(NativeFormValue)
+	}
 
-		return trueValue, nil
+	if fok && sok {
+		vm := fr.Vm
+		vm.waiter.Add(1)
+		go func() {
+			defer vm.waiter.Done()
+
+			err := os.RemoveAll(string(firstStr))
+			rv := falseValue
+			if err != nil {
+				rv = trueValue
+			}
+
+			switch form := secondForm.(type) {
+			case FormValue:
+				localFrame := newFrame(form.frame)
+
+				if len(*form.arguments) > 0 {
+					localFrame.Put((*form.arguments)[0], rv)
+				}
+
+				lv := LazyValue{
+					frame: localFrame,
+					node:  form.definition,
+				}
+				_, err := unlazy(lv)
+				if err != nil {
+					fmt.Println(err.Error())
+					return
+				}
+			case NativeFormValue:
+				_, err := form.evaler(fr, []Value{rv}, node)
+				if err != nil {
+					fmt.Println(err.Error())
+					return
+				}
+			default:
+				err := InvalidFormError{
+					position: node.position,
+				}
+				fmt.Println(err.Error())
+			}
+		}()
+
+		return zeroValue, nil
 	}
 
 	return nil, MismatchedArgumentsError{
@@ -188,10 +237,9 @@ func validateNetworkArgs(args []Value, node *astNode) (string, string, Interpret
 	addr := string(secondStr)
 
 	if (network) != "tcp" && (network) != "udp" {
-		return "", "", MismatchedArgumentsError{
-			// TODO: make this a more descriptive error
-			node: node,
-			args: args,
+		return "", "", NetworkError{
+			reason:   `Network specified to os::dial must be "tcp" or "udp"`,
+			position: node.position,
 		}
 	}
 
@@ -206,8 +254,10 @@ func osDialForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError
 
 	conn, netErr := net.Dial(network, addr)
 	if netErr != nil {
-		// TODO: make this a more descriptive error
-		return nil, RuntimeError{}
+		return nil, NetworkError{
+			reason:   netErr.Error(),
+			position: node.position,
+		}
 	}
 	connStream := NewStream()
 	_ = conn
@@ -234,8 +284,10 @@ func osListenForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterErr
 
 	listener, netErr := net.Listen(network, addr)
 	if netErr != nil {
-		// TODO: make this a more descriptive error
-		return nil, RuntimeError{}
+		return nil, NetworkError{
+			reason:   netErr.Error(),
+			position: node.position,
+		}
 	}
 	connStream := NewStream()
 	_ = listener

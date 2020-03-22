@@ -35,8 +35,8 @@
 ; basic io
 (: (log s)
    (<- os::stdout (+ (str s) '\n')))
-(: (scan)
-   (-> os::stdin))
+(: (scan cb)
+   (-> os::stdin cb))
 
 ; formatted logging shorthand
 (: (logf s items)
