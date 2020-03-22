@@ -114,6 +114,43 @@ func newRWStream(rw io.ReadWriteCloser) StreamValue {
 	return rwStream
 }
 
+func osStatForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) {
+	if len(args) < 1 {
+		return nil, IncorrectNumberOfArgsError{
+			node:     node,
+			required: 1,
+			given:    len(args),
+		}
+	}
+
+	first := args[0]
+
+	if firstStr, ok := first.(StringValue); ok {
+		fileStat, err := os.Stat(string(firstStr))
+		if err != nil {
+			return zeroValue, nil
+		}
+
+		statMap := NewMapValue()
+
+		if fileStat.IsDir() {
+			statMap.set(StringValue("dir"), trueValue)
+		} else {
+			statMap.set(StringValue("dir"), falseValue)
+		}
+		statMap.set(StringValue("name"), StringValue(fileStat.Name()))
+		statMap.set(StringValue("size"), IntValue(fileStat.Size()))
+		statMap.set(StringValue("mod"), IntValue(fileStat.ModTime().Unix()))
+
+		return statMap, nil
+	}
+
+	return nil, MismatchedArgumentsError{
+		node: node,
+		args: args,
+	}
+}
+
 func osOpenForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError) {
 	if len(args) < 1 {
 		return nil, IncorrectNumberOfArgsError{

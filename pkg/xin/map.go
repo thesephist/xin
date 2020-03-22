@@ -95,6 +95,10 @@ func (v MapValue) Equal(o Value) bool {
 	return false
 }
 
+func (m MapValue) set(k, v Value) {
+	(*m.items)[hashable(k)] = v
+}
+
 func NewMapValue() MapValue {
 	return MapValue{
 		items: &mapItems{},
@@ -143,7 +147,7 @@ func mapSetForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterError
 	first, second, third := args[0], args[1], args[2]
 
 	if firstMap, ok := first.(MapValue); ok {
-		(*firstMap.items)[hashable(second)] = third
+		firstMap.set(second, third)
 		return firstMap, nil
 	}
 
