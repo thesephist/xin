@@ -127,12 +127,33 @@
 
 (: (draw-circle! canvas color
                  cx cy radius)
-   (canvas-each canvas
-                (: (f pixel x y)
-                   (if (= radius
-                          (math::round (distance x y cx cy)))
-                     (color! pixel color)
-                     pass))))
+   (do
+     (: x-basis (dec (- cx radius)))
+     (: y-basis (dec (- cy radius)))
+     (: x-cap (inc (+ cx radius)))
+     (: y-cap (inc (+ cy radius)))
+
+     ; we only iterate through the subset of the canvas
+     ; in which circle points will exist
+     (: (ranged-each canvas f)
+        (vec::each (vec::slice canvas x-basis x-cap)
+                   (: (g column x)
+                      (vec::each (vec::slice column y-basis y-cap)
+                                 (: (h pixel y)
+                                    (f pixel
+                                       (+ (if (< x-basis 0)
+                                            0
+                                            x-basis) x)
+                                       (+ (if (< y-basis 0)
+                                            0
+                                            y-basis) y)))))))
+
+     (ranged-each canvas
+                  (: (f pixel x y)
+                     (if (= radius
+                            (math::round (distance x y cx cy)))
+                       (color! pixel color)
+                       pass)))))
 
 (: (draw-rect! canvas color
                x0 y0 x1 y1)

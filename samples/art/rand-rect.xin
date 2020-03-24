@@ -1,0 +1,35 @@
+; xin art library demo
+; random rectangles!
+
+(import 'shape')
+
+(: *width* 300)
+(: *height* 485)
+(: *count* 200)
+
+; create canvas of 120x100 pixels
+(: canvas (create-canvas *width* *height*))
+
+(: (color-from-frac x)
+   (rgb (int (* x 255))
+        (int (* x 255))
+        (int (* x 255))))
+
+(loop *count*
+      (: (_ i)
+         (do
+           (: x0 (math::rand-int *height*))
+           (: y0 (math::rand-int *width*))
+           (: x1 (math::rand-int *height*))
+           (: y1 (math::rand-int *width*))
+
+           (draw-rect! canvas
+                       (color-from-frac (/ i (frac *count*)))
+                       (if (< x0 x1) x0 x1)
+                       (if (< y0 y1) y0 y1)
+                       (if (> x0 x1) x0 x1)
+                       (if (> y0 y1) y0 y1)))))
+
+; save to file
+(write-canvas canvas
+              'art.bmp')

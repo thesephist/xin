@@ -1,0 +1,28 @@
+; xin art library demo
+; random circles!
+
+(import 'shape')
+
+(: *width* 200)
+(: *height* 320)
+(: *count* 150)
+
+; create canvas of 120x100 pixels
+(: canvas (create-canvas *width* *height*))
+
+(: (color-from-frac x)
+   (rgb (int (* x 255))
+        (int (* x 255))
+        (int (* x 255))))
+
+(loop *count*
+      (: (_ i)
+         (draw-circle! canvas
+                       (color-from-frac (/ i (frac *count*)))
+                       (math::rand-int *height*)
+                       (math::rand-int *width*)
+                       (math::rand-int 17))))
+
+; save to file
+(write-canvas canvas
+              'art.bmp')
