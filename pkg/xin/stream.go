@@ -284,16 +284,22 @@ func streamSinkForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterE
 		go func() {
 			defer vm.waiter.Done()
 
+			success := trueValue
+
 			err := firstStream.callbacks.sink(second, node)
 			if err != nil {
-				fmt.Println(FormatError(err))
+				if _, ok := err.(RuntimeError); ok {
+					success = falseValue
+				} else {
+					fmt.Println(FormatError(err))
+				}
 				return
 			}
 
 			vm.Lock()
 			defer vm.Unlock()
 
-			_, err = unlazyEvalFormWithArgs(fr, thirdForm, []Value{}, node)
+			_, err = unlazyEvalFormWithArgs(fr, thirdForm, []Value{success}, node)
 			if err != nil {
 				fmt.Println(FormatError(err))
 			}

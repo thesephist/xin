@@ -248,7 +248,9 @@ func evalBindForm(fr *Frame, args []*astNode) (Value, InterpreterError) {
 
 func evalIfForm(fr *Frame, args []*astNode) (Value, InterpreterError) {
 	if len(args) != 3 {
-		return nil, InvalidIfError{nodes: args}
+		return nil, InvalidIfError{
+			nodes: args,
+		}
 	}
 
 	condNode := args[0]
@@ -266,7 +268,10 @@ func evalIfForm(fr *Frame, args []*astNode) (Value, InterpreterError) {
 	case falseValue:
 		return eval(fr, ifFalseNode)
 	default:
-		return nil, InvalidIfConditionError{cond: cond}
+		return nil, InvalidIfConditionError{
+			cond:     cond,
+			position: condNode.position,
+		}
 	}
 }
 

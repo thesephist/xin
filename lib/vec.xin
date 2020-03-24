@@ -210,7 +210,7 @@
 
 ; dot and cross products, other combinators
 (: (flat v)
-   (reduce v (: (f w acc) (+ acc w)) (vec)))
+   (reduce v (: (f w acc) (join! acc w)) (vec)))
 (: (dot v w)
    (sum (** v w)))
 (: (combine v w op)

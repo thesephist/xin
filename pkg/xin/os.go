@@ -92,7 +92,10 @@ func newRWStream(rw io.ReadWriteCloser) StreamValue {
 		if strVal, ok := v.(StringValue); ok {
 			_, err := rw.Write(strVal)
 			if err != nil {
-				return nil
+				return RuntimeError{
+					reason:   err.Error(),
+					position: node.position,
+				}
 			}
 			return nil
 		}
