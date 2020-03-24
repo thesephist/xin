@@ -1,0 +1,33 @@
+; xin art library demo
+
+(import 'shape')
+
+; create canvas of 120x100 pixels
+(: canvas (create-canvas 120 100))
+
+; draw some demo shapes
+(draw-point! canvas
+             (rgb 200 200 200)
+             80 90)
+(draw-line! canvas
+            (rgb 255 0 0)
+            0 0 99 99)
+(draw-line! canvas
+            (rgb 255 255 0)
+            0 0 34 119)
+(draw-line! canvas
+            (rgb 0 255 0)
+            0 0 99 24)
+(draw-rect! canvas
+            (rgb 0 0 255)
+            25 25 75 75)
+(draw-circle! canvas
+              (rgb 30 30 30)
+              40 60 18)
+(draw-circle! canvas
+              (rgb 100 150 180)
+              100 90 40)
+
+; save to file
+(write-canvas canvas
+              'art.bmp')

@@ -1,0 +1,147 @@
+; shape-drawing library
+
+; in this library
+; we use an x-y coordinate system as below
+;
+; +----------- Y ->
+; |
+; |
+; |   [ shapes! ]
+; |
+; X
+; |
+; v
+
+(import '../bmp' bmp)
+
+; COLOR functions
+
+(: (fff)
+   (vec 255 255 255))
+(: (rgb r g b)
+   (vec r g b))
+
+(: (red pixel)
+   (vec::get pixel 0))
+(: (green pixel)
+   (vec::get pixel 1))
+(: (blue pixel)
+   (vec::get pixel 2))
+
+; CANVAS functions
+
+(: (create-canvas width height)
+   (vec::map (vec::of height 0)
+             (: (f)
+                (vec::map (vec::of width 0) fff))))
+
+(: (canvas-width canvas)
+   (vec::size (vec::head canvas)))
+(: (canvas-height canvas)
+   (vec::size canvas))
+(: (canvas-serialize canvas)
+   (vec::flat (vec::reverse canvas)))
+
+(: (canvas-each canvas f)
+   (vec::each canvas
+              (: (g column x)
+                 (vec::each column (: (h pixel y)
+                                      (f pixel x y))))))
+
+; save canvas contents to file on disk at <path>
+(: (write-canvas canvas path)
+   (do
+     (: file (os::open path))
+     (: image (bmp::bmp (canvas-width canvas)
+                        (canvas-height canvas)
+                        (canvas-serialize canvas)))
+
+     (<- file image
+         (: (after success?)
+            (if success?
+              (log 'Saved file.')
+              (log 'Error saving file.'))))))
+
+; get a mutable pixel from canvas at (x, y)
+(: (get-pixel canvas x y)
+   (vec::get (vec::get canvas x) y))
+
+; check whether a particular (x, y) falls in canvas bounds
+(: (in-canvas? canvas x y)
+   (if (zero? (vec::get canvas x))
+     false
+     (not (zero? (vec::get (vec::get canvas x) y)))))
+
+; color a specific point on the canvas
+(: (color! pixel color)
+   (do
+     (vec::set! pixel 0 (red color))
+     (vec::set! pixel 1 (blue color))
+     (vec::set! pixel 2 (green color))))
+
+; utility needed for draw-circle!
+(: (distance x0 y0 x1 y1)
+   (sqrt (+ (^ (- x0 x1) 2)
+            (^ (- y0 y1) 2))))
+
+; SHAPE functions
+
+(: (draw-point! canvas color
+                x y)
+   (draw-circle! canvas color x y 1))
+
+(: (draw-line! canvas color
+               x0 y0 x1 y1)
+   (do
+     (: slope (if (= x0 x1)
+                ; if the slope is infinite, we approximate
+                ; with a slope 2x height of canvas
+                (* 2 (canvas-height canvas))
+                (/ (- y1 y0)
+                   (frac (- x1 x0)))))
+     (: (f x)
+        (math::floor (+ y0
+                        (* (- x x0)
+                           slope))))
+     (vec::each
+       (range x0 (inc x1) 1)
+       (: (_ x)
+          ; generate all y's for the x
+          ; this is a pretty convoluted algorithm
+          ; and you do not need to understand it
+          (vec::each 
+            (vec::filter
+              (vec::add!
+                (range (f x)
+                       (f (inc x))
+                       1)
+                (f x))
+              (: (_ possible-y)
+                 (& (<= y0 possible-y)
+                    (<= possible-y y1))))
+            (: (_ y)
+               (if (in-canvas? canvas x y)
+                 (color! (get-pixel canvas x y)
+                         color)
+                 pass)))))))
+
+(: (draw-circle! canvas color
+                 cx cy radius)
+   (canvas-each canvas
+                (: (f pixel x y)
+                   (if (= radius
+                          (math::round (distance x y cx cy)))
+                     (color! pixel color)
+                     pass))))
+
+(: (draw-rect! canvas color
+               x0 y0 x1 y1)
+   (do
+     (draw-line! canvas color
+                 x0 y0 x0 y1)
+     (draw-line! canvas color
+                 x0 y0 x1 y0)
+     (draw-line! canvas color
+                 x0 y1 x1 y1)
+     (draw-line! canvas color
+                 x1 y0 x1 y1)))

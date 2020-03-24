@@ -42,6 +42,7 @@ You can find more example and real-world Xin code in the sample programs in the 
 - [clone of UNIX utility xxd](samples/xxd.xin)
 - [counting word frequently in a file](samples/freq.xin)
 - [basic TCP/IP chat server](samples/chat.xin)
+- [basic shape drawing library outputting to .bmp files](samples/art/shape.xin)
 
 ## Goals
 
