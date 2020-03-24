@@ -94,6 +94,9 @@
     (case 'vec addition'
       (eq-vec (+ (vec 1 2 3) (vec 'hi' 'hello' 'bye'))
               (vec 1 2 3 'hi' 'hello' 'bye')))
+    (case 'vec::slice weird ranges'
+      (eq-vec (vec::slice (nat 10) 5 2)
+              (vec)))
     (case 'take from vec'
       (eq-vec (take row 3)
               (vec 3 14 15)))
@@ -217,6 +220,8 @@
       (eq (str::slice hello -5 -1) ''))
     (case 'str::slice OOB flush right'
       (eq (str::slice hello 20 30) ''))
+    (case 'str::slice backwards bounds'
+      (eq (str::slice hello 3 2) ''))
     (case 'str::get'
       (eq (str::get hello 5) ','))
     (case 'str::get OOB left'

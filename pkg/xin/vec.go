@@ -193,6 +193,10 @@ func vecSliceForm(fr *Frame, args []Value, node *astNode) (Value, InterpreterErr
 			thirdInt = IntValue(max)
 		}
 
+		if thirdInt < secondInt {
+			thirdInt = secondInt
+		}
+
 		if inRange(secondInt) && inRange(thirdInt) {
 			base := make([]Value, 0, thirdInt-secondInt)
 			items := append(base, firstVec.underlying.items[secondInt:thirdInt]...)
