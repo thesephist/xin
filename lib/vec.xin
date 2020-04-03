@@ -176,7 +176,7 @@
 
 ; vec of size n with elements of x
 (: (of n x)
-   (map (seq n) (: (f) x)))
+   (* (vec x) n))
 
 ; accumulator functions
 (: (max v)
