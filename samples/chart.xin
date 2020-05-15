@@ -1,0 +1,25 @@
+; some simple utilities for graphing stuff in the terminal
+
+(: (chart-with-symbol symbol f xs)
+   (do
+     (: label-width (vec::max (vec::map xs
+                                        (: (h x)
+                                           (str::size (str x))))))
+     (vec::each xs
+                (: (g x)
+                   (log
+                     (+ (str::pad-start (str x) label-width ' ')
+                        (+ ' '
+                           (* symbol (f x)))))))))
+
+(: (chart f xs)
+   (chart-with-symbol '-' f xs))
+
+; examples
+(log 'Squares of natural numbers')
+(chart (: (f x) (/ (* x x) 2))
+       (nat 12))
+(log 'Number of primes up to a cap')
+(chart (: (count-prime cap)
+          (/ (vec::size (vec::filter (nat cap) math::prime?)) 3))
+       (range 100 2000 100))

@@ -17,6 +17,7 @@ test: gen
 	./xin ./samples/prime.xin
 	./xin ./samples/twin-primes.xin
 	./xin ./samples/collatz.xin
+	./xin ./samples/chart.xin
 	./xin ./samples/map.xin
 	./xin ./samples/list.xin
 	./xin ./samples/async.xin
